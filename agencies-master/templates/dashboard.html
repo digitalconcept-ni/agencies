@@ -1,0 +1,282 @@
+{% extends 'list.html' %}
+{#{% extends 'layout.html' %}#}
+{% load static %}
+{% block head_list %}
+    <script src="{% static 'lib/highcharts-9.1.1/highcharts.js' %}"></script>
+    <script src="{% static 'lib/highcharts-9.1.1/modules/exporting.js' %}"></script>
+    <script src="{% static 'lib/highcharts-9.1.1/modules/export-data.js' %}"></script>
+    <script src="{% static 'lib/highcharts-9.1.1/modules/accessibility.js' %}"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-3 ">
+                <div class="small-box bg-olive shadow-lg">
+                    <div class="inner">
+                        <h3 id="sales-today">0</h3>
+
+                        <p>Ventas Hoy</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+            {# //END FIRST #}
+
+            <div class="col-md-3">
+                <div class="small-box bg-gradient-success shadow-lg">
+                    <div class="inner">
+                        <h3 id="sales">0</h3>
+
+                        <p>Total Ventas</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-cash-register"></i>
+                    </div>
+                </div>
+            </div>
+            {# //END SECOND #}
+
+            <div class="col-md-3">
+                <div class="small-box bg-info shadow-lg">
+                    <div class="inner">
+                        <h3 id="products">0</h3>
+
+                        <p>Productos</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-list-alt"></i>
+                    </div>
+                </div>
+            </div>
+            {# //END THIRD #}
+
+            <div class="col-md-3">
+                <div class="small-box bg-lightblue shadow-lg">
+                    <div class="inner">
+                        <h3 id="clients">0</h3>
+
+                        <p>Clientes</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-users"></i>
+                    </div>
+                </div>
+            </div>
+            {# //END FOUR #}
+        </div>
+        <div class="row">
+            <div class="col-md-3 ">
+                <div class="small-box bg-danger shadow-lg">
+                    <div class="inner">
+                        <h3 id="lower-inventory">0</h3>
+
+                        <p>Productos con poco inventario</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-barcode"></i>
+                    </div>
+                    <a id="btn-lower-inventory" class="small-box-footer">
+                        Info <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#    // END CARDS INFORMTION#}
+
+    {#    /////////////////////#}
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="container"></div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="container-pie"></div>
+            </div>
+        </div>
+        <br>
+    </div>
+
+
+    {#    PART OF THE CODE FOR THE MODAL INFO FOR THE EPORDUCTS  WITH THE LOWER STOCK#}
+    <div class="modal fade" id="myModalLowerInvetory" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <b><i class="fas fa-search"></i> Detalle de productos</b>
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-sm" id="data">
+                        <thead>
+                        <tr>
+                            <th scope="col" style="width: 5%;">Nro</th>
+                            <th scope="col" style="width: 20%;">Nombre</th>
+                            <th scope="col" style="width: 10%;">Categoria</th>
+                            <th scope="col" style="width: 10%;">Imagen</th>
+                            <th scope="col" style="width: 15%;">¿Es inventariado?</th>
+                            <th scope="col" style="width: 10%;">Stock</th>
+                            <th scope="col" style="width: 15%;">Precio</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <a id="btn-sale-products" href="{{ create_url }}" target="_blank" class="btn btn-success">Comprar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="application/javascript">
+        var year = new Date;
+        let mesActual = new Intl.DateTimeFormat('es-ES', {month: 'long'}).format(year);
+
+        var graphcolumn = Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: `Reporte de ventas del año ${year.getFullYear()}`
+            },
+            subtitle: {
+                text: 'Reporte de columnas'
+            },
+            xAxis: {
+                categories: [
+                    'Enero',
+                    'Febrero',
+                    'Marzo',
+                    'Abril',
+                    'Mayo',
+                    'Junio',
+                    'Julio',
+                    'Agosto',
+                    'Septiembre',
+                    'Octubre',
+                    'Noviembre',
+                    'Diciembre'
+                ],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Valores C$'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} $</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+        });
+        var graphpie = Highcharts.chart('container-pie', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: `Porcentaje de venta de productos por el mes de ${mesActual} del año ${year.getFullYear()}`
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                }
+            },
+        });
+        var graph = {
+            getSalesYearMonth: function () {
+                $.ajax({
+                    url: pathname,
+                    data: {
+                        'action': 'get_graph_sales_year_month'
+                    },
+                    type: 'POST',
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    success: function (request) {
+                        if (!request.hasOwnProperty('error')) {
+                            graphcolumn.addSeries(request);
+                            return false;
+                        }
+                        message_error(request.error);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        message_error(errorThrown + ' ' + textStatus);
+                    }
+                });
+            },
+            getSalesProductsYearMonth: function () {
+                $.ajax({
+                    url: pathname,
+                    data: {
+                        'action': 'get_graph_sales_products_year_month'
+                    },
+                    type: 'POST',
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    success: function (request) {
+                        if (!request.hasOwnProperty('error')) {
+                            graphpie.addSeries(request);
+                            return false;
+                        }
+                        message_error(request.error);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        message_error(errorThrown + ' ' + textStatus);
+                    }
+                });
+            }
+        };
+
+        $(function () {
+            graph.getSalesYearMonth();
+            graph.getSalesProductsYearMonth();
+        });
+    </script>
+{% endblock %}
