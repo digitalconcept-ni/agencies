@@ -180,7 +180,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     products = products.filter(name__icontains=term)
                 for i in products.exclude(id__in=ids_exclude)[0:10]:
                     item = i.toJSON()
-                    item['value'] = i.__str__()
+                    item['value'] = i.__str__
                     data.append(item)
             elif action == 'search_products_select2':
                 data = []
@@ -190,7 +190,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                 products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
                 for i in products.exclude(id__in=ids_exclude)[0:10]:
                     item = i.toJSON()
-                    item['text'] = i.__str__()
+                    item['text'] = i.__str__
                     data.append(item)
             elif action == 'edit':
                 with transaction.atomic():

@@ -86,7 +86,7 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                     products = products.filter(name__icontains=term)
                 for i in products.exclude(id__in=ids_exclude)[0:10]:
                     item = i.toJSON()
-                    item['value'] = i.__str__()
+                    item['value'] = i.__str__
                     data.append(item)
             elif action == 'search_products_select2':
                 data = []
@@ -104,6 +104,7 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                     products = json.loads(request.POST['products'])
                     shopping = Shopping()
                     shopping.supplier_id = int(request.POST['supplier'])
+                    shopping.user_id = request.POST['user_id']
                     shopping.invoice_number = request.POST['invoice_number']
                     shopping.date_joined = request.POST['date_joined']
                     shopping.iva = float(request.POST['iva'])
@@ -115,11 +116,15 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                         detail.shopping_id = shopping.id
                         detail.product_id = int(i['id'])
                         detail.cant = int(i['cant'])
-                        detail.price = float(i['pvp'])
+                        detail.price = float(i['pvpc'])
                         detail.subtotal = detail.cant * detail.price
                         detail.save()
+                        if not detail.product.is_inventoried:
+                            detail.product.is_inventoried = True
                         if detail.product.is_inventoried:
                             detail.product.stock += detail.cant
+                            detail.product.cost = float(i['pvpc'])
+                            detail.product.pvp = float(i['pvp'])
                             detail.product.save()
                         cantItemsShopping += i['cant']
 
@@ -127,7 +132,7 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                     shopping.save()
                     shopping.calculate_invoice()
                     data = {'id': shopping.id}
-            elif     action == 'search_supplier':
+            elif action == 'search_supplier':
                 data = []
                 term = request.POST['term']
                 clients = Supplier.objects.filter(
@@ -193,7 +198,7 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
                     products = products.filter(name__icontains=term)
                 for i in products.exclude(id__in=ids_exclude)[0:10]:
                     item = i.toJSON()
-                    item['value'] = i.__str__()
+                    item['value'] = i.__str__
                     data.append(item)
             elif action == 'search_products_select2':
                 data = []
@@ -204,42 +209,44 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
                 products = Product.objects.filter(name__icontains=term)
                 for i in products:
                     item = i.toJSON()
-                    item['text'] = i.__str__()
+                    item['text'] = i.__str__
                     data.append(item)
             elif action == 'edit':
                 with transaction.atomic():
-                    with transaction.atomic():
-                        products = json.loads(request.POST['products'])
-                        products_review = json.loads(request.POST['products_review'])
+                    products = json.loads(request.POST['products'])
+                    products_review = json.loads(request.POST['products_review'])
 
-                        shopping = self.get_object()
-                        shopping.supplier_id = int(request.POST['supplier'])
-                        shopping.invoice_number = request.POST['invoice_number']
-                        shopping.date_joined = request.POST['date_joined']
-                        shopping.iva = float(request.POST['iva'])
-                        shopping.save()
+                    shopping = Shopping()
+                    shopping.supplier_id = int(request.POST['supplier'])
+                    shopping.user_id = request.POST['user_id']
+                    shopping.invoice_number = request.POST['invoice_number']
+                    shopping.date_joined = request.POST['date_joined']
+                    shopping.iva = float(request.POST['iva'])
+                    shopping.save()
 
-                        shopping.shoppingdetail_set.all().delete()
-                        cantItemsShopping = 0
-                        for i in products:
-                            detail = ShoppingDetail()
-                            detail.shopping_id = shopping.id
-                            detail.product_id = int(i['id'])
-                            detail.cant = int(i['cant'])
-                            detail.price = float(i['pvp'])
-                            detail.subtotal = detail.cant * detail.price
-                            detail.save()
-                            if detail.product.is_inventoried:
-                                for d in products_review:
-                                    if int(detail.product_id) == int(i['id']):
-                                        detail.product.stock = (detail.product.stock - d['cant']) + detail.cant
-                                        detail.product.save()
-                            cantItemsShopping += detail.cant
+                    shopping.shoppingdetail_set.all().delete()
+                    cantItemsShopping = 0
+                    for i in products:
+                        detail = ShoppingDetail()
+                        detail.shopping_id = shopping.id
+                        detail.product_id = int(i['id'])
+                        detail.cant = int(i['cant'])
+                        detail.price = float(i['pvp'])
+                        detail.subtotal = detail.cant * detail.price
+                        detail.save()
+                        if detail.product.is_inventoried:
+                            for d in products_review:
+                                if int(detail.product_id) == int(i['id']):
+                                    detail.product.stock = (detail.product.stock - d['cant']) + detail.cant
+                                    detail.product.cost = float(i['pvpc'])
+                                    detail.product.pvp = float(i['pvp'])
+                                    detail.product.save()
+                        cantItemsShopping += detail.cant
 
-                        shopping.cant = + int(cantItemsShopping)
-                        shopping.save()
-                        shopping.calculate_invoice()
-                        data = {'id': shopping.id}
+                    shopping.cant = + int(cantItemsShopping)
+                    shopping.save()
+                    shopping.calculate_invoice()
+                    data = {'id': shopping.id}
             elif action == 'search_supplier':
                 data = []
                 term = request.POST['term']

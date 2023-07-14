@@ -23,12 +23,13 @@ var product = {
                 {"data": "image"},
                 {"data": "is_inventoried"},
                 {"data": "stock"},
+                {"data": "cost"},
                 {"data": "pvp"},
                 {"data": "id"},
             ],
             columnDefs: [
                 {
-                    targets: [-5],
+                    targets: [3],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
@@ -36,7 +37,7 @@ var product = {
                     }
                 },
                 {
-                    targets: [-4],
+                    targets: [4],
                     class: 'text-center',
                     render: function (data, type, row) {
                         if (row.is_inventoried) {
@@ -46,7 +47,7 @@ var product = {
                     }
                 },
                 {
-                    targets: [-3],
+                    targets: [5],
                     class: 'text-center',
                     render: function (data, type, row) {
                         if (!row.is_inventoried) {

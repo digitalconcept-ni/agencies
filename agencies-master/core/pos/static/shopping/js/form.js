@@ -16,10 +16,10 @@ var sale = {
     calculateInvoice: function () {
         var subtotal = 0.00;
         var iva = $('input[name="iva"]').val();
-        this.details.products.forEach(function (value, index, array) {
+        this.details.products.forEach(function (value, index) {
             value.index = index;
             value.cant = parseInt(value.cant);
-            value.subtotal = value.cant * parseFloat(value.pvp);
+            value.subtotal = value.cant * value.cost;
             subtotal += value.subtotal;
         });
 
@@ -46,13 +46,14 @@ var sale = {
                 {"data": "id"},
                 {"data": "full_name"},
                 {"data": "stock"},
+                {"data": "cost"},
                 {"data": "pvp"},
                 {"data": "cant"},
                 {"data": "subtotal"},
             ],
             columnDefs: [
                 {
-                    targets: [-4],
+                    targets: [2],
                     class: 'text-center',
                     render: function (data, type, row) {
                         if (!row.is_inventoried) {
@@ -70,15 +71,25 @@ var sale = {
                     }
                 },
                 {
-                    targets: [-3],
+                    targets: [3],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
+                        // return '$' + parseFloat(data).toFixed(2);
+                        return '<input type="text" name="cost" class="form-control form-control-sm input-sm" autocomplete="off" value="' + parseFloat(data).toFixed(2) + '">';
+
                     }
                 },
                 {
-                    targets: [-2],
+                    targets: [4],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<input type="text" name="pvp" class="form-control form-control-sm input-sm" autocomplete="off" value="' + parseFloat(data).toFixed(2) + '">';
+                    }
+                },
+                {
+                    targets: [5],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
@@ -86,11 +97,12 @@ var sale = {
                     }
                 },
                 {
-                    targets: [-1],
+                    targets: [6],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return '$' + parseFloat(data).toFixed(2);
+                        // return '<span type="text" id="subtotal">0.00</span>';
                     }
                 },
             ],
@@ -98,8 +110,24 @@ var sale = {
 
                 $(row).find('input[name="cant"]').TouchSpin({
                     min: 1,
-                    max: data.is_inventoried ? row.stock : 1000000,
+                    max: 1000000,
                     step: 1
+                });
+                $(row).find('input[name="cost"]').TouchSpin({
+                    min: 0.01,
+                    max: 1000000,
+                    step: 0.01,
+                    decimals: 2,
+                    boostat: 5,
+                    maxboostedstep: 10,
+                });
+                $(row).find('input[name="pvp"]').TouchSpin({
+                    min: 0.01,
+                    max: 1000000,
+                    step: 0.01,
+                    decimals: 2,
+                    boostat: 5,
+                    maxboostedstep: 10,
                 });
 
             },
@@ -257,7 +285,7 @@ $(function () {
                 '<p style="margin-bottom: 0;">' +
                 '<b>Nombre:</b> ' + repo.full_name + '<br>' +
                 '<b>Stock:</b> ' + stock + '<br>' +
-                '<b>PVP:</b> <span class="badge badge-warning">$' + repo.pvp + '</span>' +
+                // '<b>PVPc:</b> <span class="badge badge-warning">$' + repo.pvpc + '</span>' +
                 '</p>' +
                 '</div>' +
                 '</div>' +
@@ -288,13 +316,29 @@ $(function () {
 
                 });
         })
+        .on('change', 'input[name="pvp"]', function () {
+            console.clear();
+            var newPvp = $(this).val();
+            var tr = tblProducts.cell($(this).closest('td, li')).index();
+            sale.details.products[tr.row].pvp = newPvp;
+            // sale.calculateInvoice();
+            // $('td:last', tblProducts.row(tr.row).node()).html('C$' + sale.details.products[tr.row].subtotal.toFixed(2));
+        })
+        .on('change', 'input[name="cost"]', function () {
+            console.clear();
+            var cost = $(this).val();
+            var tr = tblProducts.cell($(this).closest('td, li')).index();
+            sale.details.products[tr.row].cost = cost;
+            sale.calculateInvoice();
+            $('td:last', tblProducts.row(tr.row).node()).html('C$' + sale.details.products[tr.row].subtotal.toFixed(2));
+        })
         .on('change', 'input[name="cant"]', function () {
             console.clear();
             var cant = parseInt($(this).val());
             var tr = tblProducts.cell($(this).closest('td, li')).index();
             sale.details.products[tr.row].cant = cant;
             sale.calculateInvoice();
-            $('td:last', tblProducts.row(tr.row).node()).html('$' + sale.details.products[tr.row].subtotal.toFixed(2));
+            $('td:last', tblProducts.row(tr.row).node()).html('C$' + sale.details.products[tr.row].subtotal.toFixed(2));
         });
 
     $('.btnRemoveAll').on('click', function () {
@@ -334,7 +378,7 @@ $(function () {
                 {"data": "full_name"},
                 {"data": "image"},
                 {"data": "stock"},
-                {"data": "pvp"},
+                {"data": "cost"},
                 {"data": "id"},
             ],
             columnDefs: [
@@ -405,6 +449,7 @@ $(function () {
     }).on('change', function () {
         sale.calculateInvoice();
     }).val(0.15);
+
 
     $('#frmSale').on('submit', function (e) {
         e.preventDefault();

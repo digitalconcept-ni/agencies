@@ -195,14 +195,19 @@ class ShoppingForm(ModelForm):
                 'class': 'custom-select select2',
                 # 'style': 'width: 100%'
             }),
-            'date_joined': forms.DateTimeInput(format='%Y-%m-%d %H:%M:%S',attrs={
-                'value': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'date_joined': forms.DateTimeInput(format='%Y-%m-%d',attrs={
+                # 'value': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'value': datetime.now().strftime('%Y-%m-%d'),
                 'class': 'form-control',
                 'id': 'date_joined',
                 'readonly': True,
             }),
             'invoice_number': forms.TextInput(attrs={
                 'class': 'form-control',
+            }),
+            'user': forms.TextInput(attrs={
+                'class': 'form-control',
+                'readonly': True
             }),
             'iva': forms.TextInput(attrs={
                 'class': 'form-control',

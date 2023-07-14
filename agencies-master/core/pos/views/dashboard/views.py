@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum, FloatField, Q
+from django.db.models import Sum, FloatField, Q, F, Func
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -22,7 +22,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         data = {}
         try:
             action = request.POST['action']
-            if action == 'search_cards_data':
+            if action == 'search_investment':
+                investment = Product.objects.all().aggregate(
+                    result=Coalesce(Sum(F('stock') * F('cost')), 0.00, output_field=FloatField())).get('result')
+                pvp = Product.objects.all().aggregate(
+                    result=Coalesce(Sum(F('stock') * F('pvp')), 0.00, output_field=FloatField())).get('result')
+                revenue = float(pvp) - float(investment)
+                print(investment)
+                print(revenue)
+                data = [[1,f'{investment:.2f}', f'{revenue:.2f}']]
+            elif action == 'search_cards_data':
                 now = datetime.now()
                 query = Sale.objects.filter(date_joined__exact=now).only('total')
                 queryProducts = Product.objects.filter(stock__lte=5).count()
@@ -30,6 +39,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 totalClientsQuery = Client.objects.count()
                 countSalesNow = 0
                 countSalesNowMoney = 0
+
                 for i in query:
                     countSalesNowMoney += i.total
                     countSalesNow += 1
@@ -40,10 +50,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'clients': totalClientsQuery,
                     'lower-inventory': queryProducts,
                 }
-            if action == 'search_lower_inventory':
+            elif action == 'search_lower_inventory':
+                print('entro')
                 queryProducts = Product.objects.filter(stock__lte=5)
-                product = [p.toJSON() for p in queryProducts]
-                data = product
+                data = []
+                for p in queryProducts:
+                    data.append([p.id, p.name, p.category.name, p.stock,
+                                 f'{p.cost:.2f}'])
+                print(data)
             elif action == 'get_graph_sales_year_month':
                 points = []
                 year = datetime.now().year
@@ -72,8 +86,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'colorByPoint': True,
                     'data': points
                 }
-            else:
-                data['error'] = 'Ha ocurrido un error'
         except Exception as e:
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
@@ -82,6 +94,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['panel'] = 'Panel de administrador'
         context['create_url'] = reverse_lazy('shopping_create')
+        context['sales_url'] = reverse_lazy('sale_list')
+        context['clients_url'] = reverse_lazy('client_list')
         return context
 
 

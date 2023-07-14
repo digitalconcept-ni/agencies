@@ -29,6 +29,7 @@ var sale = {
             },
             columns: [
                 {"data": "number"},
+                {"data": "username"},
                 {"data": "supplier"},
                 {"data": "invoice_number"},
                 {"data": "cant"},
@@ -49,7 +50,7 @@ var sale = {
                     }
                 },
                 {
-                    targets: [-2, -3, -4, -5],
+                    targets: [6, 7, 8, 9],
                     class: 'text-center',
                     render: function (data, type, row) {
                         return '$' + parseFloat(data).toFixed(2);

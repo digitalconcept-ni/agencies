@@ -7,6 +7,7 @@ from django.forms import model_to_dict
 
 from config import settings
 from core.pos.choices import genders
+from core.user.models import User
 
 
 class Category(models.Model):
@@ -33,10 +34,20 @@ class Product(models.Model):
     image = models.ImageField(upload_to='product/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
     is_inventoried = models.BooleanField(default=True, verbose_name='¿Es inventariado?')
     stock = models.IntegerField(default=0, verbose_name='Stock')
+    cost = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de compra')
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta')
 
     def __str__(self):
         return f'{self.name} ({self.category.name})'
+
+    def get_total_earnings(self):
+        # return sum([payment.amount for payment in self.objects.all()])
+        s = self.objects.all().aggregate(
+        result=Sum(F('cost'), 0.00, output_field=FloatField())).get('result')
+        print('models')
+        print(s)
+        return s
+
 
     def toJSON(self):
         item = model_to_dict(self)
@@ -44,6 +55,10 @@ class Product(models.Model):
         item['category'] = self.category.toJSON()
         item['image'] = self.get_image()
         item['pvp'] = f'{self.pvp:.2f}'
+        if item['cost']:
+            item['cost'] = f'{self.cost:.2f}'
+        else:
+            item['pvpc'] = f'{100.20:.2f}'
         return item
 
     def get_image(self):
@@ -82,6 +97,7 @@ class Supplier(models.Model):
 
 class Shopping(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, verbose_name='Proveedor')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario')
     cant = models.IntegerField(default=0)
     invoice_number = models.CharField(max_length=10, default='F000000000')
     register = models.BooleanField(default=True)
@@ -97,6 +113,7 @@ class Shopping(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['number'] = self.get_number()
+        item['username'] = self.user.username
         item['supplier'] = self.supplier.get_full_name()
         item['subtotal'] = f'{self.subtotal:.2f}'
         item['iva'] = f'{self.iva:.2f}'

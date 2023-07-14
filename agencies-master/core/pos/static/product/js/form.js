@@ -22,17 +22,31 @@ $(function () {
         .on('keypress', function (e) {
             return validate_decimals($(this), e);
         });
+    $('input[name="cost"]')
+        .TouchSpin({
+            min: 0.01,
+            max: 1000000,
+            step: 0.01,
+            decimals: 2,
+            boostat: 5,
+            verticalbuttons: true,
+            maxboostedstep: 10,
+            prefix: 'C$'
+        })
+        .on('keypress', function (e) {
+            return validate_decimals($(this), e);
+        });
 
     let action = $('input[name="action"]').val();
 
-    if (action === 'add'){
+    if (action === 'add') {
         $('input[name="stock"]')
-        .TouchSpin({
-            min: 0,
-            max: 1000000,
-            step: 1,
-            verticalbuttons: true,
-        })
+            .TouchSpin({
+                min: 0,
+                max: 1000000,
+                step: 1,
+                verticalbuttons: true,
+            })
             .on('keypress', function (e) {
                 return validate_form_text('numbers', e, null);
             });

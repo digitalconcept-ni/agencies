@@ -1,78 +1,4 @@
 var info = {
-    list: function (all) {
-        var parameters = {
-            'action': 'search_lower_inventory',
-        };
-
-        tblInfo = $('#data').DataTable({
-            responsive: true,
-            autoWidth: false,
-            destroy: true,
-            deferRender: true,
-            ajax: {
-                url: pathname,
-                type: 'POST',
-                data: parameters,
-                dataSrc: "",
-                headers: {
-                    'X-CSRFToken': csrftoken
-                }
-            },
-            columns: [
-                {"data": "id"},
-                {"data": "name"},
-                {"data": "category.name"},
-                {"data": "image"},
-                {"data": "is_inventoried"},
-                {"data": "stock"},
-                {"data": "pvp"},
-            ],
-            columnDefs: [
-                {
-                    targets: [3],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<img alt="" src="' + data + '" class="img-fluid d-block mx-auto" style="width: 20px; height: 20px;">';
-                    }
-                },
-                {
-                    targets: [4],
-                    class: 'text-center',
-                    render: function (data, type, row) {
-                        if (row.is_inventoried) {
-                            return '<span class="badge badge-success">Si</span>';
-                        }
-                        return '<span class="badge badge-warning">No</span>';
-                    }
-                },
-                {
-                    targets: [5],
-                    class: 'text-center',
-                    render: function (data, type, row) {
-                        if (!row.is_inventoried) {
-                            return '<span class="badge badge-secondary">Sin stock</span>';
-                        }
-                        if (row.stock > 6) {
-                            return '<span class="badge badge-success">' + data + '</span>';
-                        }
-                        return '<span class="badge badge-danger">' + data + '</span>';
-                    }
-                },
-                {
-                    targets: [6],
-                    class: 'text-center',
-                    render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
-                    }
-                },
-            ],
-            initComplete: function (settings, json) {
-
-            }
-        });
-        $('#myModalLowerInvetory').modal('show');
-    },
     callInfo: function () {
         $.ajax({
             url: window.location.pathname,
@@ -96,13 +22,69 @@ $(function () {
         info.callInfo()
     }, 15000)
 
-    $('#btn-lower-inventory').on('click', function () {
-        info.list()
+
+    $('#lower').on('click', function () {
+
+        let config = [
+            {
+                targets: [3],
+                class: 'text-center',
+                render: function (data, type, row) {
+                    if (row.stock > 6) {
+                        return '<span class="badge badge-success">' + data + '</span>';
+                    } else if (row.stock === 0) {
+                        return '<span class="badge badge-secondary">Sin stock</span>';
+                    } else {
+                        return '<span class="badge badge-danger">' + data + '</span>';
+                    }
+                }
+            },
+            {
+                targets: [4],
+                class: 'text-center',
+                render: function (data, type, row) {
+                    return '$' + parseFloat(data).toFixed(2);
+                }
+            },
+        ]
+        let data = {
+            'action': 'search_lower_inventory',
+            'inserInto': 'rowModal',
+            'th': ['id', 'Nombre', 'Categoria', 'Stock', 'Costo'],
+            'table': 'tableModal',
+            'config': config,
+            'modal': true,
+        }
+        drawTables(data);
     })
 
     $('#btn-sale-products').on('click', function () {
         $('#myModalLowerInvetory').modal('hide');
 
     })
+
+    // Funcion para poder ver los costos y ganancias del inventario
+    $('#pro').on('click', function () {
+
+        let config = [
+            {
+                targets: [1, 2],
+                class: 'text-center',
+                render: function (data, type, row) {
+                    return 'C$ ' + parseFloat(data).toFixed(2);
+                }
+            },
+        ]
+        let data = {
+            'action': 'search_investment',
+            'inserInto': 'rowModal',
+            'th': ['Nro', 'Invercion', 'Ganancia'],
+            'table': 'tableModal',
+            'config': config,
+            'modal': true,
+        }
+        drawTables(data);
+    })
+
 
 })
