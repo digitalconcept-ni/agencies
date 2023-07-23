@@ -429,7 +429,7 @@ $(function () {
         parameters.append('products', JSON.stringify(sale.details.products));
         submit_with_ajax(pathname, 'Notificación',
             '¿Estas seguro de realizar la siguiente acción?', parameters, function (response) {
-                alert_action('Notificación', '¿Desea imprimir la boleta de venta?', function () {
+                alert_action('Notificación', '¿Desea imprimir la factura de venta?', function () {
                     window.open('/pos/sale/invoice/pdf/' + response.id + '/', '_blank');
                     location.href = success_url;
                 }, function () {

@@ -23,14 +23,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         try:
             action = request.POST['action']
             if action == 'search_investment':
-                investment = Product.objects.all().aggregate(
-                    result=Coalesce(Sum(F('stock') * F('cost')), 0.00, output_field=FloatField())).get('result')
-                pvp = Product.objects.all().aggregate(
-                    result=Coalesce(Sum(F('stock') * F('pvp')), 0.00, output_field=FloatField())).get('result')
-                revenue = float(pvp) - float(investment)
-                print(investment)
-                print(revenue)
-                data = [[1,f'{investment:.2f}', f'{revenue:.2f}']]
+                if request.user.is_superuser:
+                    investment = Product.objects.all().aggregate(
+                        result=Coalesce(Sum(F('stock') * F('cost')), 0.00, output_field=FloatField())).get('result')
+                    pvp = Product.objects.all().aggregate(
+                        result=Coalesce(Sum(F('stock') * F('pvp')), 0.00, output_field=FloatField())).get('result')
+                    revenue = float(pvp) - float(investment)
+                    data = [[1, f'{investment:.2f}', f'{revenue:.2f}']]
+                    print(data)
+                else:
+                    data['error'] = 'No tiene acceso a esta informacion'
             elif action == 'search_cards_data':
                 now = datetime.now()
                 query = Sale.objects.filter(date_joined__exact=now).only('total')
@@ -51,13 +53,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'lower-inventory': queryProducts,
                 }
             elif action == 'search_lower_inventory':
-                print('entro')
                 queryProducts = Product.objects.filter(stock__lte=5)
                 data = []
                 for p in queryProducts:
                     data.append([p.id, p.name, p.category.name, p.stock,
                                  f'{p.cost:.2f}'])
-                print(data)
             elif action == 'get_graph_sales_year_month':
                 points = []
                 year = datetime.now().year

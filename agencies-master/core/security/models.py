@@ -13,6 +13,8 @@ class AccessUsers(models.Model):
     date_joined = models.DateField(default=datetime.now)
     time_joined = models.TimeField(default=datetime.now)
     ip_address = models.CharField(max_length=50)
+    coords = models.CharField(max_length=50)
+    accuracy = models.CharField(max_length=50)
     type = models.CharField(max_length=15, choices=LOGIN_TYPE, default=LOGIN_TYPE[0][0])
 
     def __str__(self):
@@ -22,6 +24,7 @@ class AccessUsers(models.Model):
         item = model_to_dict(self)
         item['type'] = {'id': self.type, 'name': self.get_type_display()}
         item['user'] = self.user.toJSON()
+        item['accuracy'] = f'{self.accuracy} Metros'
         item['date_joined'] = self.date_joined.strftime('%Y-%m-%d')
         item['time_joined'] = self.time_joined.strftime('%H:%M:%S')
         return item

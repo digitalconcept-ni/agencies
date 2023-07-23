@@ -4,11 +4,12 @@ from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
+from core.pos.mixins import ValidatePermissionRequiredMixin
 from core.pos.models import Sale
 from core.reports.forms import ReportForm
 
 
-class ReportSaleView(FormView):
+class ReportSaleView(ValidatePermissionRequiredMixin, FormView):
     template_name = 'sale/report.html'
     form_class = ReportForm
 

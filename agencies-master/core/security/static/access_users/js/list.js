@@ -32,6 +32,8 @@ var access_users = {
                 {"data": "date_joined"},
                 {"data": "time_joined"},
                 {"data": "ip_address"},
+                {"data": "coords"},
+                {"data": "accuracy"},
                 {"data": "type.id"},
                 {"data": "id"},
             ],

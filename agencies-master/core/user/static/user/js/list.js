@@ -22,16 +22,29 @@ var user = {
                 {"data": "username"},
                 {"data": "date_joined"},
                 {"data": "image"},
+                {"data": "is_active"},
                 {"data": "groups"},
                 {"data": "id"},
             ],
             columnDefs: [
                 {
-                    targets: [-3],
+                    targets: [4],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return '<img alt="" src="' + row.image + '" class="img-fluid mx-auto d-block" style="width: 20px; height: 20px;">';
+                    }
+                },
+                {
+                    targets: [5],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data === true) {
+                            return '<span class="badge badge-success badge-pill">' + 'Activo' + '</span>';
+                        } else {
+                            return '<span class="badge badge-danger badge-pill">' + 'Bloqueado' + '</span>';
+                        }
                     }
                 },
                 {

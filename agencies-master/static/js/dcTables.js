@@ -58,7 +58,11 @@ const drawTables = async (data) => {
     var header = await tableColumn(data.th, data.table, data.inserInto);
 
     if (header === true) {
-        tableData = $(`#${data.table}`).DataTable({
+        $.fn.dataTable.ext.errMode = 'none';
+
+        tableData = $(`#${data.table}`).on('error.dt', function (e, settings, techNote, message) {
+            message_error(message.split('-')[1]);
+        }).DataTable({
             // dom: 'Btip',
             // buttons: {
             //     dom: {
@@ -93,10 +97,12 @@ const drawTables = async (data) => {
             },
             columnDefs: data.config,
             initComplete: function (settings, json) {
+                if (!json.hasOwnProperty('error')) {
+                    if (data.modal === true) {
+                        $('#modalInfo').modal('show');
+                    }
+                }
             }
         })
-        if (data.modal === true) {
-            $('#modalInfo').modal('show');
-        }
     }
 }

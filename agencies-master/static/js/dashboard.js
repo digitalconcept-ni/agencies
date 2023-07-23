@@ -78,7 +78,7 @@ $(function () {
         let data = {
             'action': 'search_investment',
             'inserInto': 'rowModal',
-            'th': ['Nro', 'Invercion', 'Ganancia'],
+            'th': ['Nro', 'Inversión', 'Ganancia'],
             'table': 'tableModal',
             'config': config,
             'modal': true,
