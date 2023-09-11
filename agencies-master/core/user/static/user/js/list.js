@@ -28,6 +28,18 @@ var user = {
             ],
             columnDefs: [
                 {
+                    targets: [0],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (row.is_staff === true) {
+                            return '<span class="badge badge-success badge-pill">' + 'Pre venta' + '</span>';
+                        } else{
+                            return ' ';
+                        }
+                    }
+                },
+                {
                     targets: [4],
                     class: 'text-center',
                     orderable: false,

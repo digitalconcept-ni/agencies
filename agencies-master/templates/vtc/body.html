@@ -1,12 +1,31 @@
 {% extends 'home.html' %}
 {% block body %}
     <body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
+
+    <div class="preloader-container">
+        <span class="loader"></span>
+        <span class="loader-loading mt-2">Cargando</span>
+    </div>
+
+    {#    <div class="preloader-container">#}
+    {#        <div class="contain">#}
+    {#            <div class="sun">#}
+    {#                <span style="color: orangered; font-size: 1.3em; font-weight: bold;">Cargando...</span>#}
+    {#            </div>#}
+    {#            <div class="earth">#}
+    {#                <div class="moon"></div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
+
     <div class="wrapper">
         <!-- Header -->
         {% include 'vtc/header.html' %}
         <!-- Sidebar -->
         {% include 'vtc/sidebar.html' %}
         <!-- Content -->
+
+
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container-fluid">
@@ -24,6 +43,7 @@
                 </div>
             </div>
             <div class="content">
+
                 {% csrf_token %}
                 <div class="container-fluid">
                     {% block content %}

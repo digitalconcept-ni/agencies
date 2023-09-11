@@ -39,9 +39,9 @@ class ProductForm(ModelForm):
         model = Product
         fields = '__all__'
         widgets = {
-            'name': forms.TextInput(attrs={
-                'placeholder': 'Ingrese un nombre',
-            }),
+            # 'name': forms.TextInput(attrs={
+            #     'placeholder': 'Ingrese un nombre',
+            # }),
             'category': forms.Select(attrs={
                 'class': 'select2',
                 'style': 'width: 100%'
@@ -50,6 +50,7 @@ class ProductForm(ModelForm):
                 'class': 'form-control',
             }),
         }
+        exclude = ['old_stock']
 
     def save(self, commit=True):
         data = {}
@@ -204,6 +205,7 @@ class ShoppingForm(ModelForm):
             }),
             'invoice_number': forms.TextInput(attrs={
                 'class': 'form-control',
+                'autocomplete': False
             }),
             'user': forms.TextInput(attrs={
                 'class': 'form-control',

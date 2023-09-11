@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Facturas-Guia-del-{{ today }}</title>
+    <style>
+
+        * {
+            color: black;
+        }
+
+        body {
+            font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            color: black;
+        }
+
+        .name-company {
+            font-size: 30px;
+            padding: 20px 0 20px 0;
+            margin: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .img-logo {
+            margin-top: 10px;
+            width: 75px;
+            height: 75px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+
+    <img alt="" src="{{ company.get_image }} " class="img-logo img-fluid d-block mx-auto ">
+    <h1 class="name-company">{{ company.name }}</h1>
+
+    <div class="row">
+        <div class="col">
+            <p>
+                <b>RUC: </b> {{ company.ruc }}<br>
+                <b>Direccion: </b> {{ company.address }}<br>
+                <b>Celular: </b>{{ company.phone }}<br>
+            </p>
+        </div>
+
+        <div class="col">
+            <p>
+                <b>Teléfono:</b> {{ company.mobile }}<br>
+                <b>Web: </b>{{ company.website }}<br>
+                <b>Fecha guia: </b> {{ today }} <br>
+            </p>
+        </div>
+        <div class="col">
+            <b>Impreso por: </b> {{ user.first_name }} {{ user.last_name }}<br>
+            <b>Hora impresión: </b> {{ hour }}<br>
+        </div>
+
+
+    </div>
+</div>
+
+<table class="table mt-4" style="width: 100%;">
+    <thead>
+    <tr>
+        <th scope="col" style="width: 10%;" class="text-center">Cantidad</th>
+        <th scope="col" style="width: 55%;" class="text-center">Producto</th>
+        <th scope="col" style="width: 15%;" class="text-center">P.Unitario</th>
+        <th scope="col" style="width: 20%;" class="text-right">Subtotal</th>
+    </tr>
+    </thead>
+    <tbody class="table-group-divider">
+    {% for det in products %}
+        <tr>
+            <td class="text-center">{{ det.cant }}</td>
+            <td>{{ det.product__name }}</td>
+            <td class="text-center">{{ det.price|floatformat:2 }}</td>
+            <td class="text-right">{{ det.subtotal|floatformat:2 }}</td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="3" class="text-right"><b>Subtotal</b></td>
+        <td class="text-right">{{ calculate.subtotal|floatformat:2 }}</td>
+    </tr>
+    <tr>
+        <td colspan="3" class="text-right"><b>Iva %</b></td>
+        <td class="text-right">{{ calculate.iva|floatformat:2 }}</td>
+    </tr>
+    <tr>
+        <td colspan="3" class="text-right"><b>Iva calculado</b></td>
+        <td class="text-right">{{ calculate.total_iva|floatformat:2 }}</td>
+    </tr>
+    <tr>
+        <td colspan="3" class="text-right"><b>Total a pagar</b></td>
+        <td class="text-right">{{ calculate.total|floatformat:2 }}</td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <p class="text-uppercase font-weight-bold mt-3">
+                Total de items: {{ calculate.all_product }}<br>
+                Una vez que usted a recibido la guia,
+                No hay derecho a reclamo ni devolución del producto,<br>
+            </p>
+            <p class="text-uppercase font-weight-bold text-center mt-5">
+                !QUE TENGA UN EXCELENTE DÍA!<br>
+            </p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div style="page-break-after: always;"></div>
+</div>
+</body>
+</html>

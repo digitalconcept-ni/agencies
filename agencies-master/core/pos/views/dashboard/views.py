@@ -92,6 +92,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['title'] = 'BISB - HOME | DASCHBOARD'
         context['panel'] = 'Panel de administrador'
         context['create_url'] = reverse_lazy('shopping_create')
         context['sales_url'] = reverse_lazy('sale_list')

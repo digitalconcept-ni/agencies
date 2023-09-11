@@ -11,7 +11,7 @@ class UserForm(ModelForm):
 
     class Meta:
         model = User
-        fields = 'first_name', 'last_name', 'email', 'username', 'password', 'image', 'groups', 'is_superuser', 'is_active'
+        fields = 'first_name', 'last_name', 'email', 'username', 'password', 'image', 'groups', 'is_staff', 'is_superuser', 'is_active'
         widgets = {
             'first_name': forms.TextInput(
                 attrs={
@@ -42,9 +42,9 @@ class UserForm(ModelForm):
                 'class': 'form-control select2',
                 'style': 'width: 100%',
                 'multiple': 'multiple'
-            })
+                }),
         }
-        exclude = ['user_permissions', 'last_login', 'date_joined', 'is_staff']
+        exclude = ['user_permissions', 'last_login', 'date_joined']
 
     def save(self, commit=True):
         data = {}

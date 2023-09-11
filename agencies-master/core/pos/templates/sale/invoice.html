@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Factura {{ sale.client.names }}</title>
+    <title>Factura - {{ sale.client.names }}</title>
     <style>
 
         * {
@@ -26,16 +26,6 @@
             text-align: center;
         }
 
-        table thead tr th {
-            border: 1px solid black !important;
-            padding: 3px;
-        }
-
-        table tbody tr td {
-            border: 1px solid black;
-            padding: 3px;
-        }
-
         .img-logo {
             margin-top: 10px;
             width: 75px;
@@ -47,31 +37,39 @@
 </head>
 <body>
 <div class="container-fluid">
-    <img alt="" src=" {{ sale.company.get_image }}" class="img-fluid d-block mx-auto img-logo">
-    <h1 class="name-company">{{ sale.company.name }}</h1>
-    <p class="text-center">
-        {{ sale.company.ruc }}<br>
-        {{ sale.company.address }}<br>
-        Celular: {{ sale.company.mobile }}<br>
-        Teléfono: {{ sale.company.phone }}<br>
-        Web: {{ sale.company.website }}<br>
-    </p>
-    <p>
-        <b>Número:</b> {{ sale.get_number }}<br>
-        <b>Cliente:</b> {{ sale.client.get_full_name }}<br>
-        <b>Número de cedula:</b> {{ sale.client.dni }}<br>
-        <b>Fecha de venta:</b> {{ sale.date_joined|date:'c' }}<br>
-    </p>
-    <table class="table" style="width: 100%;">
+    <img alt="" src="{{ sale.company.get_image }}" class="img-fluid d-block mx-auto img-logo">
+    <h1 class="name-company mb-5">{{ sale.company.name }}</h1>
+
+    <div class="row">
+        <div class="col">
+            <b>Número: </b> {{ sale.get_number }}<br>
+            <b>Cliente: </b> {{ sale.client.get_full_name }}<br>
+            <b>Número de cedula: </b> {{ sale.client.dni }}<br>
+            <b>Fecha de venta: </b> {{ sale.date_joined|date:'c' }}<br>
+            <b>Dirección:</b> {{ sale.client.address }}
+            <br>
+            <b>Vendedor: </b> {{ sale.user.first_name }} {{ sale.user.last_name }}<br>
+        </div>
+
+        <div class="col">
+            <b>RUC: </b>{{ sale.company.ruc }}<br>
+            <b>Direccion: </b>{{ sale.company.address }}<br>
+            <b>Celular: </b> {{ sale.company.mobile }}<br>
+            <b>Teléfono: </b> {{ sale.company.phone }}<br>
+            <b> Web: </b>{{ sale.company.website }}<br>
+        </div>
+
+    </div>
+    <table class="table mt-4" style="width: 100%;">
         <thead>
-        <tr style="border: 1px solid black;">
-            <th style="width: 20%;">Cantidad</th>
-            <th style="width: 40%;">Producto</th>
-            <th style="width: 20%;">P.Unitario</th>
-            <th style="width: 20%;" class="text-right">Subtotal</th>
+        <tr>
+            <th scope="col" style="width: 10%;">Cantidad</th>
+            <th scope="col" style="width: 55%;">Producto</th>
+            <th scope="col" style="width: 15%;">P.Unitario</th>
+            <th scope="col" style="width: 20%;" class="text-right">Subtotal</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="table-group-divider">
         {% for det in sale.saleproduct_set.all %}
             <tr>
                 <td class="text-center">{{ det.cant }}</td>
@@ -98,13 +96,17 @@
         </tr>
         <tr>
             <td colspan="4">
-                <p class="text-uppercase font-weight-bold text-center mt-3">
+                <p class="text-uppercase font-weight-bold mt-3">
                     Total de productos {{ sale.saleproduct_set.all.count }}<br>
-                    !Gracias por su preferencia!<br>
+                    <br>
                     Una vez que usted a recibido el pedido<br>
                     No hay derecho a reclamo ni devolución del producto<br>
                     Que tenga un excelente día
                 </p>
+                <p class="text-uppercase font-weight-bold text-center mt-5">
+                    !Gracias por su preferencia!<br>
+                </p>
+
             </td>
         </tr>
         </tbody>

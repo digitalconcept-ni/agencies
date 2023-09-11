@@ -14,7 +14,7 @@ from django.views.generic import CreateView, FormView, DeleteView, UpdateView, V
 # os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
 from weasyprint import HTML, CSS
 
-from core.pos.forms import ClientForm, ShoppingForm, SupplierForm
+from core.pos.forms import ClientForm, ShoppingForm, SupplierForm, ProductForm
 from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin
 from core.pos.models import Sale, Product, SaleProduct, Client, Shopping, Supplier, ShoppingDetail
 from core.reports.forms import ReportForm
@@ -86,7 +86,7 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                     products = products.filter(name__icontains=term)
                 for i in products.exclude(id__in=ids_exclude)[0:10]:
                     item = i.toJSON()
-                    item['value'] = i.__str__
+                    item['value'] = i.__str__()
                     data.append(item)
             elif action == 'search_products_select2':
                 data = []
@@ -116,17 +116,17 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                         detail.shopping_id = shopping.id
                         detail.product_id = int(i['id'])
                         detail.cant = int(i['cant'])
-                        detail.price = float(i['pvpc'])
+                        detail.price = float(i['pvp'])
                         detail.subtotal = detail.cant * detail.price
                         detail.save()
                         if not detail.product.is_inventoried:
                             detail.product.is_inventoried = True
                         if detail.product.is_inventoried:
                             detail.product.stock += detail.cant
-                            detail.product.cost = float(i['pvpc'])
+                            detail.product.cost = float(i['cost'])
                             detail.product.pvp = float(i['pvp'])
                             detail.product.save()
-                        cantItemsShopping += i['cant']
+                        cantItemsShopping += 1
 
                     shopping.cant = + int(cantItemsShopping)
                     shopping.save()
@@ -145,6 +145,10 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                 with transaction.atomic():
                     form = SupplierForm(request.POST)
                     data = form.save()
+            elif action == 'create_new_product':
+                with transaction.atomic():
+                    form = ProductForm(request.POST)
+                    data = form.save()
             else:
                 data['error'] = 'No ha ingresado a ninguna opción'
         except Exception as e:
@@ -159,6 +163,7 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
         context['action'] = 'add'
         context['products'] = []
         context['frmSupplier'] = SupplierForm()
+        context['frmProduct'] = ProductForm()
         return context
 
 
@@ -198,7 +203,7 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
                     products = products.filter(name__icontains=term)
                 for i in products.exclude(id__in=ids_exclude)[0:10]:
                     item = i.toJSON()
-                    item['value'] = i.__str__
+                    item['value'] = i.__str__()
                     data.append(item)
             elif action == 'search_products_select2':
                 data = []
@@ -209,14 +214,14 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
                 products = Product.objects.filter(name__icontains=term)
                 for i in products:
                     item = i.toJSON()
-                    item['text'] = i.__str__
+                    item['text'] = i.__str__()
                     data.append(item)
             elif action == 'edit':
                 with transaction.atomic():
                     products = json.loads(request.POST['products'])
                     products_review = json.loads(request.POST['products_review'])
 
-                    shopping = Shopping()
+                    shopping = self.get_object()
                     shopping.supplier_id = int(request.POST['supplier'])
                     shopping.user_id = request.POST['user_id']
                     shopping.invoice_number = request.POST['invoice_number']
@@ -226,24 +231,48 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
 
                     shopping.shoppingdetail_set.all().delete()
                     cantItemsShopping = 0
-                    for i in products:
+                    listProductId = []  # Lista que obtendra los id de los productos ingresados
+
+                    pr = [pr.get('id') for pr in products_review]
+
+                    # Bloque para agregar el detalle de la compra a la tabla Shoopingdetails
+                    for p in products:
                         detail = ShoppingDetail()
                         detail.shopping_id = shopping.id
-                        detail.product_id = int(i['id'])
-                        detail.cant = int(i['cant'])
-                        detail.price = float(i['pvp'])
+                        detail.product_id = int(p['id'])
+                        detail.cant = int(p['cant'])
+                        detail.price = float(p['pvp'])
                         detail.subtotal = detail.cant * detail.price
                         detail.save()
                         if detail.product.is_inventoried:
-                            for d in products_review:
-                                if int(detail.product_id) == int(i['id']):
-                                    detail.product.stock = (detail.product.stock - d['cant']) + detail.cant
-                                    detail.product.cost = float(i['pvpc'])
-                                    detail.product.pvp = float(i['pvp'])
-                                    detail.product.save()
-                        cantItemsShopping += detail.cant
+                            if p['id'] in pr:
+                                indice = pr.index(p['id'])
+                                detail.product.stock = (detail.product.stock - products_review[indice]['cant']) + \
+                                                       p['cant']
+                                detail.product.cost = float(p['cost'])
+                                detail.product.pvp = float(p['pvp'])
+                                detail.product.save()
+                            else:
+                                detail.product.stock += p['cant']
+                                detail.product.cost = float(p['cost'])
+                                detail.product.pvp = float(p['pvp'])
+                                detail.product.save()
+                        listProductId.append(p['id'])
+                        cantItemsShopping += 1
 
-                    shopping.cant = + int(cantItemsShopping)
+                    # Ciclo para retroceder los cambios de los productos que fueron mal digitados
+                    if len(pr) != 0:
+                        for i in pr:
+                            print(i)
+                            if i not in listProductId:
+                                indice = pr.index(i)
+                                detail.product_id = int(i)
+                                detail.product.stock = detail.product.stock - products_review[indice]['cant']
+                                detail.product.cost = float(products_review[indice]['cost'])
+                                detail.product.pvp = float(products_review[indice]['pvp'])
+                                detail.product.save()
+
+                    shopping.cant = int(cantItemsShopping)
                     shopping.save()
                     shopping.calculate_invoice()
                     data = {'id': shopping.id}

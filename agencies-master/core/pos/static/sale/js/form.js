@@ -7,7 +7,8 @@ var sale = {
         subtotal: 0.00,
         iva: 0.00,
         total: 0.00,
-        products: []
+        products: [],
+        products_review: []
     },
     getProductsIds: function () {
         return this.details.products.map(value => value.id);
@@ -168,6 +169,8 @@ $(function () {
     });
 
     $('#frmClient').on('submit', function (e) {
+        let loader = document.querySelector('.preloader-container');
+
         e.preventDefault();
         var parameters = new FormData(this);
         parameters.append('action', 'create_client');
@@ -177,6 +180,8 @@ $(function () {
                 var newOption = new Option(response.full_name, response.id, false, true);
                 select_client.append(newOption).trigger('change');
                 $('#myModalClient').modal('hide');
+                loader.style.opacity = 0
+                loader.style.visibility = 'hidden'
             });
     });
 
@@ -427,6 +432,7 @@ $(function () {
         var success_url = this.getAttribute('data-url');
         var parameters = new FormData(this);
         parameters.append('products', JSON.stringify(sale.details.products));
+        parameters.append('products_review', JSON.stringify(sale.details.products_review));
         submit_with_ajax(pathname, 'Notificación',
             '¿Estas seguro de realizar la siguiente acción?', parameters, function (response) {
                 alert_action('Notificación', '¿Desea imprimir la factura de venta?', function () {

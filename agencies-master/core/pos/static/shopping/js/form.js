@@ -1,5 +1,5 @@
 var tblProducts;
-var select_supplier, select_search_product;
+var select_supplier, select_search_product, create_product;
 var tblSearchProducts;
 
 var sale = {
@@ -148,7 +148,7 @@ $(function () {
         language: 'es'
     });
 
-    // Client
+    // Supplier
 
     select_supplier.select2({
         theme: "bootstrap4",
@@ -177,13 +177,26 @@ $(function () {
         minimumInputLength: 1,
     });
 
+    // Event to open the model for create a new supplier
     $('.btnAddSupplier').on('click', function () {
         $('#myModalSupplier').modal('show');
     });
 
+
     $('#myModalSupplier').on('hidden.bs.modal', function (e) {
         $('#frmSupplier').trigger('reset');
     });
+
+    // Event to open the modal to create a new product
+    $('.btnCreateProduct').on('click', function () {
+        $('#myModalCreateProduct').modal('show');
+    });
+
+
+    $('#myModalCreateProduct').on('hidden.bs.modal', function (e) {
+        $('#frmCreateProduct').trigger('reset');
+    });
+
 
     $('input[name="birthdate"]').datetimepicker({
         useCurrent: false,
@@ -193,6 +206,7 @@ $(function () {
         maxDate: new Date()
     });
 
+    // Form to create a new Supplier
     $('#frmSupplier').on('submit', function (e) {
         e.preventDefault();
         var parameters = new FormData(this);
@@ -205,6 +219,19 @@ $(function () {
                 $('#myModalSupplier').modal('hide');
             });
     });
+
+    // Event form to create a new Product
+    $('#frmCreateProduct').on('submit', function (e) {
+        e.preventDefault();
+        var parameters = new FormData(this);
+        parameters.append('action', 'create_new_product');
+        submit_with_ajax(pathname, 'Notificación',
+            '¿Estas seguro de crear al siguiente producto?', parameters, function (response) {
+                //console.log(response);
+                $('#myModalCreateProduct').modal('hide');
+            });
+    });
+
 
     // Products
     /*select_search_product.autocomplete({

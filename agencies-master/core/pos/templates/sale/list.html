@@ -10,6 +10,7 @@
 {% block columns %}
     <tr>
         <th scope="col">Número</th>
+        <th scope="col">Usuario</th>
         <th scope="col">Cliente</th>
         <th scope="col">Fecha de registro</th>
         <th scope="col">Subtotal</th>
@@ -59,6 +60,7 @@
 {% block content_list_before %}
     <div class="row">
         <div class="col-lg-5">
+
             <div class="form-group">
                 <label>Rangos de fechas:</label>
                 <div class="input-group mb-3">
@@ -74,6 +76,30 @@
                 </div>
             </div>
         </div>
+
+        {% if request.user.is_superuser == True %}
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label>Descarga de guía: </label>
+                    <div class="input-group mb-3">
+                        <select name="idPreSeles" id="selectPreSales" class="form-control">
+                            <option value="">Selecciona la guia</option>
+                            <option value="0">General</option>
+                            {% for u in pre_sales %}
+                                <option value="{{ u.id }}">{{ u.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="input-group-append">
+                            <a class="btn btn-success disabled" type="button" id="btnDonwloadGuide" target="_blank">
+                                <i class="fas fa-download"></i> Descargar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        {% endif %}
+
     </div>
     <hr>
 {% endblock %}

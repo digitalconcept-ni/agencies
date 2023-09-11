@@ -29,6 +29,7 @@ var sale = {
             },
             columns: [
                 {"data": "number"},
+                {"data": "user"},
                 {"data": "client.full_name"},
                 {"data": "date_joined"},
                 {"data": "subtotal"},
@@ -43,13 +44,17 @@ var sale = {
                     targets: [0],
                     class: 'text-center',
                     render: function (data, type, row) {
-                        return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
+                        if (row.saleproduct[0].endofday === true) {
+                            return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
+                        } else {
+                            return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
+                        }
                     }
                 },
                 {
                     targets: [-2, -3, -4, -5],
                     class: 'text-center',
-                    render: function (data, type, row) {
+                    render: function (data) {
                         return '$' + parseFloat(data).toFixed(2);
                     }
                 },
@@ -58,9 +63,11 @@ var sale = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        var buttons = '<a href="' + pathname + 'delete/' + row.id + '/" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
-                        buttons += '<a href="' + pathname + 'update/' + row.id + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
-                        buttons += '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
+                        var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
+                        if (row.modify === false) {
+                            buttons += '<a href="' + pathname + 'delete/' + row.id + '/" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
+                            buttons += '<a href="' + pathname + 'update/' + row.id + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+                        }
                         buttons += '<a href="' + pathname + 'invoice/pdf/' + row.id + '/" target="_blank" class="btn btn-info btn-xs btn-flat"><i class="fas fa-file-pdf"></i></a> ';
                         return buttons;
                     }
@@ -108,6 +115,43 @@ $(function () {
             }
         });
 
+    $('#selectPreSales').on('change', function (e) {
+        let id = $(this).val();
+        if (id !== '') {
+            var url = `guides/pdf/${id}`
+            document.getElementById('btnDonwloadGuide').href = url;
+            $('#btnDonwloadGuide').removeClass('disabled');
+
+        } else {
+            $('#btnDonwloadGuide').addClass('disabled');
+        }
+        // $.ajax({
+        //     url: 'guides/pdf/',
+        //     data: parameters,
+        //     type: 'GET',
+        //     dataSrc:'',
+        //     headers: {
+        //         'X-CSRFToken': csrftoken
+        //     },
+        //     success: function (request) {
+        //         console.log(request)
+        //         location.href = request
+        //
+        //         // if (!request.hasOwnProperty('error')) {
+        //         //     callback(request);
+        //         //     return false;
+        //         // }
+        //         message_error(request.error);
+        //         // loader.style.opacity = 0
+        //         // loader.style.visibility = 'hidden'
+        //     },
+        //     error: function (jqXHR, textStatus, errorThrown) {
+        //         message_error(errorThrown + ' ' + textStatus);
+        //     }
+        // });
+
+    })
+
     $('.drp-buttons').hide();
 
     $('.btnSearch').on('click', function () {
@@ -152,7 +196,7 @@ $(function () {
                     {
                         targets: [-1, -3],
                         class: 'text-center',
-                        render: function (data, type, row) {
+                        render: function (data) {
                             return '$' + parseFloat(data).toFixed(2);
                         }
                     },

@@ -1,23 +1,25 @@
 import json
-import os
-
+from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Q
-from django.http import HttpResponse
+from django.db.models import Q, Sum
+from django.http import HttpResponse, FileResponse
 from django.http import JsonResponse, HttpResponseRedirect
 from django.template.loader import get_template
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, FormView, DeleteView, UpdateView, View
 import os
 
+from core.pos.mergerPdfFiles import mergerPdf
+from core.user.models import User
+
 os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
 from weasyprint import HTML, CSS
 
 from core.pos.forms import SaleForm, ClientForm
 from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin
-from core.pos.models import Sale, Product, SaleProduct, Client
+from core.pos.models import Sale, Product, SaleProduct, Client, Company
 from core.reports.forms import ReportForm
 
 
@@ -43,6 +45,13 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 data = []
                 for i in SaleProduct.objects.filter(sale_id=request.POST['id']):
                     data.append(i.toJSON())
+            elif action == 'download_guides':
+                today = str(datetime.now().date())
+                # consulta donde podremos obtener las ventas que el preventa ha realizado el mismo dia
+                # for d in SaleProduct.objects.filter(Q(sale__date_joined=today) & Q(sale__user__is_staff=True)):
+                for d in Sale.objects.filter(Q(date_joined=today) & Q(user__is_staff=True)):
+                    print(d.saleproduct_set.all())
+                print('se imprio lo de hoy')
             else:
                 data['error'] = 'Ha ocurrido un error'
         except Exception as e:
@@ -55,6 +64,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
         context['create_url'] = reverse_lazy('sale_create')
         context['list_url'] = reverse_lazy('sale_list')
         context['entity'] = 'Ventas'
+        context['pre_sales'] = User.objects.filter(is_staff=True)
         return context
 
 
@@ -95,6 +105,7 @@ class SaleCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Create
                 with transaction.atomic():
                     products = json.loads(request.POST['products'])
                     sale = Sale()
+                    sale.user_id = request.user.id
                     sale.date_joined = request.POST['date_joined']
                     sale.client_id = int(request.POST['client'])
                     sale.iva = float(request.POST['iva'])
@@ -153,8 +164,6 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
     def get_form(self, form_class=None):
         instance = self.get_object()
         form = SaleForm(instance=instance)
-        print(instance.client.id)
-        print(instance.client)
         form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
         return form
 
@@ -180,7 +189,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     products = products.filter(name__icontains=term)
                 for i in products.exclude(id__in=ids_exclude)[0:10]:
                     item = i.toJSON()
-                    item['value'] = i.__str__
+                    item['value'] = i.__str__()
                     data.append(item)
             elif action == 'search_products_select2':
                 data = []
@@ -190,32 +199,63 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                 products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
                 for i in products.exclude(id__in=ids_exclude)[0:10]:
                     item = i.toJSON()
-                    item['text'] = i.__str__
+                    item['text'] = i.__str__()
                     data.append(item)
             elif action == 'edit':
                 with transaction.atomic():
-                    with transaction.atomic():
-                        products = json.loads(request.POST['products'])
-                        sale = self.get_object()
-                        sale.date_joined = request.POST['date_joined']
-                        sale.client_id = int(request.POST['client'])
-                        sale.iva = float(request.POST['iva'])
-                        sale.save()
-                        sale.saleproduct_set.all().delete()
-                        for i in products:
-                            detail = SaleProduct()
-                            detail.sale_id = sale.id
-                            detail.product_id = int(i['id'])
-                            detail.cant = int(i['cant'])
-                            detail.price = float(i['pvp'])
-                            detail.subtotal = detail.cant * detail.price
-                            detail.save()
-                            if detail.product.is_inventoried:
-                                detail.product.stock -= detail.cant
+                    products = json.loads(request.POST['products'])
+                    products_review = json.loads(request.POST['products_review'])
+
+                    sale = self.get_object()
+                    sale.date_joined = request.POST['date_joined']
+                    sale.client_id = int(request.POST['client'])
+                    sale.iva = float(request.POST['iva'])
+                    sale.save()
+
+                    sale.saleproduct_set.all().delete()
+                    listProductId = []  # Lista que obtendra los id de los productos ingresados
+                    pr = [pr.get('id') for pr in products_review]
+
+                    for p in products:
+                        detail = SaleProduct()
+                        detail.sale_id = sale.id
+                        detail.product_id = int(p['id'])
+                        detail.cant = int(p['cant'])
+                        detail.price = float(p['pvp'])
+                        detail.subtotal = detail.cant * detail.price
+                        detail.save()
+                        if detail.product.is_inventoried:
+                            if p['id'] in pr:
+                                indice = pr.index(p['id'])
+                                print('indice existe: ', indice)
+                                detail.product.stock = (detail.product.stock + products_review[indice]['cant']) - \
+                                                       p['cant']
+                                detail.product.cost = float(p['cost'])
+                                detail.product.pvp = float(p['pvp'])
                                 detail.product.save()
-                        sale.calculate_invoice()
-                        data = {'id': sale.id}
+                            else:
+                                detail.product.stock -= p['cant']
+                                detail.product.cost = float(p['cost'])
+                                detail.product.pvp = float(p['pvp'])
+                                detail.product.save()
+                        listProductId.append(p['id'])
+
+                    if len(pr) != 0:
+                        for i in pr:
+                            print(i)
+                            if i not in listProductId:
+                                indice = pr.index(i)
+                                print('indice no existe: ', indice)
+                                print('No existe: ', i)
+                                detail.product_id = int(i)
+                                detail.product.stock = detail.product.stock + products_review[indice]['cant']
+                                detail.product.cost = float(products_review[indice]['cost'])
+                                detail.product.pvp = float(products_review[indice]['pvp'])
+                                detail.product.save()
+
+                    sale.calculate_invoice()
                     data = {'id': sale.id}
+                data = {'id': sale.id}
             elif action == 'search_client':
                 data = []
                 term = request.POST['term']
@@ -286,6 +326,92 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
             css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
             pdf = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[CSS(css_url)])
             return HttpResponse(pdf, content_type='application/pdf')
+        except:
+            pass
+        return HttpResponseRedirect(reverse_lazy('sale_list'))
+
+
+class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
+            now = datetime.now()
+            user = request.user
+            # today = str(now.date())
+            hour = f'{now.hour} : {now.minute}'
+            today = '2023-09-08'
+            id = kwargs['id']
+            
+            if id == 0:
+                # COLLECT ALL THE SALES OF THE DAY
+                detailProducts = SaleProduct.objects.filter(Q(sale__date_joined=today) & Q(endofday__exact=False)) \
+                    .values('product__name', 'price').annotate(cant=Sum('cant')).annotate(subtotal=Sum('subtotal'))
+            else:
+                # COLLECT ALL THE SALES FOR ESPESIFIC SER
+                detailProducts = SaleProduct.objects.filter(
+                    Q(sale__date_joined=today) & Q(sale__user_id=id) & Q(endofday__exact=True)) \
+                    .values('product__name', 'price').annotate(cant=Sum('cant')).annotate(subtotal=Sum('subtotal'))
+
+            if detailProducts.count() != 0:
+                # CALCULATE INVOICE
+                subtotal = 0.00
+                totalProducts = 0
+                for det in detailProducts:
+                    subtotal += float(det['subtotal'])
+                    totalProducts += det['cant']
+                ivaCalculado = subtotal * 0.15
+                totalInvoice = subtotal + ivaCalculado
+                calculate = {'subtotal': subtotal, 'iva': 0.15, 'total_iva': ivaCalculado, 'total': totalInvoice,
+                             'all_product': totalProducts}
+
+                # CREATE A PDF FOR THE GUIDE TO DAY
+                template = get_template('sale/guide.html')
+                context = {
+                    'user': user,
+                    'products': detailProducts,
+                    'calculate': calculate,
+                    'company': Company.objects.first(),
+                    'today': today,
+                    'hour': hour,
+                    'icon': f'{settings.MEDIA_URL}logo.png'
+                }
+                html = template.render(context)
+                css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
+                pdfGruide = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[CSS(css_url)])
+                f = open(os.path.join(dirname, 'guide.pdf'), 'wb')
+                f.write(pdfGruide)
+                f.close()
+
+                # CREATE A PDFS FOR ALL SALES TO DAY
+                if id == 0:
+                    # COLLECT ALL THE SALES OF THE DAY
+                    query = Sale.objects.filter(
+                        Q(date_joined=today) & Q(user__is_staff=True) & Q(saleproduct__endofday=False))
+                else:
+                    query = Sale.objects.filter(
+                        Q(date_joined=today) & Q(user_id=id) & Q(saleproduct__endofday=True))
+
+                for q in query:
+                    s = q.saleproduct_set.all()
+                    for i in s:
+                        i.end_day()
+
+                template = get_template('sale/invoice2.html')
+                context = {
+                    'query': query,
+                    'today': today,
+                    'icon': f'{settings.MEDIA_URL}logo.png'
+                }
+                html = template.render(context)
+                css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
+                pdfInvoice = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[CSS(css_url)])
+                f = open(os.path.join(dirname, 'invoices.pdf'), 'wb')
+                f.write(pdfInvoice)
+                f.close()
+                pd = mergerPdf()
+                # return HttpResponse(pd['path'], content_type='application/pdf')
+                return FileResponse(open(pd['path'], 'rb'))
         except:
             pass
         return HttpResponseRedirect(reverse_lazy('sale_list'))

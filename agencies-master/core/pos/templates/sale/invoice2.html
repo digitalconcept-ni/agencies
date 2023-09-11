@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Facturas-Guia-del-{{ today }}</title>
+    <style>
+
+        * {
+            color: black;
+        }
+
+        body {
+            font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            color: black;
+        }
+
+        .name-company {
+            font-size: 30px;
+            padding: 20px 0 20px 0;
+            margin: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .img-logo {
+            margin-top: 10px;
+            width: 75px;
+            height: 75px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    {% for q in query %}
+
+        <img alt="" src="{{ q.company.get_image }} " class="img-logo img-fluid d-block mx-auto ">
+        <h1 class="name-company">{{ q.company.name }}</h1>
+
+        <div class="row">
+            <div class="col">
+                <p>
+                    <b>Número:</b> {{ q.get_number }}<br>
+                    <b>Fecha de venta:</b> {{ q.date_joined|date:'c' }}<br>
+                    <b>Cliente:</b> {{ q.client.get_full_name }}<br>
+                    <b>Número de cedula:</b> {{ q.client.dni }}<br>
+                    <b>Dirección:</b> {{ q.client.address }}<br>
+                    <b>Vendedor: </b> {{ q.user.first_name }} {{ q.user.last_name }}<br>
+                </p>
+            </div>
+            <div class="col">
+                <p>
+                    <b>RUC: </b> {{ q.company.ruc }}<br>
+                    <b>Direccion: </b> {{ q.company.address }}<br>
+                    <b>Celular: </b>{{ q.company.mobile }}<br>
+                    <b>Teléfono:</b> {{ q.company.phone }}<br>
+                    <b>Web: </b>{{ q.company.website }}<br>
+                </p>
+            </div>
+
+
+        </div>
+        </div>
+
+        <table class="table mt-4" style="width: 100%;">
+            <thead>
+            <tr>
+                <th scope="col" style="width: 10%;" class="text-center">Cantidad</th>
+                <th scope="col" style="width: 55%;" class="text-center">Producto</th>
+                <th scope="col" style="width: 15%;" class="text-center">P.Unitario</th>
+                <th scope="col" style="width: 20%;" class="text-right">Subtotal</th>
+            </tr>
+            </thead>
+            <tbody class="table-group-divider">
+            {% for det in q.saleproduct_set.all %}
+                <tr>
+                    <td class="text-center">{{ det.cant }}</td>
+                    <td>{{ det.product }}</td>
+                    <td class="text-center">{{ det.price|floatformat:2 }}</td>
+                    <td class="text-right">{{ det.subtotal|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="3" class="text-right"><b>Subtotal</b></td>
+                <td class="text-right">{{ q.subtotal|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-right"><b>Iva %</b></td>
+                <td class="text-right">{{ q.iva|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-right"><b>Iva calculado</b></td>
+                <td class="text-right">{{ q.total_iva|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-right"><b>Total a pagar</b></td>
+                <td class="text-right">{{ q.total|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <p class="text-uppercase font-weight-bold mt-3">
+                        Total de items: {{ q.saleproduct_set.all.count }}
+                        <br>
+                        Una vez que usted a recibido el pedido,
+                        No hay derecho a reclamo ni devolución del producto,
+                        Que tenga un excelente día</p>
+
+                    <p class="text-uppercase font-weight-bold text-center mt-5">
+                        !Gracias por su preferencia!<br>
+                    </p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div style="page-break-after: always;"></div>
+    {% endfor %}
+</div>
+</body>
+</html>

@@ -35,6 +35,8 @@ function message_error(obj) {
 }
 
 function submit_with_ajax(url, title, content, parameters, callback) {
+    let loader = document.querySelector('.preloader-container');
+
     $.confirm({
         theme: 'material',
         title: title,
@@ -50,6 +52,8 @@ function submit_with_ajax(url, title, content, parameters, callback) {
                 text: "Si",
                 btnClass: 'btn-primary',
                 action: function () {
+                    loader.style.opacity = 1
+                    loader.style.visibility = 'initial'
                     $.ajax({
                         url: url,
                         data: parameters,
@@ -156,3 +160,9 @@ function validate_decimals(el, evt) {
 
     return true;
 }
+
+window.addEventListener('load', () => {
+    let loader = document.querySelector('.preloader-container');
+    loader.style.opacity = 0
+    loader.style.visibility = 'hidden'
+});

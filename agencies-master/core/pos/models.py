@@ -43,11 +43,10 @@ class Product(models.Model):
     def get_total_earnings(self):
         # return sum([payment.amount for payment in self.objects.all()])
         s = self.objects.all().aggregate(
-        result=Sum(F('cost'), 0.00, output_field=FloatField())).get('result')
+            result=Sum(F('cost'), 0.00, output_field=FloatField())).get('result')
         print('models')
         print(s)
         return s
-
 
     def toJSON(self):
         item = model_to_dict(self)
@@ -102,6 +101,7 @@ class Shopping(models.Model):
     invoice_number = models.CharField(max_length=10, default='F000000000')
     register = models.BooleanField(default=True)
     date_joined = models.DateField(default=datetime.now)
+    time_joined = models.TimeField(default=datetime.now)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total_iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
@@ -112,6 +112,9 @@ class Shopping(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
+        item['modify'] = False
+        if self.date_joined.strftime("%Y-%m-%d") < str(datetime.now().date()):
+            item['modify'] = True
         item['number'] = self.get_number()
         item['username'] = self.user.username
         item['supplier'] = self.supplier.get_full_name()
@@ -119,7 +122,7 @@ class Shopping(models.Model):
         item['iva'] = f'{self.iva:.2f}'
         item['total_iva'] = f'{self.total_iva:.2f}'
         item['total'] = f'{self.total:.2f}'
-        item['date_joined'] = self.date_joined.strftime('%Y-%m-%d')
+        item['date_joined'] = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%H:%M:%S")}'
         item['saleproduct'] = [i.toJSON() for i in self.shoppingdetail_set.all()]
         return item
 
@@ -172,7 +175,7 @@ class Client(models.Model):
         return self.get_full_name()
 
     def get_full_name(self):
-        return f'{self.names} ({self.dni})'
+        return f'{self.names}'
 
     def toJSON(self):
         item = model_to_dict(self)
@@ -221,8 +224,10 @@ class Company(models.Model):
 
 class Sale(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     date_joined = models.DateField(default=datetime.now)
+    time_joined = models.TimeField(default=datetime.now)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total_iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
@@ -242,13 +247,17 @@ class Sale(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
+        item['modify'] = False
+        if self.date_joined.strftime("%Y-%m-%d") < str(datetime.now().date()):
+            item['modify'] = True
         item['number'] = self.get_number()
         item['client'] = self.client.toJSON()
+        item['user'] = self.user.username
         item['subtotal'] = f'{self.subtotal:.2f}'
         item['iva'] = f'{self.iva:.2f}'
         item['total_iva'] = f'{self.total_iva:.2f}'
         item['total'] = f'{self.total:.2f}'
-        item['date_joined'] = self.date_joined.strftime('%Y-%m-%d')
+        item['date_joined'] = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%H:%M:%S")}'
         item['saleproduct'] = [i.toJSON() for i in self.saleproduct_set.all()]
         return item
 
@@ -275,12 +284,22 @@ class Sale(models.Model):
 class SaleProduct(models.Model):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    endofday = models.BooleanField(default=False)
     price = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     cant = models.IntegerField(default=0)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
 
     def __str__(self):
         return self.product.name
+
+    def end_day(self):
+        if self.sale.user.is_active:
+            self.sale.user.is_active = False
+            self.sale.user.save()
+        print(self.sale.user.is_active)
+        self.endofday = True
+        self.save()
+
 
     def toJSON(self):
         item = model_to_dict(self, exclude=['sale'])
