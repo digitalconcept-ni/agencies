@@ -6,10 +6,10 @@ __pycache__/
 */migrations/*
 **/migrations/*
 */logs/*
-config/*
+#config/*
 staticfiles/*
 db.sqlite3
-media
+media/*
 .idea
 
 # If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
@@ -140,7 +140,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+#lib/
 lib64/
 parts/
 sdist/
