@@ -4,12 +4,13 @@ from PyPDF2 import PdfMerger, PdfReader
 from config import settings
 
 
-def mergerPdf():
+def mergerPdf(directorySchema):
     try:
         data = {}
         today = datetime.now().date()
         yesterday = today - timedelta(days=1)
-        dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
+        dirname = directorySchema
+        # dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
         invoice = dirname + '/invoices.pdf'
         guide = dirname + '/guide.pdf'
         finalName = 'guia-facturas-' + str(today) + '.pdf'
@@ -32,5 +33,3 @@ def mergerPdf():
     except Exception as e:
         data['error'] = str(e)
     return data
-
-mergerPdf()

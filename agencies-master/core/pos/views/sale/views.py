@@ -64,7 +64,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
         context['create_url'] = reverse_lazy('sale_create')
         context['list_url'] = reverse_lazy('sale_list')
         context['entity'] = 'Ventas'
-        context['pre_sales'] = User.objects.filter(is_staff=True)
+        context['pre_sales'] = User.objects.filter(presale=True)
         return context
 
 
@@ -336,23 +336,30 @@ class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         try:
             dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
+            directorySchema = os.path.join(dirname, request.tenant.schema_name)
+            if not os.path.isdir(directorySchema):
+                os.mkdir(directorySchema)
             now = datetime.now()
             user = request.user
-            # today = str(now.date())
+            today = str(now.date())
             hour = f'{now.hour} : {now.minute}'
-            today = '2023-09-08'
+            # today = '2023-09-08'
             id = kwargs['id']
-            
+
+            print(today)
+            print(id)
+
             if id == 0:
                 # COLLECT ALL THE SALES OF THE DAY
                 detailProducts = SaleProduct.objects.filter(Q(sale__date_joined=today) & Q(endofday__exact=False)) \
                     .values('product__name', 'price').annotate(cant=Sum('cant')).annotate(subtotal=Sum('subtotal'))
             else:
-                # COLLECT ALL THE SALES FOR ESPESIFIC SER
+                # COLLECT ALL THE SALES FOR ESPESIFIC USER
                 detailProducts = SaleProduct.objects.filter(
-                    Q(sale__date_joined=today) & Q(sale__user_id=id) & Q(endofday__exact=True)) \
+                    Q(sale__date_joined=today) & Q(sale__user_id=id) & Q(endofday__exact=False)) \
                     .values('product__name', 'price').annotate(cant=Sum('cant')).annotate(subtotal=Sum('subtotal'))
 
+            print(detailProducts)
             if detailProducts.count() != 0:
                 # CALCULATE INVOICE
                 subtotal = 0.00
@@ -379,7 +386,7 @@ class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
                 html = template.render(context)
                 css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
                 pdfGruide = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[CSS(css_url)])
-                f = open(os.path.join(dirname, 'guide.pdf'), 'wb')
+                f = open(os.path.join(directorySchema, 'guide.pdf'), 'wb')
                 f.write(pdfGruide)
                 f.close()
 
@@ -387,10 +394,10 @@ class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
                 if id == 0:
                     # COLLECT ALL THE SALES OF THE DAY
                     query = Sale.objects.filter(
-                        Q(date_joined=today) & Q(user__is_staff=True) & Q(saleproduct__endofday=False))
+                        Q(date_joined=today) & Q(user__presale=True) & Q(saleproduct__endofday=False))
                 else:
                     query = Sale.objects.filter(
-                        Q(date_joined=today) & Q(user_id=id) & Q(saleproduct__endofday=True))
+                        Q(date_joined=today) & Q(user_id=id) & Q(saleproduct__endofday=False))
 
                 for q in query:
                     s = q.saleproduct_set.all()
@@ -406,10 +413,10 @@ class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
                 html = template.render(context)
                 css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
                 pdfInvoice = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[CSS(css_url)])
-                f = open(os.path.join(dirname, 'invoices.pdf'), 'wb')
+                f = open(os.path.join(directorySchema, 'invoices.pdf'), 'wb')
                 f.write(pdfInvoice)
                 f.close()
-                pd = mergerPdf()
+                pd = mergerPdf(directorySchema)
                 # return HttpResponse(pd['path'], content_type='application/pdf')
                 return FileResponse(open(pd['path'], 'rb'))
         except:

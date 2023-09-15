@@ -22,6 +22,7 @@ var user = {
                 {"data": "username"},
                 {"data": "date_joined"},
                 {"data": "image"},
+                {"data": "is_superuser"},
                 {"data": "is_active"},
                 {"data": "groups"},
                 {"data": "id"},
@@ -32,7 +33,7 @@ var user = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        if (row.is_staff === true) {
+                        if (row.presale === true) {
                             return '<span class="badge badge-success badge-pill">' + 'Pre venta' + '</span>';
                         } else{
                             return ' ';
@@ -49,6 +50,18 @@ var user = {
                 },
                 {
                     targets: [5],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data === true) {
+                            return '<span class="badge badge-success badge-pill">' + 'Si' + '</span>';
+                        } else {
+                            return '<span class="badge badge-danger badge-pill">' + 'No' + '</span>';
+                        }
+                    }
+                },
+                {
+                    targets: [6],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
