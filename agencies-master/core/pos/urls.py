@@ -44,7 +44,7 @@ urlpatterns = [
     path('sale/add/', SaleCreateView.as_view(), name='sale_create'),
     path('sale/delete/<int:pk>/', SaleDeleteView.as_view(), name='sale_delete'),
     path('sale/update/<int:pk>/', SaleUpdateView.as_view(), name='sale_update'),
-    path('sale/guides/pdf/<int:id>/', SaleInvoiceGuidesPdfView.as_view(), name='sale_guides_pdf'),
+    path('sale/guides/pdf/', SaleInvoiceGuidesPdfView.as_view(), name='sale_guides_pdf'),
     path('sale/invoice/pdf/<int:pk>/', SaleInvoicePdfView.as_view(), name='sale_invoice_pdf'),
     # company
     path('company/update/', CompanyUpdateView.as_view(), name='company_update'),

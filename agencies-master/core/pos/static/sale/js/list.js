@@ -27,30 +27,49 @@ var sale = {
                     'X-CSRFToken': csrftoken
                 }
             },
-            columns: [
-                {"data": "number"},
-                {"data": "user"},
-                {"data": "client.full_name"},
-                {"data": "date_joined"},
-                {"data": "subtotal"},
-                {"data": "iva"},
-                {"data": "total_iva"},
-                {"data": "total"},
-                {"data": "id"},
-            ],
-            order: [[0, "desc"], [2, "desc"]],
-            columnDefs: [
+            columns: [{
+                "data": "number"
+            },
                 {
-                    targets: [0],
-                    class: 'text-center',
-                    render: function (data, type, row) {
-                        if (row.saleproduct[0].endofday === true) {
-                            return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
-                        } else {
-                            return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
-                        }
-                    }
+                    "data": "user"
                 },
+                {
+                    "data": "client.full_name"
+                },
+                {
+                    "data": "date_joined"
+                },
+                {
+                    "data": "subtotal"
+                },
+                {
+                    "data": "iva"
+                },
+                {
+                    "data": "total_iva"
+                },
+                {
+                    "data": "total"
+                },
+                {
+                    "data": "id"
+                },
+            ],
+            order: [
+                [0, "desc"],
+                [2, "desc"]
+            ],
+            columnDefs: [{
+                targets: [0],
+                class: 'text-center',
+                render: function (data, type, row) {
+                    if (row.saleproduct[0].endofday === true) {
+                        return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
+                    } else {
+                        return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
+                    }
+                }
+            },
                 {
                     targets: [-2, -3, -4, -5],
                     class: 'text-center',
@@ -116,40 +135,47 @@ $(function () {
         });
 
     $('#selectPreSales').on('change', function (e) {
-        let id = $(this).val();
-        if (id !== '') {
-            var url = `guides/pdf/${id}`
-            document.getElementById('btnDonwloadGuide').href = url;
+        if ($(this).val() !== '') {
             $('#btnDonwloadGuide').removeClass('disabled');
-
         } else {
             $('#btnDonwloadGuide').addClass('disabled');
         }
-        // $.ajax({
-        //     url: 'guides/pdf/',
-        //     data: parameters,
-        //     type: 'GET',
-        //     dataSrc:'',
-        //     headers: {
-        //         'X-CSRFToken': csrftoken
-        //     },
-        //     success: function (request) {
-        //         console.log(request)
-        //         location.href = request
-        //
-        //         // if (!request.hasOwnProperty('error')) {
-        //         //     callback(request);
-        //         //     return false;
-        //         // }
-        //         message_error(request.error);
-        //         // loader.style.opacity = 0
-        //         // loader.style.visibility = 'hidden'
-        //     },
-        //     error: function (jqXHR, textStatus, errorThrown) {
-        //         message_error(errorThrown + ' ' + textStatus);
-        //     }
-        // });
+    })
 
+    $('#btnDonwloadGuide').on('click', function (e) {
+        id = $('#selectPreSales').val()
+        if (id !== '') {
+            let loader = document.querySelector('.preloader-container');
+            loader.style.opacity = 1
+            loader.style.visibility = 'initial'
+            $.ajax({
+                url: 'guides/pdf/',
+                data: {'id': id},
+                type: 'POST',
+                dataSrc: "",
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                success: function (request) {
+                    if (!request.hasOwnProperty('error')) {
+                        if (request.hasOwnProperty('info')) {
+                            message_info(request)
+                        } else {
+                            document.getElementById('iconDonwload').href = request
+                            $('#iconDonwload').removeClass('disabled')
+                            loader.style.opacity = 0
+                            loader.style.visibility = 'hidden'
+                            return false;
+                        }
+                    } else {
+                        message_error(request.error);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    message_error(errorThrown + ' ' + textStatus);
+                }
+            });
+        }
     })
 
     $('.drp-buttons').hide();
@@ -185,21 +211,29 @@ $(function () {
                         'X-CSRFToken': csrftoken
                     },
                 },
-                columns: [
-                    {"data": "product.name"},
-                    {"data": "product.category.name"},
-                    {"data": "price"},
-                    {"data": "cant"},
-                    {"data": "subtotal"},
-                ],
-                columnDefs: [
+                columns: [{
+                    "data": "product.name"
+                },
                     {
-                        targets: [-1, -3],
-                        class: 'text-center',
-                        render: function (data) {
-                            return '$' + parseFloat(data).toFixed(2);
-                        }
+                        "data": "product.category.name"
                     },
+                    {
+                        "data": "price"
+                    },
+                    {
+                        "data": "cant"
+                    },
+                    {
+                        "data": "subtotal"
+                    },
+                ],
+                columnDefs: [{
+                    targets: [-1, -3],
+                    class: 'text-center',
+                    render: function (data) {
+                        return '$' + parseFloat(data).toFixed(2);
+                    }
+                },
                     {
                         targets: [-2],
                         class: 'text-center',

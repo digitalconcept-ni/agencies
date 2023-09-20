@@ -88,11 +88,15 @@
                             {% for u in pre_sales %}
                                 <option value="{{ u.id }}">{{ u.username }}</option>
                             {% endfor %}
-                        </select>
+                        </select>   
                         <div class="input-group-append">
-                            <a class="btn btn-success disabled" type="button" id="btnDonwloadGuide" target="_blank">
+                            <button class="btn btn-success disabled" type="button" id="btnDonwloadGuide">
                                 <i class="fas fa-download"></i> Descargar
+                            </button>
+                            <a href="" class="btn btn-warning disabled" id="iconDonwload" target="_blank">
+                            <i class="fas fa-file"></i>
                             </a>
+                            
                         </div>
                     </div>
                 </div>

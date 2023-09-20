@@ -332,9 +332,15 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
 
 
 class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
+    # def post(self, request, *args, **kwargs):
+    #     data = {}
+    #     data['final_url'] = '/media/merger/' + request.tenant.schema_name + '/'+ 'guia-facturas-2023-09-12.pdf'
+    #     return JsonResponse(data, safe=False)
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
+            print(request.POST['id'])
+            data = {}
             dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
             directorySchema = os.path.join(dirname, request.tenant.schema_name)
             if not os.path.isdir(directorySchema):
@@ -344,10 +350,7 @@ class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
             today = str(now.date())
             hour = f'{now.hour} : {now.minute}'
             # today = '2023-09-08'
-            id = kwargs['id']
-
-            print(today)
-            print(id)
+            id = request.POST['id']
 
             if id == 0:
                 # COLLECT ALL THE SALES OF THE DAY
@@ -385,7 +388,8 @@ class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
                 }
                 html = template.render(context)
                 css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
-                pdfGruide = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[CSS(css_url)])
+                pdfGruide = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
+                    stylesheets=[CSS(css_url)])
                 f = open(os.path.join(directorySchema, 'guide.pdf'), 'wb')
                 f.write(pdfGruide)
                 f.close()
@@ -412,13 +416,16 @@ class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
                 }
                 html = template.render(context)
                 css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
-                pdfInvoice = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[CSS(css_url)])
+                pdfInvoice = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
+                    stylesheets=[CSS(css_url)])
                 f = open(os.path.join(directorySchema, 'invoices.pdf'), 'wb')
                 f.write(pdfInvoice)
                 f.close()
-                pd = mergerPdf(directorySchema)
+                pd = mergerPdf(directorySchema, request.tenant.schema_name)
                 # return HttpResponse(pd['path'], content_type='application/pdf')
-                return FileResponse(open(pd['path'], 'rb'))
+                return JsonResponse(pd['path'], safe=False)
+            data['info'] = 'No se encontraron ventas de hoy'
+            return JsonResponse(data, safe=False)
         except:
             pass
         return HttpResponseRedirect(reverse_lazy('sale_list'))

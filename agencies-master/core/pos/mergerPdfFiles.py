@@ -1,10 +1,9 @@
 import os
 from datetime import datetime, timedelta
 from PyPDF2 import PdfMerger, PdfReader
-from config import settings
 
 
-def mergerPdf(directorySchema):
+def mergerPdf(directorySchema, tenant_name):
     try:
         data = {}
         today = datetime.now().date()
@@ -29,7 +28,7 @@ def mergerPdf(directorySchema):
             merger.write(f)
             merger.close()
         # FINAL PATH WHERE THE FILE IS STORAGE
-        data['path'] = os.path.join(dirname, finalName)
+        data['path'] = '/media/merger/' + tenant_name + '/' + finalName
     except Exception as e:
         data['error'] = str(e)
     return data

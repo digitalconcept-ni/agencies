@@ -34,6 +34,24 @@ function message_error(obj) {
     });
 }
 
+function message_info(obj) {
+    var html = '';
+    if (typeof (obj) === 'object') {
+        html = '<ul style="text-align: left;">';
+        $.each(obj, function (key, value) {
+            html += '<li>' + key + ': ' + value + '</li>';
+        });
+        html += '</ul>';
+    } else {
+        html = '<p>' + obj + '</p>';
+    }
+    Swal.fire({
+        title: 'info',
+        html: html,
+        icon: 'info'
+    });
+}
+
 function submit_with_ajax(url, title, content, parameters, callback) {
     let loader = document.querySelector('.preloader-container');
 
