@@ -13,6 +13,7 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+var pathname = window.location.pathname;
 
 const csrftoken = getCookie('csrftoken');
 
