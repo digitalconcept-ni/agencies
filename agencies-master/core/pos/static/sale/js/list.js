@@ -144,27 +144,33 @@ $(function () {
 
     $('#btnDonwloadGuide').on('click', function (e) {
         id = $('#selectPreSales').val()
+        let param = {
+            'action': 'download_guides',
+            'id': id
+        }
         if (id !== '') {
             let loader = document.querySelector('.preloader-container');
             loader.style.opacity = 1
             loader.style.visibility = 'initial'
             $.ajax({
-                url: 'guides/pdf/',
-                data: {'id': id},
+                url: pathname,
+                data: param,
                 type: 'POST',
                 dataSrc: "",
                 headers: {
                     'X-CSRFToken': csrftoken
                 },
                 success: function (request) {
+                    loader.style.opacity = 0
+                    loader.style.visibility = 'hidden'
                     if (!request.hasOwnProperty('error')) {
                         if (request.hasOwnProperty('info')) {
                             message_info(request)
                         } else {
-                            document.getElementById('iconDonwload').href = request
+                            console.log(request)
+                            document.getElementById('iconDonwload').href = request.path
                             $('#iconDonwload').removeClass('disabled')
-                            loader.style.opacity = 0
-                            loader.style.visibility = 'hidden'
+
                             return false;
                         }
                     } else {
