@@ -32,6 +32,16 @@ TENANT = {
     'PORT': '5432',
 }}
 
+TENANT_SERVER = {
+    'default': {
+    'ENGINE': 'django_tenants.postgresql_backend',
+    'NAME': 'bisb',
+    'USER': 'postgres',
+    'PASSWORD': 'M@te0urbin@',
+    'HOST': 'localhost',
+    'PORT': '5432',
+}}
+
 # mysqlclient
 
 MYSQL = {

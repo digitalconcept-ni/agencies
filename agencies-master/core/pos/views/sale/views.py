@@ -132,9 +132,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     'user': request.user,
                     'uri': request.build_absolute_uri()
                 }
-                print(param)
                 path = self.guide(param)
-                print(path)
                 data = path
             elif action == 'search':
                 data = []

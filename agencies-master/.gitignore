@@ -6,10 +6,10 @@ __pycache__/
 */migrations/*
 **/migrations/*
 */logs/*
-deploy/*
 staticfiles/*
 db.sqlite3
-/config/
+#deploy/*
+#config/*
 media/*
 .idea
 

@@ -130,16 +130,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # DATABASES = db.SQLITE
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django_tenants.postgresql_backend',
-        'NAME': 'admin',
-        'USER': 'postgres',
-        'PASSWORD': '00Dascher',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+DATABASES = db.TENANT
+
 DATABASE_ROUTERS = (
     'django_tenants.routers.TenantSyncRouter',
 )
