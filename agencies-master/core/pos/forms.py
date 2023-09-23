@@ -160,13 +160,13 @@ class SaleForm(ModelForm):
                 'class': 'custom-select select2',
                 # 'style': 'width: 100%'
             }),
-            'date_joined': forms.DateInput(format='%Y-%m-%d', attrs={
+            'date_joined': forms.HiddenInput(attrs={
                 'value': datetime.now().strftime('%Y-%m-%d'),
                 'autocomplete': 'off',
                 'class': 'form-control datetimepicker-input',
                 'id': 'date_joined',
                 'data-target': '#date_joined',
-                'data-toggle': 'datetimepicker'
+                'data-toggle': 'datetimepicker',
             }
                                            ),
             'iva': forms.TextInput(attrs={
@@ -196,7 +196,7 @@ class ShoppingForm(ModelForm):
                 'class': 'custom-select select2',
                 # 'style': 'width: 100%'
             }),
-            'date_joined': forms.DateTimeInput(format='%Y-%m-%d',attrs={
+            'date_joined': forms.DateTimeInput(format='%Y-%m-%d', attrs={
                 # 'value': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'value': datetime.now().strftime('%Y-%m-%d'),
                 'class': 'form-control',

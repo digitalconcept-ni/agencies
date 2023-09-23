@@ -38,7 +38,7 @@ class Product(models.Model):
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta')
 
     def __str__(self):
-        return f'{self.name} ({self.category.name})'
+        return f'{self.code} - {self.name}'
 
     def get_total_earnings(self):
         # return sum([payment.amount for payment in self.objects.all()])

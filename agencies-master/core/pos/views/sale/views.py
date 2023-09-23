@@ -14,7 +14,7 @@ import os
 from core.pos.mergerPdfFiles import mergerPdf
 from core.user.models import User
 
-os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
+# os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
 from weasyprint import HTML, CSS
 
 from core.pos.forms import SaleForm, ClientForm
@@ -166,7 +166,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
 class SaleCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, CreateView):
     model = Sale
     form_class = SaleForm
-    template_name = 'sale/create.html'
+    template_name = 'sale/createmovil.html'
     success_url = reverse_lazy('sale_list')
     url_redirect = success_url
     permission_required = 'add_sale'
@@ -191,7 +191,10 @@ class SaleCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Create
                 ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
-                products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
+                print(term)
+                print(data)
+                # products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
+                products = Product.objects.filter(Q(name__icontains=term) | Q(code__icontains=term)).filter(Q(stock__gt=0) | Q(is_inventoried=False))
                 for i in products.exclude(id__in=ids_exclude)[0:10]:
                     item = i.toJSON()
                     item['text'] = i.__str__()
