@@ -108,7 +108,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 pdfInvoice = HTML(string=html, base_url=param['uri']).write_pdf(
                     stylesheets=[CSS(css_url)])
                 f = open(os.path.join(directorySchema, 'invoices.pdf'), 'wb')
-                f.write(pdfInvoice  )
+                f.write(pdfInvoice)
                 f.close()
                 pd = mergerPdf(directorySchema, param['tenant'])
                 # return HttpResponse(pd['path'], content_type='application/pdf')
@@ -117,7 +117,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             else:
                 data['info'] = 'No se encontraron ventas de hoy'
         except  Exception as e:
-            data['error']= str(e)
+            data['error'] = str(e)
         return data
 
     def post(self, request, *args, **kwargs):
@@ -140,7 +140,11 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 end_date = request.POST['end_date']
                 queryset = Sale.objects.all()
                 if len(start_date) and len(end_date):
-                    queryset = queryset.filter(date_joined__range=[start_date, end_date])
+                    if request.user.is_superuser:
+                        queryset = queryset.filter(date_joined__range=[start_date, end_date])
+                    else:
+                        queryset = queryset.filter(Q(date_joined__range=[start_date, end_date]) &
+                                                   Q(user_id=request.user.id))
                 for i in queryset:
                     data.append(i.toJSON())
             elif action == 'search_products_detail':
@@ -166,10 +170,17 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
 class SaleCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, CreateView):
     model = Sale
     form_class = SaleForm
-    template_name = 'sale/createmovil.html'
+    template_name = ''
     success_url = reverse_lazy('sale_list')
     url_redirect = success_url
     permission_required = 'add_sale'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_superuser:
+            self.template_name = 'sale/create.html'
+        else:
+            self.template_name = 'sale/createmovil.html'
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         data = {}
@@ -194,7 +205,8 @@ class SaleCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Create
                 print(term)
                 print(data)
                 # products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
-                products = Product.objects.filter(Q(name__icontains=term) | Q(code__icontains=term)).filter(Q(stock__gt=0) | Q(is_inventoried=False))
+                products = Product.objects.filter(Q(name__icontains=term) | Q(code__icontains=term)).filter(
+                    Q(stock__gt=0) | Q(is_inventoried=False))
                 for i in products.exclude(id__in=ids_exclude)[0:10]:
                     item = i.toJSON()
                     item['text'] = i.__str__()

@@ -94,7 +94,7 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
                 # products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
-                products = Product.objects.filter(name__icontains=term)
+                products = Product.objects.filter(Q(name__icontains=term) | Q(code__icontains=term))
                 for i in products:
                     item = i.toJSON()
                     item['text'] = i.__str__()

@@ -75,7 +75,7 @@ class ClientForm(ModelForm):
         fields = '__all__'
         widgets = {
             'names': forms.TextInput(attrs={'placeholder': 'Ingrese un nombre'}),
-            'dni': forms.TextInput(attrs={'placeholder': 'Ingrese un número de cedula'}),
+            'dni': forms. TextInput(attrs={'placeholder': 'Ingrese un número de cedula'}),
             'birthdate': forms.DateInput(format='%Y-%m-%d', attrs={
                 'class': 'form-control datetimepicker-input',
                 'id': 'birthdate',

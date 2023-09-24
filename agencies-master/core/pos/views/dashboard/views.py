@@ -35,7 +35,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     data['error'] = 'No tiene acceso a esta informacion'
             elif action == 'search_cards_data':
                 now = datetime.now()
-                query = Sale.objects.filter(date_joined__exact=now).only('total')
+                if request.user.is_superuser:
+                    query = Sale.objects.filter(date_joined__exact=now).only('total')
+                else:
+                    query = Sale.objects.filter(Q(date_joined__exact=now) & Q(user_id=request.user.id)).only('total')
                 queryProducts = Product.objects.filter(stock__lte=5).count()
                 totalProductsQuery = Product.objects.count()
                 totalClientsQuery = Client.objects.count()

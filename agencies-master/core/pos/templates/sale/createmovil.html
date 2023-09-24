@@ -17,14 +17,14 @@
     <script src="{% static 'sale/js/formmovil.js' %}"></script>
 {% endblock %}
 
-{% block content %}
+{% block body_2 %}
     <form id="frmSale" method="post" data-url="{{ list_url }}">
-        <div class="mr-0 ml-0">
+        <div class="container-fluid pt-4">
 
             <div class="card">
 
                 <div class="card-header">
-                    <h3 class="card-title float-right">
+                    <h3 class="card-title">
                         <button type="submit" class="btn btn-success">
                             <i class="fas fa-save"></i>
                         </button>
@@ -60,7 +60,9 @@
             </div>
 
             {# PARTE DEL DETALLE #}
+
             <table class="table table-active" id="tblProducts">
+
                 <thead>
                 <tr>
                     <th>id</th>
@@ -75,7 +77,7 @@
             </table>
 
             {# PART OF DETAIL OF INVOICE #}
-            <div class="card-invoice">
+            <div class="card-invoice" style="position: absolute; bottom: 0px; width: 390px;">
                 {# SE DEJA AFUERA PORQUE NO SE REQUIERE VISUALIZAR #}
                 <input type="hidden" name="action" value="{{ action }}">
                 <div class="form-group">
