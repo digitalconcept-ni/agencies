@@ -217,6 +217,7 @@ $(function () {
                 var newOption = new Option(response.full_name, response.id, false, true);
                 select_supplier.append(newOption).trigger('change');
                 $('#myModalSupplier').modal('hide');
+
             });
     });
 

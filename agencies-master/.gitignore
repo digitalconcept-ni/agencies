@@ -8,8 +8,8 @@ __pycache__/
 */logs/*
 staticfiles/*
 db.sqlite3
-#deploy/*
-#config/*
+deploy/*
+config/*
 media/*
 .idea
 

@@ -1,10 +1,10 @@
 #!/bin/bash
 
 export FECHA=`date +%d_%m_%Y_%H_%M_%S`
-export NAME=apolo_${FECHA}.dump
-export DIR=/home/william/backup/
+export NAME=bisb_${FECHA}.dump
+export DIR=/home/mateo/backup/
 USER_DB=postgres
-NAME_DB=apolo
+NAME_DB=bisb
 cd $DIR
 > ${NAME}
 export PGPASSWORD=123

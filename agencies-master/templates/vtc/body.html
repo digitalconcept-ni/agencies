@@ -6,57 +6,59 @@
         <span class="loader"></span>
         <span class="loader-loading mt-2">Cargando</span>
     </div>
-    <div class="wrapper">
-        <!-- Header -->
-        {% include 'vtc/header.html' %}
-        <!-- Sidebar -->
-        {% include 'vtc/sidebar.html' %}
-        <!-- Content -->
+    {% block body_2 %}
+        <div class="wrapper">
+            <!-- Header -->
+            {% include 'vtc/header.html' %}
+            <!-- Sidebar -->
+            {% include 'vtc/sidebar.html' %}
+            <!-- Content -->
 
 
-        <div class="content-wrapper">
-            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb ">
-                                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
-                                <li class="breadcrumb-item"><a href="{{ list_url }}">{{ entity }}</a></li>
-                            </ol>
+            <div class="content-wrapper">
+                <div class="content-header">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <ol class="breadcrumb ">
+                                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ list_url }}">{{ entity }}</a></li>
+                                </ol>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="content">
+                <div class="content">
 
-                {% csrf_token %}
-                <div class="container-fluid">
-                    {% block content %}
+                    {% csrf_token %}
+                    <div class="container-fluid">
+                        {% block content %}
 
-                    {% endblock %}
+                        {% endblock %}
+                    </div>
                 </div>
             </div>
+            <!-- Footer -->
+            {% include 'footer.html' %}
         </div>
-        <!-- Footer -->
-        {% include 'footer.html' %}
-    </div>
-    <!-- Block javascript -->
-    {% block javascript %}
+        <!-- Block javascript -->
+        {% block javascript %}
 
+        {% endblock %}
+        <script>
+            {% if messages %}
+                var html = '<p>';
+                {% for message in messages %}
+                    html += '{{ message }}<br>';
+                {% endfor %}
+                html += '</p>';
+                Swal.fire({
+                    title: 'Error!',
+                    html: html,
+                    icon: 'error'
+                });
+            {% endif %}
+        </script>
     {% endblock %}
-    <script>
-        {% if messages %}
-            var html = '<p>';
-            {% for message in messages %}
-                html += '{{ message }}<br>';
-            {% endfor %}
-            html += '</p>';
-            Swal.fire({
-                title: 'Error!',
-                html: html,
-                icon: 'error'
-            });
-        {% endif %}
-    </script>
     </body>
 {% endblock %}

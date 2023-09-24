@@ -13,6 +13,7 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
 var pathname = window.location.pathname;
 
 const csrftoken = getCookie('csrftoken');
@@ -71,8 +72,8 @@ function submit_with_ajax(url, title, content, parameters, callback) {
                 text: "Si",
                 btnClass: 'btn-primary',
                 action: function () {
-                    loader.style.opacity = 1
-                    loader.style.visibility = 'initial'
+                    loader.style.opacity = 1;
+                    loader.style.visibility = 'initial';
                     $.ajax({
                         url: url,
                         data: parameters,
@@ -85,6 +86,8 @@ function submit_with_ajax(url, title, content, parameters, callback) {
                         contentType: false,
                         success: function (request) {
                             if (!request.hasOwnProperty('error')) {
+                                loader.style.opacity = 0
+                                loader.style.visibility = 'hidden'
                                 callback(request);
                                 return false;
                             }

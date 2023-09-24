@@ -41,8 +41,9 @@ var sale = {
             responsive: false,
             autoWidth: false,
             destroy: true,
-            dom: '<<t>ip>',
-            scrollX: true,
+            dom: '<<t>p>',
+            scrollY: 305,
+            scrollCollapse: true,
             data: this.details.products,
             columns: [
                 {"data": "id"},
@@ -66,7 +67,7 @@ var sale = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<a rel="remove" class="btn-xs">' + data + '</a>';
+                        return '<a rel="remove" class="btn-xs" style="font-size: 14px; font-weight: bold">' + data + '</a>';
                     }
                 },
                 {
