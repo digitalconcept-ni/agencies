@@ -43,8 +43,9 @@ var sale = {
             destroy: true,
             dom: 't',
             // dom: '<<t>p>',
-            scrollY: 295,
+            scrollY: 290,
             scrollCollapse: true,
+            paging: false,
             data: this.details.products,
             columns: [
                 {"data": "id"},

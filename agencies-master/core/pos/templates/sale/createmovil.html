@@ -21,26 +21,22 @@
     <form id="frmSale" method="post" data-url="{{ list_url }}">
         <div class="container-fluid pt-4">
 
-            <div class="card">
+            <div class="card mb-0">
 
                 <div class="card-header">
-                    <h3 class="card-title">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save"></i>
-                        </button>
-                        <a href="{{ list_url }}" class="btn btn-danger">
-                            <i class="fas fa-times"></i>
-                        </a>
-                        {#                        <b>{{ title }}</b>#}
-                    </h3>
-                </div>
-
-                <div class="card-body">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i>
+                            </button>
+                            <a href="{{ list_url }}" class="btn btn-danger">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+
+                        <div class="col-8">
                             {# FOR GROUP FOR CLIENT #}
                             <div class="form-group">
-                                <label>Cliente:</label>
                                 <div class="input-group">
                                     {{ form.client }}
                                     <div class="input-group-append">
@@ -51,6 +47,13 @@
                                 </div>
                             </div>
                         </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
                     </div>
                     <div class="row">
                         <div class="col">
@@ -84,13 +87,10 @@
             </table>
 
             {# PART OF DETAIL OF INVOICE #}
-            <div class="" style="border-top: 2px solid black; background-color: white;position: absolute;
-    bottom: 0;">
+            <div class="fixed-bottom" style="border-top: 2px solid black; background-color: white;">
                 {# SE DEJA AFUERA PORQUE NO SE REQUIERE VISUALIZAR #}
                 <input type="hidden" name="action" value="{{ action }}">
-                <div class="form-group">
-                    {{ form.date_joined }}
-                </div>
+                {{ form.date_joined }}
                 {# FIN AFUERA #}
                 {# FILA DEL SUB TOTAL Y CUANTO DEL IVA #}
                 <div class="row">
