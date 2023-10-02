@@ -63,7 +63,7 @@ var sale = {
                 targets: [0],
                 class: 'text-center',
                 render: function (data, type, row) {
-                    if (row.saleproduct[0].endofday === true) {
+                    if (row.endofday === true) {
                         return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
                     } else {
                         return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'

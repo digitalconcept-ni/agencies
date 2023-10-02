@@ -1,6 +1,8 @@
+import csv
 import json
 from datetime import datetime
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Q, Sum
@@ -8,6 +10,7 @@ from django.http import HttpResponse, FileResponse
 from django.http import JsonResponse, HttpResponseRedirect
 from django.template.loader import get_template
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, FormView, DeleteView, UpdateView, View
 import os
 
@@ -17,7 +20,7 @@ from core.user.models import User
 # os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
 from weasyprint import HTML, CSS
 
-from core.pos.forms import SaleForm, ClientForm
+from core.pos.forms import SaleForm, ClientForm, SaleMovilForm
 from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin
 from core.pos.models import Sale, Product, SaleProduct, Client, Company
 from core.reports.forms import ReportForm
@@ -42,15 +45,17 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             # today = '2023-09-08'
             id = int(param['id'])
 
+            query = Sale.objects.filter(date_joined=today)
             if id == 0:
                 # COLLECT ALL THE SALES OF THE DAY
-                detailProducts = SaleProduct.objects.filter(Q(sale__date_joined=today) & Q(endofday__exact=False)) \
-                    .values('product__name', 'price').annotate(cant=Sum('cant')).annotate(subtotal=Sum('subtotal'))
+                detailProducts = query.filter(endofday__exact=False) \
+                    .values('saleproduct__product__name', 'saleproduct__price').annotate(
+                    cant=Sum('saleproduct__cant')).annotate(subtotal=Sum('saleproduct__subtotal'))
             else:
                 # COLLECT ALL THE SALES FOR ESPESIFIC USER
-                detailProducts = SaleProduct.objects.filter(
-                    Q(sale__date_joined=today) & Q(sale__user_id=id) & Q(endofday__exact=False)) \
-                    .values('product__name', 'price').annotate(cant=Sum('cant')).annotate(subtotal=Sum('subtotal'))
+                detailProducts = query.filter(Q(user_id=id) & Q(endofday__exact=False)) \
+                    .values('saleproduct__product__name', 'saleproduct__price').annotate(
+                    cant=Sum('saleproduct__cant')).annotate(subtotal=Sum('saleproduct__subtotal'))
 
             if detailProducts.count() != 0:
                 # CALCULATE INVOICE
@@ -83,23 +88,19 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 f.write(pdfGruide)
                 f.close()
 
-                # CREATE A PDFS FOR ALL SALES TO DAY
+                # CREATE A PDFS FOR ALL SALES TODAY
                 if id == 0:
                     # COLLECT ALL THE SALES OF THE DAY
-                    query = Sale.objects.filter(
-                        Q(date_joined=today) & Q(user__presale=True) & Q(saleproduct__endofday=False))
+                    querySales = query.filter(Q(user__presale=True) & Q(endofday=False))
                 else:
-                    query = Sale.objects.filter(
-                        Q(date_joined=today) & Q(user_id=id) & Q(saleproduct__endofday=False))
+                    querySales = query.filter(Q(user_id=id) & Q(endofday=False))
 
-                for q in query:
-                    s = q.saleproduct_set.all()
-                    for i in s:
-                        i.end_day()
+                for q in querySales:
+                    q.end_day()
 
                 template = get_template('sale/invoice2.html')
                 context = {
-                    'query': query,
+                    'query': querySales,
                     'today': today,
                     'icon': f'{settings.MEDIA_URL}logo.png'
                 }
@@ -139,12 +140,14 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 start_date = request.POST['start_date']
                 end_date = request.POST['end_date']
                 queryset = Sale.objects.all()
-                if len(start_date) and len(end_date):
-                    if request.user.is_superuser:
-                        queryset = queryset.filter(date_joined__range=[start_date, end_date])
-                    else:
-                        queryset = queryset.filter(Q(date_joined__range=[start_date, end_date]) &
-                                                   Q(user_id=request.user.id))
+                if len(start_date) and len(end_date) and request.user.is_superuser:
+                    queryset = queryset.filter(date_joined__range=[start_date, end_date])
+                elif len(start_date) and len(end_date) and not request.user.is_superuser:
+                    queryset = queryset.filter(
+                        Q(user_id=request.user.id) & Q(date_joined__range=[start_date, end_date]))
+                elif not len(start_date) and not len(end_date) and not request.user.is_superuser:
+                    queryset = queryset.filter(user_id=request.user.id)
+
                 for i in queryset:
                     data.append(i.toJSON())
             elif action == 'search_products_detail':
@@ -169,17 +172,20 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
 
 class SaleCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, CreateView):
     model = Sale
-    form_class = SaleForm
+    form_class = ''
     template_name = ''
     success_url = reverse_lazy('sale_list')
     url_redirect = success_url
     permission_required = 'add_sale'
 
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_superuser:
-            self.template_name = 'sale/create.html'
-        else:
+        if request.user.presale:
+            self.form_class = SaleMovilForm
             self.template_name = 'sale/createmovil.html'
+        else:
+            self.form_class = SaleForm
+            self.template_name = 'sale/create.html'
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -337,7 +343,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                         if detail.product.is_inventoried:
                             if p['id'] in pr:
                                 indice = pr.index(p['id'])
-                                print('indice existe: ', indice)
+                                # print('indice existe: ', indice)
                                 detail.product.stock = (detail.product.stock + products_review[indice]['cant']) - \
                                                        p['cant']
                                 detail.product.cost = float(p['cost'])
@@ -352,11 +358,10 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
 
                     if len(pr) != 0:
                         for i in pr:
-                            print(i)
                             if i not in listProductId:
                                 indice = pr.index(i)
-                                print('indice no existe: ', indice)
-                                print('No existe: ', i)
+                                # print('indice no existe: ', indice)
+                                # print('No existe: ', i)
                                 detail.product_id = int(i)
                                 detail.product.stock = detail.product.stock + products_review[indice]['cant']
                                 detail.product.cost = float(products_review[indice]['cost'])

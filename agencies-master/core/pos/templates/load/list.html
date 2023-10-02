@@ -1,0 +1,21 @@
+{% extends 'list.html' %}
+{% load static %}
+
+{% block head_list %}
+    <script src="{% static 'load/js/loadcsv.js' %}"></script>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <label for="file-csv">Seleciona un archivo: </label>
+                <input type="file" name="file-csv" id="insert_file">
+                <button type="button" class="btn btn-success" id="btn_insert_csv">Insertar</button>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

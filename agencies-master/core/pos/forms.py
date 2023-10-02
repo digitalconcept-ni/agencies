@@ -182,6 +182,40 @@ class SaleForm(ModelForm):
             })
         }
 
+class SaleMovilForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['client'].queryset = Client.objects.none()
+
+    class Meta:
+        model = Sale
+        fields = '__all__'
+        widgets = {
+            'client': forms.Select(attrs={
+                'class': 'custom-select select2',
+                # 'style': 'width: 100%'
+            }),
+            'date_joined': forms.HiddenInput(attrs={
+                'value': datetime.now().strftime('%Y-%m-%d'),
+                'autocomplete': 'off',
+                'class': 'form-control datetimepicker-input',
+                'id': 'date_joined',
+                'data-target': '#date_joined',
+                'data-toggle': 'datetimepicker',
+            }
+                                           ),
+            'iva': forms.TextInput(attrs={
+                'style': 'border: none; width: 100%;'
+            }),
+            'subtotal': forms.TextInput(attrs={
+                'readonly': True,
+                'style': 'border: none; width: 100%;'
+            }),
+            'total': forms.TextInput(attrs={
+                'readonly': True,
+                'style': 'border: none; width: 100%;'
+            })
+        }
 
 class ShoppingForm(ModelForm):
     def __init__(self, *args, **kwargs):

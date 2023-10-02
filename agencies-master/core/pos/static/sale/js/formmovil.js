@@ -41,8 +41,9 @@ var sale = {
             responsive: false,
             autoWidth: false,
             destroy: true,
-            dom: '<<t>p>',
-            scrollY: 305,
+            dom: 't',
+            // dom: '<<t>p>',
+            scrollY: 295,
             scrollCollapse: true,
             data: this.details.products,
             columns: [
@@ -401,15 +402,7 @@ $(function () {
         keepOpen: false
     });
 
-    $("input[name='iva']").TouchSpin({
-        min: 0,
-        max: 100,
-        step: 0.01,
-        decimals: 2,
-        boostat: 5,
-        maxboostedstep: 10,
-        postfix: '%'
-    }).on('change', function () {
+    $("input[name='iva']").on('change', function () {
         sale.calculateInvoice();
     }).val(0.00);
 

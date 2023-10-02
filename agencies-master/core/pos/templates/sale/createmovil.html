@@ -36,24 +36,31 @@
                 </div>
 
                 <div class="card-body">
-                    {# FOR GROUP FOR CLIENT #}
-                    <div class="form-group">
-                        <label>Cliente:</label>
-                        <div class="input-group">
-                            {{ form.client }}
-                            <div class="input-group-append">
-                                <button class="btn btn-success btn-flat btnAddClient" type="button">
-                                    <i class="fas fa-user-plus"></i>
-                                </button>
+                    <div class="row">
+                        <div class="col">
+                            {# FOR GROUP FOR CLIENT #}
+                            <div class="form-group">
+                                <label>Cliente:</label>
+                                <div class="input-group">
+                                    {{ form.client }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success btn-flat btnAddClient" type="button">
+                                            <i class="fas fa-user-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    {# SPACE FOR SEARCH PRODUCTS #}
-                    <div class="form-group col">
-                        <label>Buscador de productos:</label>
-                        <div class="input-group">
-                            <select class="form-control select2" name="search_product"></select>
+                    <div class="row">
+                        <div class="col">
+                            {# SPACE FOR SEARCH PRODUCTS #}
+                            <div class="form-group">
+                                <label>Buscador de productos:</label>
+                                <div class="input-group">
+                                    <select class="form-control select2" name="search_product"></select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -77,7 +84,8 @@
             </table>
 
             {# PART OF DETAIL OF INVOICE #}
-            <div class="card-invoice" style="position: absolute; bottom: 0px; width: 390px;">
+            <div class="" style="border-top: 2px solid black; background-color: white;position: absolute;
+    bottom: 0;">
                 {# SE DEJA AFUERA PORQUE NO SE REQUIERE VISUALIZAR #}
                 <input type="hidden" name="action" value="{{ action }}">
                 <div class="form-group">
@@ -86,13 +94,13 @@
                 {# FIN AFUERA #}
                 {# FILA DEL SUB TOTAL Y CUANTO DEL IVA #}
                 <div class="row">
-                    <div class="col">
+                    <div class="col-6">
                         <div class="form-group">
                             <label>Subtotal:</label>
                             {{ form.subtotal }}
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-6">
                         <div class="form-group">
                             <label>IVA:</label>
                             {{ form.iva }}
@@ -102,14 +110,14 @@
 
                 {# PARTE DEL IVA CALCULADO Y DEL TOTAL A PAGAR #}
                 <div class="row">
-                    <div class="col">
+                    <div class="col-6">
                         <div class="form-group">
                             <label>IVA Calculado:</label>
-                            <input type="text" class="form-control" readonly name="ivacalc"
+                            <input type="text" style="border: none; width: 100%;" name="ivacalc"
                                    value="0.00">
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-6">
                         <div class="form-group">
                             <label>Total a pagar:</label>
                             {{ form.total }}

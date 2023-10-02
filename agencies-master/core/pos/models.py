@@ -29,10 +29,10 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=150, verbose_name='Nombre', unique=True)
-    code = models.CharField(max_length=6, verbose_name='Codigo de producto')
+    code = models.CharField(max_length=6, unique=True, verbose_name='Codigo de producto')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
     image = models.ImageField(upload_to='product/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
-    is_inventoried = models.BooleanField(default=True, verbose_name='¿Es inventariado?')
+    is_inventoried = models.BooleanField(default=True, blank= True, null=True, verbose_name='¿Es inventariado?')
     stock = models.IntegerField(default=0, verbose_name='Stock')
     cost = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de compra')
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta')
@@ -225,6 +225,7 @@ class Company(models.Model):
 class Sale(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario')
+    endofday = models.BooleanField(default=False)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     date_joined = models.DateField(default=datetime.now)
     time_joined = models.TimeField(default=datetime.now)
@@ -235,6 +236,13 @@ class Sale(models.Model):
 
     def __str__(self):
         return self.client.names
+
+    def end_day(self):
+        if self.user.is_active:
+            self.user.is_active = False
+            self.user.save()
+        self.endofday = True
+        self.save()
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
@@ -284,22 +292,12 @@ class Sale(models.Model):
 class SaleProduct(models.Model):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    endofday = models.BooleanField(default=False)
     price = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     cant = models.IntegerField(default=0)
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
 
     def __str__(self):
         return self.product.name
-
-    def end_day(self):
-        if self.sale.user.is_active:
-            self.sale.user.is_active = False
-            self.sale.user.save()
-        print(self.sale.user.is_active)
-        self.endofday = True
-        self.save()
-
 
     def toJSON(self):
         item = model_to_dict(self, exclude=['sale'])

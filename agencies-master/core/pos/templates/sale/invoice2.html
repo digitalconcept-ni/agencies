@@ -38,6 +38,7 @@
 <body>
 <div class="container-fluid">
     {% for q in query %}
+        <h1>{{ q }} </h1>
 
         <img alt="" src="{{ q.company.get_image }} " class="img-logo img-fluid d-block mx-auto ">
         <h1 class="name-company">{{ q.company.name }}</h1>
