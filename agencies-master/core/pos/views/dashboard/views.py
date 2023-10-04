@@ -39,7 +39,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     query = Sale.objects.filter(date_joined__exact=now).only('total')
                 else:
                     query = Sale.objects.filter(Q(date_joined__exact=now) & Q(user_id=request.user.id)).only('total')
-                queryProducts = Product.objects.filter(stock__lte=5).count()
+                queryProducts = Product.objects.filter(stock__lte=10).count()
                 totalProductsQuery = Product.objects.count()
                 totalClientsQuery = Client.objects.count()
                 countSalesNow = 0
@@ -56,7 +56,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'lower-inventory': queryProducts,
                 }
             elif action == 'search_lower_inventory':
-                queryProducts = Product.objects.filter(stock__lte=5)
+                queryProducts = Product.objects.filter(stock__lte=10)
                 data = []
                 for p in queryProducts:
                     data.append([p.id, p.name, p.category.name, p.stock,

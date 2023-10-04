@@ -27,6 +27,11 @@ $(function () {
 
         let config = [
             {
+                targets: [0],
+                class: 'text-center',
+                visible: false
+            },
+            {
                 targets: [3],
                 class: 'text-center',
                 render: function (data, type, row) {

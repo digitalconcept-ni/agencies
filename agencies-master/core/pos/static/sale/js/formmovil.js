@@ -39,13 +39,12 @@ var sale = {
         this.calculateInvoice();
         tblProducts = $('#tblProducts').DataTable({
             responsive: false,
-            autoWidth: false,
+            autoWidth: true,
             destroy: true,
-            dom: 't',
-            // dom: '<<t>p>',
-            scrollY: 290,
-            scrollCollapse: true,
             paging: false,
+            dom: 't',
+            scrollY: 400,
+            scrollCollapse: true,
             data: this.details.products,
             columns: [
                 {"data": "id"},
@@ -143,7 +142,7 @@ $(function () {
                 };
             },
         },
-        placeholder: 'Ingrese una descripción',
+        placeholder: 'Ingrese un nombre',
         minimumInputLength: 1,
     });
 
@@ -164,7 +163,6 @@ $(function () {
     });
 
     $('#frmClient').on('submit', function (e) {
-        let loader = document.querySelector('.preloader-container');
 
         e.preventDefault();
         var parameters = new FormData(this);
@@ -175,8 +173,6 @@ $(function () {
                 var newOption = new Option(response.full_name, response.id, false, true);
                 select_client.append(newOption).trigger('change');
                 $('#myModalClient').modal('hide');
-                loader.style.opacity = 0
-                loader.style.visibility = 'hidden'
             });
     });
 
@@ -235,7 +231,7 @@ $(function () {
                 };
             },
         },
-        placeholder: 'Ingrese una descripción',
+        placeholder: 'Ingrese un codigo o descripción',
         minimumInputLength: 1,
         templateResult: function (repo) {
             if (repo.loading) {

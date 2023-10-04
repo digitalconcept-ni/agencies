@@ -271,11 +271,21 @@ class SaleCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Create
 
 class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, UpdateView):
     model = Sale
-    form_class = SaleForm
-    template_name = 'sale/create.html'
+    form_class = ''
+    template_name = ''
     success_url = reverse_lazy('sale_list')
     url_redirect = success_url
     permission_required = 'change_sale'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.presale:
+            self.form_class = SaleMovilForm
+            self.template_name = 'sale/createmovil.html'
+        else:
+            self.form_class = SaleForm
+            self.template_name = 'sale/create.html'
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
         instance = self.get_object()

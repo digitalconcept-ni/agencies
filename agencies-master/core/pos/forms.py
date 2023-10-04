@@ -205,15 +205,15 @@ class SaleMovilForm(ModelForm):
             }
                                            ),
             'iva': forms.TextInput(attrs={
-                'style': 'border: none; width: 100%;'
+                'style': 'border: none; width: 100%; background: transparent; color: white;'
             }),
             'subtotal': forms.TextInput(attrs={
                 'readonly': True,
-                'style': 'border: none; width: 100%;'
+                'style': 'border: none; width: 100%; background: transparent; color: white;'
             }),
             'total': forms.TextInput(attrs={
                 'readonly': True,
-                'style': 'border: none; width: 100%;'
+                'style': 'border: none; width: 100%; background: transparent; color: white;'
             })
         }
 

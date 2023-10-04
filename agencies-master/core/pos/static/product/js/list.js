@@ -18,7 +18,7 @@ var product = {
             },
             columns: [
                 {"data": "id"},
-                {"data": "name"},
+                {"data": "full_name"},
                 {"data": "category.name"},
                 {"data": "image"},
                 {"data": "is_inventoried"},

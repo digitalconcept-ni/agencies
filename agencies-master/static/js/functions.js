@@ -85,13 +85,14 @@ function submit_with_ajax(url, title, content, parameters, callback) {
                         processData: false,
                         contentType: false,
                         success: function (request) {
+                            loader.style.opacity = 0;
+                            loader.style.visibility = 'hidden';
                             if (!request.hasOwnProperty('error')) {
-                                loader.style.opacity = 0
-                                loader.style.visibility = 'hidden'
                                 callback(request);
                                 return false;
+                            } else {
+                                message_error(request.error);
                             }
-                            message_error(request.error);
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
                             message_error(errorThrown + ' ' + textStatus);

@@ -169,8 +169,6 @@ $(function () {
     });
 
     $('#frmClient').on('submit', function (e) {
-        let loader = document.querySelector('.preloader-container');
-
         e.preventDefault();
         var parameters = new FormData(this);
         parameters.append('action', 'create_client');
@@ -180,8 +178,6 @@ $(function () {
                 var newOption = new Option(response.full_name, response.id, false, true);
                 select_client.append(newOption).trigger('change');
                 $('#myModalClient').modal('hide');
-                loader.style.opacity = 0
-                loader.style.visibility = 'hidden'
             });
     });
 
