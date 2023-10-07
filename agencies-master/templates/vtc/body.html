@@ -42,9 +42,6 @@
             {% include 'footer.html' %}
         </div>
         <!-- Block javascript -->
-        {% block javascript %}
-
-        {% endblock %}
         <script>
             {% if messages %}
                 var html = '<p>';
@@ -59,6 +56,14 @@
                 });
             {% endif %}
         </script>
+    {% endblock %}
+
+    {% block javascript2 %}
+
+    {% endblock %}
+
+    {% block javascript %}
+
     {% endblock %}
     </body>
 {% endblock %}

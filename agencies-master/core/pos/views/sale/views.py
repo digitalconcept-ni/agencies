@@ -154,6 +154,14 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 data = []
                 for i in SaleProduct.objects.filter(sale_id=request.POST['id']):
                     data.append(i.toJSON())
+            elif action == 'delete':
+                print('delete')
+                sale = Sale.objects.get(id=request.POST['id'])
+                set = sale.saleproduct_set.all()
+                for s in set:
+                    s.product.stock += s.cant
+                    s.save()
+                sale.delete()
             else:
                 data['error'] = 'No se ha encontrado el acttion'
         except Exception as e:
@@ -411,33 +419,6 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
         return context
 
 
-class SaleDeleteView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, DeleteView):
-    model = Sale
-    template_name = 'sale/delete.html'
-    success_url = reverse_lazy('sale_list')
-    url_redirect = success_url
-    permission_required = 'delete_sale'
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        data = {}
-        try:
-            self.object.delete()
-        except Exception as e:
-            data['error'] = str(e)
-        return JsonResponse(data)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Eliminación de una Venta'
-        context['entity'] = 'Ventas'
-        context['list_url'] = self.success_url
-        return context
-
-
 class SaleInvoicePdfView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
@@ -456,97 +437,97 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
         return HttpResponseRedirect(reverse_lazy('sale_list'))
 
 
-class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
-
-    def post(self, request, *args, **kwargs):
-        try:
-            print(request.POST['id'])
-            data = {}
-            dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
-            directorySchema = os.path.join(dirname, request.tenant.schema_name)
-            if not os.path.isdir(directorySchema):
-                os.mkdir(directorySchema)
-            now = datetime.now()
-            user = request.user
-            today = str(now.date())
-            hour = f'{now.hour} : {now.minute}'
-            # today = '2023-09-08'
-            id = request.POST['id']
-
-            if id == 0:
-                # COLLECT ALL THE SALES OF THE DAY
-                detailProducts = SaleProduct.objects.filter(Q(sale__date_joined=today) & Q(endofday__exact=False)) \
-                    .values('product__name', 'price').annotate(cant=Sum('cant')).annotate(subtotal=Sum('subtotal'))
-            else:
-                # COLLECT ALL THE SALES FOR ESPESIFIC USER
-                detailProducts = SaleProduct.objects.filter(
-                    Q(sale__date_joined=today) & Q(sale__user_id=id) & Q(endofday__exact=False)) \
-                    .values('product__name', 'price').annotate(cant=Sum('cant')).annotate(subtotal=Sum('subtotal'))
-
-            print(detailProducts)
-            if detailProducts.count() != 0:
-                # CALCULATE INVOICE
-                subtotal = 0.00
-                totalProducts = 0
-                for det in detailProducts:
-                    subtotal += float(det['subtotal'])
-                    totalProducts += det['cant']
-                ivaCalculado = subtotal * 0.15
-                totalInvoice = subtotal + ivaCalculado
-                calculate = {'subtotal': subtotal, 'iva': 0.15, 'total_iva': ivaCalculado, 'total': totalInvoice,
-                             'all_product': totalProducts}
-
-                # CREATE A PDF FOR THE GUIDE TO DAY
-                template = get_template('sale/guide.html')
-                context = {
-                    'user': user,
-                    'products': detailProducts,
-                    'calculate': calculate,
-                    'company': Company.objects.first(),
-                    'today': today,
-                    'hour': hour,
-                    'icon': f'{settings.MEDIA_URL}logo.png'
-                }
-                html = template.render(context)
-                css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
-                pdfGruide = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
-                    stylesheets=[CSS(css_url)])
-                f = open(os.path.join(directorySchema, 'guide.pdf'), 'wb')
-                f.write(pdfGruide)
-                f.close()
-
-                # CREATE A PDFS FOR ALL SALES TO DAY
-                if id == 0:
-                    # COLLECT ALL THE SALES OF THE DAY
-                    query = Sale.objects.filter(
-                        Q(date_joined=today) & Q(user__presale=True) & Q(saleproduct__endofday=False))
-                else:
-                    query = Sale.objects.filter(
-                        Q(date_joined=today) & Q(user_id=id) & Q(saleproduct__endofday=False))
-
-                for q in query:
-                    s = q.saleproduct_set.all()
-                    for i in s:
-                        i.end_day()
-
-                template = get_template('sale/invoice2.html')
-                context = {
-                    'query': query,
-                    'today': today,
-                    'icon': f'{settings.MEDIA_URL}logo.png'
-                }
-                html = template.render(context)
-                css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
-                pdfInvoice = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
-                    stylesheets=[CSS(css_url)])
-                f = open(os.path.join(directorySchema, 'invoices.pdf'), 'wb')
-                f.write(pdfInvoice)
-                f.close()
-                pd = mergerPdf(directorySchema, request.tenant.schema_name)
-                # return HttpResponse(pd['path'], content_type='application/pdf')
-                return JsonResponse(pd['path'], safe=False)
-            data['info'] = 'No se encontraron ventas de hoy'
-            return JsonResponse(data, safe=False)
-        except:
-            pass
-        return HttpResponseRedirect(reverse_lazy('sale_list'))
+# class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
+#
+#     def post(self, request, *args, **kwargs):
+#         try:
+#             print(request.POST['id'])
+#             data = {}
+#             dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
+#             directorySchema = os.path.join(dirname, request.tenant.schema_name)
+#             if not os.path.isdir(directorySchema):
+#                 os.mkdir(directorySchema)
+#             now = datetime.now()
+#             user = request.user
+#             today = str(now.date())
+#             hour = f'{now.hour} : {now.minute}'
+#             # today = '2023-09-08'
+#             id = request.POST['id']
+#
+#             if id == 0:
+#                 # COLLECT ALL THE SALES OF THE DAY
+#                 detailProducts = SaleProduct.objects.filter(Q(sale__date_joined=today) & Q(endofday__exact=False)) \
+#                     .values('product__name', 'price').annotate(cant=Sum('cant')).annotate(subtotal=Sum('subtotal'))
+#             else:
+#                 # COLLECT ALL THE SALES FOR ESPESIFIC USER
+#                 detailProducts = SaleProduct.objects.filter(
+#                     Q(sale__date_joined=today) & Q(sale__user_id=id) & Q(endofday__exact=False)) \
+#                     .values('product__name', 'price').annotate(cant=Sum('cant')).annotate(subtotal=Sum('subtotal'))
+#
+#             print(detailProducts)
+#             if detailProducts.count() != 0:
+#                 # CALCULATE INVOICE
+#                 subtotal = 0.00
+#                 totalProducts = 0
+#                 for det in detailProducts:
+#                     subtotal += float(det['subtotal'])
+#                     totalProducts += det['cant']
+#                 ivaCalculado = subtotal * 0.15
+#                 totalInvoice = subtotal + ivaCalculado
+#                 calculate = {'subtotal': subtotal, 'iva': 0.15, 'total_iva': ivaCalculado, 'total': totalInvoice,
+#                              'all_product': totalProducts}
+#
+#                 # CREATE A PDF FOR THE GUIDE TO DAY
+#                 template = get_template('sale/guide.html')
+#                 context = {
+#                     'user': user,
+#                     'products': detailProducts,
+#                     'calculate': calculate,
+#                     'company': Company.objects.first(),
+#                     'today': today,
+#                     'hour': hour,
+#                     'icon': f'{settings.MEDIA_URL}logo.png'
+#                 }
+#                 html = template.render(context)
+#                 css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
+#                 pdfGruide = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
+#                     stylesheets=[CSS(css_url)])
+#                 f = open(os.path.join(directorySchema, 'guide.pdf'), 'wb')
+#                 f.write(pdfGruide)
+#                 f.close()
+#
+#                 # CREATE A PDFS FOR ALL SALES TO DAY
+#                 if id == 0:
+#                     # COLLECT ALL THE SALES OF THE DAY
+#                     query = Sale.objects.filter(
+#                         Q(date_joined=today) & Q(user__presale=True) & Q(saleproduct__endofday=False))
+#                 else:
+#                     query = Sale.objects.filter(
+#                         Q(date_joined=today) & Q(user_id=id) & Q(saleproduct__endofday=False))
+#
+#                 for q in query:
+#                     s = q.saleproduct_set.all()
+#                     for i in s:
+#                         i.end_day()
+#
+#                 template = get_template('sale/invoice2.html')
+#                 context = {
+#                     'query': query,
+#                     'today': today,
+#                     'icon': f'{settings.MEDIA_URL}logo.png'
+#                 }
+#                 html = template.render(context)
+#                 css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
+#                 pdfInvoice = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(
+#                     stylesheets=[CSS(css_url)])
+#                 f = open(os.path.join(directorySchema, 'invoices.pdf'), 'wb')
+#                 f.write(pdfInvoice)
+#                 f.close()
+#                 pd = mergerPdf(directorySchema, request.tenant.schema_name)
+#                 # return HttpResponse(pd['path'], content_type='application/pdf')
+#                 return JsonResponse(pd['path'], safe=False)
+#             data['info'] = 'No se encontraron ventas de hoy'
+#             return JsonResponse(data, safe=False)
+#         except:
+#             pass
+#         return HttpResponseRedirect(reverse_lazy('sale_list'))

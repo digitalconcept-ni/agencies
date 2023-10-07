@@ -22,8 +22,11 @@ class ProductListView(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 for i in Product.objects.all():
                     data.append(i.toJSON())
+            elif action == 'delete':
+                pro = Product.objects.get(id=request.POST['id'])
+                pro.delete()
             else:
-                data['error'] = 'Ha ocurrido un error'
+                data['error'] = 'Ha ocurrido un error revise sus valores'
         except Exception as e:
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
@@ -101,32 +104,4 @@ class ProductUpdateView(ValidatePermissionRequiredMixin, UpdateView):
         context['entity'] = 'Productos'
         context['list_url'] = self.success_url
         context['action'] = 'edit'
-        return context
-
-
-class ProductDeleteView(ValidatePermissionRequiredMixin, DeleteView):
-    model = Product
-    template_name = 'product/delete.html'
-    success_url = reverse_lazy('product_list')
-    url_redirect = success_url
-    permission_required = 'delete_product'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        data = {}
-        try:
-            self.object.delete()
-        except Exception as e:
-            data['error'] = str(e)
-        return JsonResponse(data)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Eliminación de un Producto'
-        context['entity'] = 'Productos'
-        context['list_url'] = self.success_url
         return context

@@ -20,6 +20,9 @@ class SupplierListView(ValidatePermissionRequiredMixin, ListView):
                 data = []
                 for i in Supplier.objects.all():
                     data.append(i.toJSON())
+            elif action == 'delete':
+                sup = Supplier.objects.get(id=request.POST['id'])
+                sup.delete()
             else:
                 data['error'] = 'Ha ocurrido un error'
         except Exception as e:
@@ -96,31 +99,4 @@ class SupplierUpdateView(ValidatePermissionRequiredMixin, UpdateView):
         context['entity'] = 'Proveedores'
         context['list_url'] = self.success_url
         context['action'] = 'edit'
-        return context
-
-
-class SupplierDeleteView(ValidatePermissionRequiredMixin, DeleteView):
-    model = Supplier
-    template_name = 'supplier/delete.html'
-    success_url = reverse_lazy('supplier_list')
-    url_redirect = success_url
-    permission_required = 'delete_supplier'
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        data = {}
-        try:
-            self.object.delete()
-        except Exception as e:
-            data['error'] = str(e)
-        return JsonResponse(data)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Eliminación de un Proveedor'
-        context['entity'] = 'proveedores'
-        context['list_url'] = self.success_url
         return context

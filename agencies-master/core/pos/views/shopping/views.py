@@ -38,6 +38,12 @@ class ShoppingListView(ValidatePermissionRequiredMixin, FormView):
                     queryset = queryset.filter(date_joined__range=[start_date, end_date])
                 for i in queryset:
                     data.append(i.toJSON())
+            elif action == 'delete':
+                sho = Shopping.objects.get(id=request.POST['id'])
+                for s in sho.shoppingdetail_set.all():
+                    s.product.stock -= s.cant
+                    s.product.save()
+                sho.delete()
             elif action == 'search_invoice_number':
                 data = []
                 queryset = Shopping.objects.all()
@@ -303,38 +309,6 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
         context['action'] = 'edit'
         context['products'] = self.get_details_product()
         context['frmSupplier'] = SupplierForm()
-        return context
-
-
-class ShoppingDeleteView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, DeleteView):
-    model = Shopping
-    template_name = 'shopping/delete.html'
-    success_url = reverse_lazy('shopping_list')
-    url_redirect = success_url
-    permission_required = 'delete_shopping'
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        data = {}
-        try:
-            products = [p for p in ShoppingDetail.objects.filter(shopping_id=self.object.id)]
-            for i in products:
-                if i.product.is_inventoried:
-                    i.product.stock -= i.cant
-                    i.product.save()
-            self.object.delete()
-        except Exception as e:
-            data['error'] = str(e)
-        return JsonResponse(data)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Eliminación de una Compra'
-        context['entity'] = 'Compras'
-        context['list_url'] = self.success_url
         return context
 
 # class SaleInvoicePdfView(LoginRequiredMixin, View):
