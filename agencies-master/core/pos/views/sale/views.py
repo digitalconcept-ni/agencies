@@ -17,11 +17,11 @@ import os
 from core.pos.mergerPdfFiles import mergerPdf
 from core.user.models import User
 
-# os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
+os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
 from weasyprint import HTML, CSS
 
 from core.pos.forms import SaleForm, ClientForm, SaleMovilForm
-from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin
+from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin, deviceVerificationMixin
 from core.pos.models import Sale, Product, SaleProduct, Client, Company
 from core.reports.forms import ReportForm
 
@@ -45,7 +45,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             # today = '2023-09-08'
             id = int(param['id'])
 
-            query = Sale.objects.filter(date_joined=today)
+            query = Sale.objects.filter(Q(date_joined=today) & Q(user__presale=True))
             if id == 0:
                 # COLLECT ALL THE SALES OF THE DAY
                 detailProducts = query.filter(endofday__exact=False) \
@@ -56,6 +56,8 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 detailProducts = query.filter(Q(user_id=id) & Q(endofday__exact=False)) \
                     .values('saleproduct__product__name', 'saleproduct__price').annotate(
                     cant=Sum('saleproduct__cant')).annotate(subtotal=Sum('saleproduct__subtotal'))
+
+            print(detailProducts.count())
 
             if detailProducts.count() != 0:
                 # CALCULATE INVOICE
@@ -91,7 +93,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 # CREATE A PDFS FOR ALL SALES TODAY
                 if id == 0:
                     # COLLECT ALL THE SALES OF THE DAY
-                    querySales = query.filter(Q(user__presale=True) & Q(endofday=False))
+                    querySales = query.filter(endofday=False)
                 else:
                     querySales = query.filter(Q(user_id=id) & Q(endofday=False))
 
@@ -116,7 +118,11 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 data['path'] = pd['path']
                 return data
             else:
-                data['info'] = 'No se encontraron ventas de hoy'
+                if id == 0:
+                    data['info'] = 'No se encontraron ventas registradas de hoy de los preventas'
+                else:
+                    data['info'] = 'No se encontraron ventas registradas del preventa'
+                return data
         except  Exception as e:
             data['error'] = str(e)
         return data
@@ -178,23 +184,13 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
         return context
 
 
-class SaleCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, CreateView):
+class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermissionRequiredMixin, CreateView):
     model = Sale
-    form_class = ''
-    template_name = ''
+    # form_class = ''
+    # template_name = ''
     success_url = reverse_lazy('sale_list')
     url_redirect = success_url
     permission_required = 'add_sale'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.presale:
-            self.form_class = SaleMovilForm
-            self.template_name = 'sale/createmovil.html'
-        else:
-            self.form_class = SaleForm
-            self.template_name = 'sale/create.html'
-        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         data = {}
@@ -277,27 +273,21 @@ class SaleCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Create
         return context
 
 
-class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, UpdateView):
+class SaleUpdateView(deviceVerificationMixin,ExistsCompanyMixin, ValidatePermissionRequiredMixin, UpdateView):
     model = Sale
-    form_class = ''
-    template_name = ''
+    # form_class = ''
+    # template_name = ''
     success_url = reverse_lazy('sale_list')
     url_redirect = success_url
     permission_required = 'change_sale'
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.presale:
-            self.form_class = SaleMovilForm
-            self.template_name = 'sale/createmovil.html'
-        else:
-            self.form_class = SaleForm
-            self.template_name = 'sale/create.html'
-        return super().dispatch(request, *args, **kwargs)
-
     def get_form(self, form_class=None):
+        module = self.request.path.split('/')[3]
         instance = self.get_object()
-        form = SaleForm(instance=instance)
+        if module == 'update':
+            form = SaleMovilForm(instance=instance)
+        else:
+            form = SaleForm(instance=instance)
         form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
         return form
 
@@ -435,7 +425,6 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
         except:
             pass
         return HttpResponseRedirect(reverse_lazy('sale_list'))
-
 
 # class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):
 #

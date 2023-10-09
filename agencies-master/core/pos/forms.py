@@ -150,6 +150,7 @@ class SupplierForm(ModelForm):
 class SaleForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        print('sale')
         self.fields['client'].queryset = Client.objects.none()
 
     class Meta:
@@ -185,6 +186,7 @@ class SaleForm(ModelForm):
 class SaleMovilForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        print('salemovil')
         self.fields['client'].queryset = Client.objects.none()
 
     class Meta:

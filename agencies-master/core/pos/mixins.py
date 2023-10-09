@@ -8,7 +8,8 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 
-from core.pos.models import Company
+from core.pos.forms import SaleMovilForm, SaleForm
+from core.pos.models import Company, Client
 
 
 class IsSuperuserMixin(object):
@@ -63,3 +64,20 @@ class ExistsCompanyMixin(object):
             return super().dispatch(request, *args, **kwargs)
         messages.error(request, 'No se puede facturar si no esta registrada la compañia')
         return redirect('dashboard')
+
+
+class deviceVerificationMixin(object):
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if 'Sec-Ch-Ua-Mobile' in request.headers:
+            if request.headers['Sec-Ch-Ua-Mobile'] == '?1':
+                self.form_class = SaleMovilForm
+                self.template_name = 'sale/createmovil.html'
+            elif request.headers['Sec-Ch-Ua-Mobile'] == '?0':
+                self.form_class = SaleForm
+                self.template_name = 'sale/create.html'
+        else:
+            self.form_class = SaleForm
+            self.template_name = 'sale/create.html'
+        return super().dispatch(request, *args, **kwargs)

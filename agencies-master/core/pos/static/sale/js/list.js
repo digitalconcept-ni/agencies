@@ -24,7 +24,8 @@ var sale = {
                 data: parameters,
                 dataSrc: "",
                 headers: {
-                    'X-CSRFToken': csrftoken
+                    'X-CSRFToken': csrftoken,
+                    'X-Screen': '1080'
                 }
             },
             columns: [{
@@ -144,43 +145,26 @@ $(function () {
 
     $('#btnDonwloadGuide').on('click', function (e) {
         id = $('#selectPreSales').val()
-        let param = {
-            'action': 'download_guides',
-            'id': id
-        }
         if (id !== '') {
-            let loader = document.querySelector('.preloader-container');
-            loader.style.opacity = 1
-            loader.style.visibility = 'initial'
-            $.ajax({
-                url: pathname,
-                data: param,
-                type: 'POST',
-                dataSrc: "",
-                headers: {
-                    'X-CSRFToken': csrftoken
-                },
-                success: function (request) {
-                    loader.style.opacity = 0
-                    loader.style.visibility = 'hidden'
-                    if (!request.hasOwnProperty('error')) {
-                        if (request.hasOwnProperty('info')) {
-                            message_info(request)
-                        } else {
-                            console.log(request)
-                            document.getElementById('iconDonwload').href = request.path
-                            $('#iconDonwload').removeClass('disabled')
+            var param = new FormData();
+            param.append('action', 'download_guides')
+            param.append('id', id)
 
-                            return false;
-                        }
-                    } else {
-                        message_error(request.error);
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    message_error(errorThrown + ' ' + textStatus);
+            submit_with_ajax(pathname, 'Descargar Guia', '¿Estas seguro de esta accion?', param, function (request) {
+                if (request.hasOwnProperty('info')) {
+                    message_info(request.info)
+                } else {
+                    document.getElementById('iconDonwload').href = request.path
+                    $('#iconDonwload').removeClass('disabled');
+                    Swal.fire({
+                        title: 'Alerta',
+                        text: 'Guia realizada correctamente',
+                        icon: 'success',
+                        timer: 1500,
+                    })
                 }
-            });
+
+            })
         }
     })
 
