@@ -166,7 +166,7 @@ class ShoppingDetail(models.Model):
 
 class Client(models.Model):
     names = models.CharField(max_length=150, verbose_name='Nombres')
-    dni = models.CharField(max_length=14, unique=True, verbose_name='Número de cedula')
+    dni = models.CharField(max_length=14, unique=True, default='0010101010034S', verbose_name='Número de cedula')
     birthdate = models.DateField(default=datetime.now, verbose_name='Fecha de nacimiento')
     address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')
     gender = models.CharField(max_length=10, choices=genders, default='male', verbose_name='Genero')
