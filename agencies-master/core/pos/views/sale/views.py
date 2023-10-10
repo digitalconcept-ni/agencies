@@ -50,24 +50,27 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 # COLLECT ALL THE SALES OF THE DAY
                 detailProducts = query.filter(endofday__exact=False) \
                     .values('saleproduct__product__name', 'saleproduct__price').annotate(
-                    cant=Sum('saleproduct__cant')).annotate(subtotal=Sum('saleproduct__subtotal'))
+                    cant=Sum('saleproduct__cant')).annotate(subtotal=Sum('saleproduct__subtotal')).annotate(
+                    iva=Sum('total_iva'))
             else:
                 # COLLECT ALL THE SALES FOR ESPESIFIC USER
                 detailProducts = query.filter(Q(user_id=id) & Q(endofday__exact=False)) \
                     .values('saleproduct__product__name', 'saleproduct__price').annotate(
-                    cant=Sum('saleproduct__cant')).annotate(subtotal=Sum('saleproduct__subtotal'))
+                    cant=Sum('saleproduct__cant')).annotate(subtotal=Sum('saleproduct__subtotal')).annotate(
+                    iva=Sum('total_iva'))
 
-            print(detailProducts.count())
+            # print(detailProducts[0]['iva'])
 
             if detailProducts.count() != 0:
                 # CALCULATE INVOICE
                 subtotal = 0.00
                 totalProducts = 0
+                ivaCalculado = detailProducts[0]['iva']
                 for det in detailProducts:
                     subtotal += float(det['subtotal'])
                     totalProducts += det['cant']
-                ivaCalculado = subtotal * 0.15
-                totalInvoice = subtotal + ivaCalculado
+                print(ivaCalculado)
+                totalInvoice = subtotal + float(ivaCalculado)
                 calculate = {'subtotal': subtotal, 'iva': 0.15, 'total_iva': ivaCalculado, 'total': totalInvoice,
                              'all_product': totalProducts}
 
@@ -273,7 +276,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
         return context
 
 
-class SaleUpdateView(deviceVerificationMixin,ExistsCompanyMixin, ValidatePermissionRequiredMixin, UpdateView):
+class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, UpdateView):
     model = Sale
     # form_class = ''
     # template_name = ''
@@ -283,13 +286,19 @@ class SaleUpdateView(deviceVerificationMixin,ExistsCompanyMixin, ValidatePermiss
 
     def get_form(self, form_class=None):
         module = self.request.path.split('/')[3]
-        instance = self.get_object()
+        print(module)
         if module == 'update':
-            form = SaleMovilForm(instance=instance)
-        else:
-            form = SaleForm(instance=instance)
-        form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
-        return form
+            instance = self.get_object()
+            if 'Sec-Ch-Ua-Mobile' in self.request.headers:
+                if self.request.headers['Sec-Ch-Ua-Mobile'] == '?1':
+                    form = SaleMovilForm(instance=instance)
+                    form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
+                    self.template_name = 'sale/createmovil.html'
+                elif self.request.headers['Sec-Ch-Ua-Mobile'] == '?0':
+                    form = SaleForm(instance=instance)
+                    form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
+                    self.template_name = 'sale/create.html'
+                return form
 
     def get_details_product(self):
         data = []

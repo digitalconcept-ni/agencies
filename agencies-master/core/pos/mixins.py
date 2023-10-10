@@ -68,6 +68,20 @@ class ExistsCompanyMixin(object):
 
 class deviceVerificationMixin(object):
 
+    # def get_form(self, form_class=None):
+    #     module = self.request.path.split('/')[3]
+    #     print(module)
+    #     if module == 'update':
+    #         instance = self.get_object()
+    #         if 'Sec-Ch-Ua-Mobile' in self.request.headers:
+    #             if self.request.headers['Sec-Ch-Ua-Mobile'] == '?1':
+    #                 form = SaleMovilForm(instance=instance)
+    #                 form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
+    #             elif self.request.headers['Sec-Ch-Ua-Mobile'] == '?0':
+    #                 form = SaleForm(instance=instance)
+    #                 form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
+    #             return form
+
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         if 'Sec-Ch-Ua-Mobile' in request.headers:

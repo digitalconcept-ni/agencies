@@ -1,4 +1,5 @@
 import csv
+import os
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
@@ -18,22 +19,22 @@ class loadCsvView(LoginRequiredMixin, ListView):
             if action == 'insert_file':
                 print('entry the action')
                 product_list = []
-                with open('/home/mateo/agencies/agencies-master/inventorygonzalez.csv', 'r') as file:
-                    reader = csv.reader(file)
-                    for i, row in enumerate(reader):
-                        product = Product(
-                            name=row[0],
-                            code=row[1],
-                            category_id=row[4],
-                            image='',
-                            is_inventoried=True,
-                            stock=row[2],
-                            cost=row[5],
-                            pvp=row[3]
-                        )
-                        product_list.append(product)
-                    print(product_list)
-                    Product.objects.bulk_create(product_list)
+                file = request.FILES['file']
+                decode_file = file.read().decode("utf-8").splitlines()
+                reader = csv.reader(decode_file)
+                for row in reader:
+                    product = Product(
+                        name=row[0],
+                        code=row[1],
+                        category_id=row[4],
+                        image='',
+                        is_inventoried=True,
+                        stock=row[2],
+                        cost=row[5],
+                        pvp=row[3]
+                    )
+                    product_list.append(product)
+                Product.objects.bulk_create(product_list)
                 data['success'] = 'Proceso terminado con exito'
             return JsonResponse(data, safe=False)
         except Exception as e:
