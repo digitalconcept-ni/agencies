@@ -53,7 +53,7 @@ $(function () {
             },
         ]
         let data = {
-            'action': 'search_lower_inventory',
+            'data': {'action': 'search_lower_inventory'},
             'inserInto': 'rowModal',
             'th': ['id', 'Nombre', 'Categoria', 'Stock', 'Costo'],
             'table': 'tableModal',
@@ -81,7 +81,7 @@ $(function () {
             },
         ]
         let data = {
-            'action': 'search_investment',
+            'data': {'action': 'search_investment'},
             'inserInto': 'rowModal',
             'th': ['Nro', 'Inversión', 'Ganancia'],
             'table': 'tableModal',
@@ -91,5 +91,41 @@ $(function () {
         drawTables(data);
     })
 
+    // $('#salestoday').on('click', function () {
+    //     alert('Hello')
+    //     $('#modalInfo').modal('show');
+    // })
+
+    $('#selectPreSales').on('change', function () {
+        if ($(this).val() !== '') {
+            var id = $(this).val();
+            let config = [
+                {
+                    targets: [0],
+                    visible: false
+                },
+                {
+                    targets: [1],
+                    class: 'text-center',
+                },
+                {
+                    targets: [2],
+                    class: 'text-center',
+                    render: function (data, type, row) {
+                        return 'C$ ' + parseFloat(data).toFixed(2);
+                    }
+                },
+            ]
+            let data = {
+                'data': {'action': 'search_presale_info', 'id': id},
+                'inserInto': 'rowDash',
+                'th': ['Nro', 'Cantidad de facturas', 'Total C$', 'Ultimo Cliente', 'Hora ultimo pedido'],
+                'table': 'tableDash',
+                'config': config,
+                'modal': false,
+            }
+            drawTables(data);
+        }
+    })
 
 })

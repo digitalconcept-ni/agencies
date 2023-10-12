@@ -39,6 +39,7 @@
 <div class="container-fluid">
     <img alt="" src="{{ company.get_image }} " class="img-logo img-fluid d-block mx-auto ">
     <h1 class="name-company">{{ company.name }}</h1>
+    <h4 class="text-center">ORDEN DE EXTRACCION: {{ today }}-{{ hour }}</h4>
 
     <div class="row">
         <div class="col">
@@ -78,7 +79,8 @@
     {% for det in products %}
         <tr>
             <td class="text-center">{{ det.cant }}</td>
-            <td>{{ det.saleproduct__product__name }}</td>
+            <td>{{ det.saleproduct__product__code }} - {{ det.saleproduct__product__name }}
+                - {{ det.saleproduct__product__category__name }}</td>
             <td class="text-center">{{ det.saleproduct__price|floatformat:2 }}</td>
             <td class="text-right">{{ det.subtotal|floatformat:2 }}</td>
         </tr>

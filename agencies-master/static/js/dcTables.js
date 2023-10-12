@@ -86,10 +86,10 @@ const drawTables = async (data) => {
             ajax: {
                 url: data.url,
                 type: 'POST',
-                // data: data.data,
-                data: {
-                    'action': data.action,
-                },
+                data: data.data,
+                // data: {
+                //     'action': data.action,
+                // },
                 dataSrc: "",
                 headers: {
                     'X-CSRFToken': csrftoken

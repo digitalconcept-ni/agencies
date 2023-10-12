@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, F
 from django.http import HttpResponse, FileResponse
 from django.http import JsonResponse, HttpResponseRedirect
 from django.template.loader import get_template
@@ -41,37 +41,28 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             now = datetime.now()
             user = param['user']
             today = str(now.date())
-            hour = f'{now.hour} : {now.minute}'
+            hour = f'{now.hour}:{now.minute}'
             # today = '2023-09-08'
             id = int(param['id'])
 
             query = Sale.objects.filter(Q(date_joined=today) & Q(user__presale=True))
-            if id == 0:
-                # COLLECT ALL THE SALES OF THE DAY
-                detailProducts = query.filter(endofday__exact=False) \
-                    .values('saleproduct__product__name', 'saleproduct__price').annotate(
-                    cant=Sum('saleproduct__cant')).annotate(subtotal=Sum('saleproduct__subtotal')).annotate(
-                    iva=Sum('total_iva'))
-            else:
-                # COLLECT ALL THE SALES FOR ESPESIFIC USER
-                detailProducts = query.filter(Q(user_id=id) & Q(endofday__exact=False)) \
-                    .values('saleproduct__product__name', 'saleproduct__price').annotate(
-                    cant=Sum('saleproduct__cant')).annotate(subtotal=Sum('saleproduct__subtotal')).annotate(
-                    iva=Sum('total_iva'))
-
-            # print(detailProducts[0]['iva'])
+            querySales = query.filter(Q(user_id=id) & Q(endofday__exact=False))
+            # COLLECT ALL THE SALES FOR ESPESIFIC USER
+            detailProducts = querySales.order_by('-saleproduct__product__category_id').values(
+                'saleproduct__product__category__name', 'saleproduct__product__code', 'saleproduct__product__name',
+                'saleproduct__price').annotate(cant=Sum('saleproduct__cant')).annotate(
+                subtotal=Sum('saleproduct__subtotal'))
 
             if detailProducts.count() != 0:
                 # CALCULATE INVOICE
+                iva = querySales.aggregate(result=Sum(F('total_iva'))).get('result')
                 subtotal = 0.00
                 totalProducts = 0
-                ivaCalculado = detailProducts[0]['iva']
                 for det in detailProducts:
                     subtotal += float(det['subtotal'])
                     totalProducts += det['cant']
-                print(ivaCalculado)
-                totalInvoice = subtotal + float(ivaCalculado)
-                calculate = {'subtotal': subtotal, 'iva': 0.15, 'total_iva': ivaCalculado, 'total': totalInvoice,
+                totalInvoice = subtotal + float(iva)
+                calculate = {'subtotal': subtotal, 'iva': 0.15, 'total_iva': float(iva), 'total': totalInvoice,
                              'all_product': totalProducts}
 
                 # CREATE A PDF FOR THE GUIDE TO DAY
@@ -94,12 +85,6 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 f.close()
 
                 # CREATE A PDFS FOR ALL SALES TODAY
-                if id == 0:
-                    # COLLECT ALL THE SALES OF THE DAY
-                    querySales = query.filter(endofday=False)
-                else:
-                    querySales = query.filter(Q(user_id=id) & Q(endofday=False))
-
                 for q in querySales:
                     q.end_day()
 
@@ -121,10 +106,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 data['path'] = pd['path']
                 return data
             else:
-                if id == 0:
-                    data['info'] = 'No se encontraron ventas registradas de hoy de los preventas'
-                else:
-                    data['info'] = 'No se encontraron ventas registradas del preventa'
+                data['info'] = 'No se encontraron ventas registradas del preventa'
                 return data
         except  Exception as e:
             data['error'] = str(e)

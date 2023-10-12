@@ -55,7 +55,7 @@ var access_users = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<a href="' + pathname + 'delete/' + row.id + '/" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                        return '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
                     }
                 },
             ],

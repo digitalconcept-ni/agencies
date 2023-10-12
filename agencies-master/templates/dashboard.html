@@ -14,7 +14,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3 ">
-                <a href="{{ sales_url }}" target="_blank">
+                <a id="salestoday">
                     <div class="small-box bg-olive shadow-lg">
                         <div class="inner">
                             <h3 id="sales-today">0</h3>
@@ -100,8 +100,46 @@
 
     {#    /////////////////////#}
 
-    {% if request.user.is_superuser %}
+    {% if request.user.is_superuser %}.
         <div class="container-fluid">
+
+            {# CARD INFOR SALE PRE SALE#}
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <b>Seguimiento</b>
+                    </h3>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="input-group mb-3">
+                                <select name="idPreSeles" id="selectPreSales" class="form-control">
+                                    <option value="">Selecciona el preventa</option>
+                                    {% for u in pre_sales %}
+                                        <option value="{{ u.id }}">{{ u.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered table-sm" id="tableDash">
+                        <thead>
+                        <tr id="trow" rel="rowDash">
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# END CARD INFO PRE SALE#}
+
             <div class="row">
                 <div class="col-lg-12">
                     <div id="container"></div>
@@ -114,6 +152,7 @@
                 </div>
             </div>
             <br>
+        </div>
         </div>
 
         {#    PART OF THE CODE FOR THE MODAL INFO FOR THE EPORDUCTS  WITH THE LOWER STOCK#}

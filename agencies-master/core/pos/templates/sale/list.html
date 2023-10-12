@@ -83,8 +83,7 @@
                     <label>Descarga de guía: </label>
                     <div class="input-group mb-3">
                         <select name="idPreSeles" id="selectPreSales" class="form-control">
-                            <option value="">Selecciona la guia</option>
-                            <option value="0">General</option>
+                            <option value="">Selecciona el preventa </option>
                             {% for u in pre_sales %}
                                 <option value="{{ u.id }}">{{ u.username }}</option>
                             {% endfor %}
@@ -93,7 +92,7 @@
                             <button class="btn btn-success disabled" type="button" id="btnDonwloadGuide">
                                 <i class="fas fa-download"></i> Descargar
                             </button>
-                            <a href="" class="btn btn-warning disabled" id="iconDonwload" target="_blank">
+                            <a href="" class="btn btn-warning disabled d-hidden-mini" id="iconDonwload" target="_blank">
                             <i class="fas fa-file"></i>
                             </a>
                             

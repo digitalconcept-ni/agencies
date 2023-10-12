@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 
 from core.pos.models import Sale, Product, SaleProduct, Client
+from core.user.models import User
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -21,6 +22,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         data = {}
         try:
+            now = datetime.now()
             action = request.POST['action']
             if action == 'search_investment':
                 if request.user.is_superuser:
@@ -34,7 +36,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 else:
                     data['error'] = 'No tiene acceso a esta informacion'
             elif action == 'search_cards_data':
-                now = datetime.now()
                 if request.user.is_superuser:
                     query = Sale.objects.filter(date_joined__exact=now).only('total')
                 else:
@@ -89,6 +90,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'colorByPoint': True,
                     'data': points
                 }
+            elif action == 'search_presale_info':
+                query = Sale.objects.select_related().filter(Q(date_joined__exact=now) & Q(user_id=request.POST['id']))
+                totalMoney = query.aggregate(result=Sum(F('total'))).get('result')
+                totalSales = query.count()
+                u = query.order_by('time_joined').last()
+                data = [[request.POST['id'], f'{totalSales}', f'{totalMoney:.2f}', f'{u.client.names}', f'{u.time_joined}']]
+
         except Exception as e:
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
@@ -97,6 +105,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'BISB - HOME | DASCHBOARD'
         context['panel'] = 'Panel de administrador'
+        context['pre_sales'] = User.objects.filter(presale=True)
         context['create_url'] = reverse_lazy('shopping_create')
         context['sales_url'] = reverse_lazy('sale_list')
         context['clients_url'] = reverse_lazy('client_list')

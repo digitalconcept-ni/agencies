@@ -140,6 +140,7 @@ $(function () {
             $('#btnDonwloadGuide').removeClass('disabled');
         } else {
             $('#btnDonwloadGuide').addClass('disabled');
+            $('#iconDonwload').addClass('d-hidden-mini')
         }
     })
 
@@ -155,7 +156,9 @@ $(function () {
                     message_info(request.info)
                 } else {
                     document.getElementById('iconDonwload').href = request.path
-                    $('#iconDonwload').removeClass('disabled');
+                    $('#iconDonwload').removeClass('disabled')
+                        .removeClass('d-hidden-mini');
+                    tblSale.ajax.reload();
                     Swal.fire({
                         title: 'Alerta',
                         text: 'Guia realizada correctamente',
