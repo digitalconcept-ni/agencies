@@ -91,7 +91,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'data': points
                 }
             elif action == 'search_presale_info':
-                query = Sale.objects.select_related().filter(Q(date_joined__exact=now) & Q(user_id=request.POST['id']))
+                print(request.POST)
+                query = Sale.objects.filter(Q(date_joined__exact=now) & Q(user_id=request.POST['id']))
                 totalMoney = query.aggregate(result=Sum(F('total'))).get('result')
                 totalSales = query.count()
                 u = query.order_by('time_joined').last()
