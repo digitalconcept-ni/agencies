@@ -91,14 +91,11 @@ $(function () {
         drawTables(data);
     })
 
-    // $('#salestoday').on('click', function () {
-    //     alert('Hello')
-    //     $('#modalInfo').modal('show');
-    // })
+    $('#btnSearchPresaleInfo').on('click', function () {
+        var Selector = $('#selectPreSales').val();
 
-    $('#selectPreSales').on('change', function () {
-        if ($(this).val() !== '') {
-            var id = $(this).val();
+        if (Selector !== '') {
+            var id = Selector;
             let config = [
                 {
                     targets: [0],
@@ -127,5 +124,37 @@ $(function () {
             drawTables(data);
         }
     })
+
+    // $('#selectPreSales').on('change', function () {
+    //     if ($(this).val() !== '') {
+    //         var id = $(this).val();
+    //         let config = [
+    //             {
+    //                 targets: [0],
+    //                 visible: false
+    //             },
+    //             {
+    //                 targets: [1],
+    //                 class: 'text-center',
+    //             },
+    //             {
+    //                 targets: [2],
+    //                 class: 'text-center',
+    //                 render: function (data, type, row) {
+    //                     return 'C$ ' + parseFloat(data).toFixed(2);
+    //                 }
+    //             },
+    //         ]
+    //         let data = {
+    //             'data': {'action': 'search_presale_info', 'id': id},
+    //             'inserInto': 'rowDash',
+    //             'th': ['Nro', 'Cantidad de facturas', 'Total C$', 'Ultimo Cliente', 'Hora ultimo pedido'],
+    //             'table': 'tableDash',
+    //             'config': config,
+    //             'modal': false,
+    //         }
+    //         drawTables(data);
+    //     }
+    // })
 
 })
