@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum, FloatField, Q, F, Func
+from django.db.models import Sum, FloatField, Q, F, Func, Count, Max
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -35,26 +35,34 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     print(data)
                 else:
                     data['error'] = 'No tiene acceso a esta informacion'
-            elif action == 'search_cards_data':
-                if request.user.is_superuser:
-                    query = Sale.objects.filter(date_joined__exact=now).only('total')
-                else:
-                    query = Sale.objects.filter(Q(date_joined__exact=now) & Q(user_id=request.user.id)).only('total')
-                queryProducts = Product.objects.filter(stock__lte=10).count()
-                totalProductsQuery = Product.objects.count()
-                totalClientsQuery = Client.objects.count()
-                countSalesNow = 0
-                countSalesNowMoney = 0
+            elif action == 'search_data':
+                maximumProductSold = SaleProduct.objects.select_related().filter(sale__date_joined=now).values(
+                    'product__name').annotate(
+                    total=Sum(F('cant'))).order_by('-total')[:5]
+                sold = []
+                for x, maximumProductSold in enumerate(maximumProductSold):
+                    sold.append([x+1, maximumProductSold['product__name'], maximumProductSold['total']])
 
-                for i in query:
-                    countSalesNowMoney += i.total
-                    countSalesNow += 1
+                queryProducts = Product.objects.select_related()
+                querySales = Sale.objects.select_related().filter(date_joined__exact=now)
+                if request.user.is_superuser:
+                    sale = querySales
+                else:
+                    sale = querySales.filter(user_id=request.user.id)
+                lowInventory = queryProducts.filter(stock__lte=15).count()
+                totalProductsQuery = queryProducts.count()
+                totalClientsQuery = Client.objects.count()
+                countSalesToday = sale.count()
+                countSalesTodayMoney = sale.aggregate(
+                    result=Coalesce(Sum(F('total')), 0.00, output_field=FloatField())).get('result')
+
                 data = {
-                    'sales-today': countSalesNow,
-                    'sales': countSalesNowMoney,
+                    'sales-today': countSalesToday,
+                    'sales': countSalesTodayMoney,
                     'products': totalProductsQuery,
                     'clients': totalClientsQuery,
-                    'lower-inventory': queryProducts,
+                    'lower-inventory': lowInventory,
+                    'maximumsold': sold
                 }
             elif action == 'search_lower_inventory':
                 queryProducts = Product.objects.filter(stock__lte=10)
@@ -90,23 +98,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'colorByPoint': True,
                     'data': points
                 }
-            elif action == 'search_presale_info':
-                print(request.POST)
-                query = Sale.objects.filter(Q(date_joined__exact=now) & Q(user_id=request.POST['id']))
-                totalMoney = query.aggregate(result=Sum(F('total'))).get('result')
-                totalSales = query.count()
-                u = query.order_by('time_joined').last()
-                data = [[request.POST['id'], f'{totalSales}', f'{totalMoney:.2f}', f'{u.client.names}', f'{u.time_joined}']]
-
         except Exception as e:
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'BISB - HOME | DASCHBOARD'
+        context['title'] = 'BisB -Dashboard'
         context['panel'] = 'Panel de administrador'
-        context['pre_sales'] = User.objects.filter(presale=True)
         context['create_url'] = reverse_lazy('shopping_create')
         context['sales_url'] = reverse_lazy('sale_list')
         context['clients_url'] = reverse_lazy('client_list')

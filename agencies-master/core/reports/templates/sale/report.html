@@ -1,28 +1,81 @@
 {% extends 'report.html' %}
 {% load static %}
 {% block head_report %}
+    <script src="{% static 'js/dcTables.js' %}"></script>
     <script src="{% static 'sale/js/report.js' %}"></script>
+    <script src="{% static 'sale/js/follow.js' %}"></script>
+
 {% endblock %}
 
 {% block content_report %}
+
     <div class="row">
-        <div class="col-lg-4">
-            <div class="form-group">
-                <label>Rango de fechas:</label>
-                {{ form.date_range }}
+        <div class="col-12">
+            <div class="card card-navy card-tabs">
+                <div class="card-header p-0 pt-1">
+                    <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="custom-tabs-one-home-tab" data-toggle="pill"
+                               href="#custom-tabs-one-sale" role="tab" aria-controls="custom-tabs-one-sale"
+                               aria-selected="true">Ventas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-one-profile-tab" data-toggle="pill"
+                               href="#custom-tabs-one-follow" role="tab" aria-controls="custom-tabs-one-follow"
+                               aria-selected="false">Seguimiento</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="custom-tabs-one-tabContent">
+                        <div class="tab-pane fade active show" id="custom-tabs-one-sale" role="tabpanel"
+                             aria-labelledby="custom-tabs-one-sale-tab">
+                            <h2>Reporte de Ventas</h2>
+
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Rango de fechas:</label>
+                                    {{ form.date_range }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="custom-tabs-one-follow" role="tabpanel"
+                             aria-labelledby="custom-tabs-one-follow-tab">
+                            <div class="row">
+                                <div class="col-md-6 col">
+                                <h2>Reporte preventa</h2>
+                                    <div class="input-group mb-3">
+                                        <select name="idPreSeles" id="selectPreSales" class="form-control">
+                                            <option value="">Selecciona el preventa</option>
+                                            {% for u in pre_sales %}
+                                                <option value="{{ u.id }}">{{ u.username }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-success" type="button" id="btnSearchPresaleInfo">
+                                                <i class="fas fa-search"></i> Buscar
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
-    <hr>
     <table class="table table-bordered" id="data">
         <thead>
-        <tr>
-            <th scope="col">Nro</th>
-            <th scope="col">Cliente</th>
-            <th scope="col">Fecha de registro</th>
-            <th scope="col">Subtotal</th>
-            <th scope="col">Iva</th>
-            <th scope="col">Total</th>
+        <tr id="trow" rel="rowData">
+            {#            <th scope="col">Nro</th>#}
+            {#            <th scope="col">Cliente</th>#}
+            {#            <th scope="col">Fecha de registro</th>#}
+            {#            <th scope="col">Subtotal</th>#}
+            {#            <th scope="col">Iva</th>#}
+            {#            <th scope="col">Total</th>#}
         </tr>
         </thead>
         <tbody>

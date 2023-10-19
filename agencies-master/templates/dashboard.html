@@ -13,66 +13,49 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-md-3 ">
-                <a id="salestoday">
-                    <div class="small-box bg-olive shadow-lg">
-                        <div class="inner">
-                            <h3 id="sales-today">0</h3>
 
-                            <p>Ventas Hoy</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fa fa-check-circle"></i>
-                        </div>
+            <div class="col-md-3 col-sm-6 col-12">
+                <div class="info-box bg-olive">
+                    <span class="info-box-icon"><i class="fa fa-file-alt"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Ventas de hoy</span>
+                        <h3 class="info-box-number" id="sales-today">0</h3>
                     </div>
-                </a>
+                </div>
             </div>
-
             {# //END FIRST #}
 
-            <div class="col-md-3">
-                <a href="{{ sales_url }}">
-                    <div class="small-box bg-gradient-success shadow-lg">
-                        <div class="inner">
-                            <h3 id="sales">0</h3>
-
-                            <p>Total Ventas</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fa fa-cash-register"></i>
-                        </div>
+            <div class="col-md-3 col-sm-6 col-12">
+                <div class="info-box bg-gradient-success">
+                    <span class="info-box-icon"><i class="fa fa-money-bill-wave"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total ventas de hoy</span>
+                        <h3 class="info-box-number" id="sales">0</h3>
                     </div>
-                </a>
+                </div>
             </div>
             {# //END SECOND #}
 
             {% if request.user.is_superuser %}
 
-
-                <div class="col-md-3" id="pro">
-                    <div class="small-box bg-info shadow-lg">
-                        <div class="inner">
-                            <h3 id="products">0</h3>
-
-                            <p>Productos</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fa fa-list-alt"></i>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box bg-gradient-info products shadow-lg" id="pro">
+                        <span class="info-box-icon"><i class="fa fa-barcode"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Productos</span>
+                            <h3 class="info-box-number" id="products">0</h3>
                         </div>
                     </div>
                 </div>
                 {# //END THIRD #}
 
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6 col-12">
                     <a href="{{ clients_url }}">
-                        <div class="small-box bg-lightblue shadow-lg">
-                            <div class="inner">
-                                <h3 id="clients">0</h3>
-
-                                <p>Clientes</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fa fa-users"></i>
+                        <div class="info-box bg-gradient-lightblue products shadow-lg">
+                            <span class="info-box-icon"><i class="fa fa-users"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Clientes</span>
+                                <h3 class="info-box-number" id="clients">0</h3>
                             </div>
                         </div>
                     </a>
@@ -81,15 +64,12 @@
             {% endif %}
         </div>
         <div class="row">
-            <div class="col-md-3 " id="lower">
-                <div class="small-box bg-danger shadow-lg">
-                    <div class="inner">
-                        <h3 id="lower-inventory">0</h3>
-
-                        <p>Productos con poco inventario</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fa fa-barcode"></i>
+            <div class="col-md-3 col-sm-6 col-12" id="lower">
+                <div class="info-box bg-gradient-danger products shadow-lg">
+                    <span class="info-box-icon"><i class="fa fa-arrow-down"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Productos poco inventario</span>
+                        <h3 class="info-box-number" id="lower-inventory">0</h3>
                     </div>
                 </div>
             </div>
@@ -100,53 +80,33 @@
 
     {#    /////////////////////#}
 
-    {% if request.user.is_superuser %}.
-        <div class="container-fluid">
+    {% if request.user.is_superuser %}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header border-0">
+                            <h3 class="card-title">Productos mas vendidos hoy</h3>
+                        </div>
 
-            {# CARD INFOR SALE PRE SALE#}
-
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <b>Seguimiento</b>
-                    </h3>
-                </div>
-
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 col">
-                            <div class="input-group mb-3">
-                                <select name="idPreSeles" id="selectPreSales" class="form-control">
-                                    <option value="">Selecciona el preventa</option>
-                                    {% for u in pre_sales %}
-                                        <option value="{{ u.id }}">{{ u.username }}</option>
-                                    {% endfor %}
-                                </select>
-                                <div class="input-group-append">
-                                    <button class="btn btn-success" type="button" id="btnSearchPresaleInfo">
-                                        <i class="fas fa-search"></i> Buscar
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-striped table-valign-middle" id="tableDashProductSold">
+                                <thead>
+                                <tr id="trow" rel="rowDash">
+                                    <th scope="col">Nro</th>
+                                    <th scope="col">Producto</th>
+                                    <th scope="col">Cantidad</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
 
                         </div>
                     </div>
 
-                    <table class="table table-bordered table-sm" id="tableDash">
-                        <thead>
-                        <tr id="trow" rel="rowDash">
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
                 </div>
-            </div>
-
-            {# END CARD INFO PRE SALE#}
-
-            <div class="row">
-                <div class="col-lg-12">
+                <div class="col-md-12 col-lg-6">
                     <div id="container"></div>
                 </div>
             </div>
@@ -161,36 +121,6 @@
         </div>
 
         {#    PART OF THE CODE FOR THE MODAL INFO FOR THE EPORDUCTS  WITH THE LOWER STOCK#}
-        <div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-hidden="true">
-            {{ csrf }}
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <b><i class="fas fa-search"></i> Detalle</b>
-                        </h5>
-
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <table class="table table-bordered table-sm" id="tableModal">
-                            <thead>
-                            <tr id="trow" rel="rowModal">
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <a id="btn-sale-products" href="{{ create_url }}" target="_blank"
-                           class="btn btn-success">Comprar</a>
-                    </div>
-                </div>
-            </div>
-        </div>
         <script type="application/javascript">
             var year = new Date;
             let mesActual = new Intl.DateTimeFormat('es-ES', {month: 'long'}).format(year);
@@ -354,6 +284,65 @@
                 <div class="modal-footer">
                     <a id="btn-sale-products" href="{{ create_url }}" target="_blank"
                        class="btn btn-success">Comprar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {# PROBANDO #}
+    <div class="modal fade" id="modalInfo2" tabindex="-1" role="dialog" aria-hidden="true">
+        {{ csrf }}
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" id="modalheader">
+                    <div rel="modal-header">
+                        <h5 class="modal-title">
+                            <b><i class="fas fa-search"></i> Detalle</b>
+                        </h5>
+                    </div>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body" id="modalbody">
+                    <div rel="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 col">
+                                <div class="input-group mb-3">
+                                    <select name="idPreSeles" id="selectPreSales" class="form-control">
+                                        <option value="">Selecciona el preventa</option>
+                                        {% for u in pre_sales %}
+                                            <option value="{{ u.id }}">{{ u.username }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success" type="button" id="btnSearchPresaleInfo">
+                                            <i class="fas fa-search"></i> Buscar
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-sm" id="tableModal">
+                        <thead>
+                        <tr id="trow" rel="rowModal">
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer" rel="modal-footer" id="modalfooter">
+                    <div rel="modal-footer">
+                        <a id="btn-sale-products" href="/pos/shopping/add" target="_blank"
+                           class="btn btn-success">Comprar</a>
+                    </div>
                 </div>
             </div>
         </div>

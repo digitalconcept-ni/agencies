@@ -35,6 +35,7 @@ const clean = (table, insertInto) => {
                 resolve(true);
             } catch (error) {
                 console.log(error)
+                message_error(error)
             }
         }
     })
@@ -55,6 +56,7 @@ const tableColumn = async (data, table, insertInto) => {
 }
 
 const drawTables = async (data) => {
+
     var header = await tableColumn(data.th, data.table, data.inserInto);
 
     if (header === true) {
@@ -95,9 +97,26 @@ const drawTables = async (data) => {
                     'X-CSRFToken': csrftoken
                 },
             },
+            order: false,
+            // paging: false,
+            ordering: false,
+            info: false,
+            // searching: false,
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: 'Descargar Excel <i class="fas fa-file-excel"></i>',
+                    titleAttr: 'Excel',
+                    className: 'btn btn-success btn-flat'
+                }],
             columnDefs: data.config,
             initComplete: function (settings, json) {
-                if (!json.hasOwnProperty('error')) {
+                if (json.hasOwnProperty('error')) {
+                    message_error(json.error)
+                } else if (json.hasOwnProperty('info')) {
+                    message_info(json)
+                } else {
                     if (data.modal === true) {
                         $('#modalInfo').modal('show');
                     }
