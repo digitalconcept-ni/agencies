@@ -87,7 +87,7 @@ class deviceVerificationMixin(object):
         if 'Sec-Ch-Ua-Mobile' in request.headers:
             if request.headers['Sec-Ch-Ua-Mobile'] == '?1':
                 self.form_class = SaleMovilForm
-                self.template_name = 'sale/createmovil.html'
+                self.template_name = 'sale/createmovil2.html'
             elif request.headers['Sec-Ch-Ua-Mobile'] == '?0':
                 self.form_class = SaleForm
                 self.template_name = 'sale/create.html'

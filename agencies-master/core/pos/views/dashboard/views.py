@@ -32,7 +32,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                         result=Coalesce(Sum(F('stock') * F('pvp')), 0.00, output_field=FloatField())).get('result')
                     revenue = float(pvp) - float(investment)
                     data = [[1, f'{investment:.2f}', f'{revenue:.2f}']]
-                    print(data)
                 else:
                     data['error'] = 'No tiene acceso a esta informacion'
             elif action == 'search_data':
@@ -41,7 +40,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     total=Sum(F('cant'))).order_by('-total')[:5]
                 sold = []
                 for x, maximumProductSold in enumerate(maximumProductSold):
-                    sold.append([x+1, maximumProductSold['product__name'], maximumProductSold['total']])
+                    sold.append([x + 1, maximumProductSold['product__name'], maximumProductSold['total']])
 
                 queryProducts = Product.objects.select_related()
                 querySales = Sale.objects.select_related().filter(date_joined__exact=now)
@@ -70,6 +69,29 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 for p in queryProducts:
                     data.append([p.id, p.name, p.category.name, p.stock,
                                  f'{p.cost:.2f}'])
+            elif action == 'search_payment_method':
+                data = []
+                query = Sale.objects.select_related().filter(date_joined=now)
+                cashPayment = query.filter(payment='cash')
+                creditPayment = query.filter(payment='credit')
+                posPayment = query.filter(payment='pos')
+                transferPayment = query.filter(payment='trasnfer')
+
+                cash = cashPayment.aggregate(result=Coalesce(Sum(F('total')), 0.00, output_field=FloatField())).get(
+                    'result')
+                credit = creditPayment.aggregate(result=Coalesce(Sum(F('total')), 0.00, output_field=FloatField())).get(
+                    'result')
+                pos = posPayment.aggregate(result=Coalesce(Sum(F('total')), 0.00, output_field=FloatField())).get(
+                    'result')
+                transfer = transferPayment.aggregate(
+                    result=Coalesce(Sum(F('total')), 0.00, output_field=FloatField())).get('result')
+
+                data.append(
+                    [1, [cashPayment.count(), cash], [posPayment.count(), pos], [transferPayment.count(), transfer],
+                     [creditPayment.count(), credit]])
+                # data.append(
+                #     [1, cashPayment.count(), posPayment.count(), transferPayment.count(), creditPayment.count()])
+
             elif action == 'get_graph_sales_year_month':
                 points = []
                 year = datetime.now().year

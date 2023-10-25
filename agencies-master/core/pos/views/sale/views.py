@@ -45,7 +45,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             # today = '2023-09-08'
             id = int(param['id'])
 
-            query = Sale.objects.filter(Q(date_joined=today) & Q(user__presale=True))
+            query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
             querySales = query.filter(Q(user_id=id) & Q(endofday__exact=False))
             # COLLECT ALL THE SALES FOR ESPESIFIC USER
             detailProducts = querySales.order_by('-saleproduct__product__category_id').values(
@@ -130,7 +130,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 data = []
                 start_date = request.POST['start_date']
                 end_date = request.POST['end_date']
-                queryset = Sale.objects.all()
+                queryset = Sale.objects.select_related()
                 if len(start_date) and len(end_date) and request.user.is_superuser:
                     queryset = queryset.filter(date_joined__range=[start_date, end_date])
                 elif len(start_date) and len(end_date) and not request.user.is_superuser:
@@ -213,6 +213,12 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                     sale.user_id = request.user.id
                     sale.date_joined = request.POST['date_joined']
                     sale.client_id = int(request.POST['client'])
+                    if request.POST['payment'] == 'credit':
+                        sale.payment = request.POST['payment']
+                        sale.days = request.POST['days']
+                        sale.end = request.POST['end']
+                    else:
+                        sale.payment = request.POST['payment']
                     sale.iva = float(request.POST['iva'])
                     sale.save()
                     for i in products:
@@ -226,6 +232,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                         if detail.product.is_inventoried:
                             detail.product.stock -= detail.cant
                             detail.product.save()
+
                     sale.calculate_invoice()
                     data = {'id': sale.id}
             elif action == 'search_client':
@@ -268,14 +275,13 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
 
     def get_form(self, form_class=None):
         module = self.request.path.split('/')[3]
-        print(module)
         if module == 'update':
             instance = self.get_object()
             if 'Sec-Ch-Ua-Mobile' in self.request.headers:
                 if self.request.headers['Sec-Ch-Ua-Mobile'] == '?1':
                     form = SaleMovilForm(instance=instance)
                     form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
-                    self.template_name = 'sale/createmovil.html'
+                    self.template_name = 'sale/createmovil2.html'
                 elif self.request.headers['Sec-Ch-Ua-Mobile'] == '?0':
                     form = SaleForm(instance=instance)
                     form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
@@ -324,6 +330,12 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     sale = self.get_object()
                     sale.date_joined = request.POST['date_joined']
                     sale.client_id = int(request.POST['client'])
+                    if request.POST['payment'] == 'credit':
+                        sale.payment = request.POST['payment']
+                        sale.days = request.POST['days']
+                        sale.end = request.POST['end']
+                    else:
+                        sale.payment = request.POST['payment']
                     sale.iva = float(request.POST['iva'])
                     sale.save()
 

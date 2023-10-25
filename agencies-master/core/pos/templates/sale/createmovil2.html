@@ -1,0 +1,240 @@
+{% extends 'list.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block head_list %}
+    <link href="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.css' %}" rel="stylesheet"/>
+    <script src="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+    <link href="{% static 'lib/select2-4.0.13/css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'lib/select2-4.0.13/css/select2-bootstrap4.min.css' %}" rel="stylesheet"/>
+    <script src="{% static 'lib/select2-4.0.13/js/select2.min.js' %}"></script>
+    <script src="{% static 'lib/select2-4.0.13/js/i18n/es.js' %}"></script>
+    <script src="{% static 'lib/moment-2.25.3/moment-with-locales.js' %}"></script>
+    <script src="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/js/tempusdominus-bootstrap.js' %}"></script>
+    <link href="{% static 'lib/bootstrap-touchspin-4.2.5/css/jquery.bootstrap-touchspin.css' %}" rel="stylesheet"/>
+    <script src="{% static 'lib/bootstrap-touchspin-4.2.5/js/jquery.bootstrap-touchspin.js' %}"></script>
+    <link href="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/css/tempusdominus-bootstrap.css' %}" rel="stylesheet"/>
+
+    <script src="{% static 'sale/js/formmovil.js' %}"></script>
+{% endblock %}
+
+{% block body_2 %}
+    <form id="frmSale" method="post" data-url="{{ list_url }}">
+        <div class="container-fluid">
+            <div class="card mb-0 mt-2">
+                <div class="card-body p-1">
+                    {# BTN AND USER #}
+                    <div class="row p-1">
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i>
+                            </button>
+                            <a href="{{ list_url }}" class="btn btn-danger">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+
+                        <div class="col-8">
+                            {# FOR GROUP FOR CLIENT #}
+                            <div class="form-group">
+                                <div class="input-group">
+                                    {{ form.client }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success btn-flat btnAddClient" type="button">
+                                            <i class="fas fa-user-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {# SPACE FOR SEARCH PRODUCTS #}
+                            <div class="form-group">
+                                {#                                <label>Buscador de productos:</label>#}
+                                <div class="input-group">
+                                    <select class="form-control select2" name="search_product"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-outline card-outline-tabs">
+                <div class="card-header p-0 border-bottom-0">
+                    <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="custom-tabs-four-detalle-tab" data-toggle="pill"
+                               href="#custom-tabs-four-detalle" role="tab" aria-controls="custom-tabs-four-home"
+                               aria-selected="true">Detalle</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " id="custom-tabs-four-profile-tab" data-toggle="pill"
+                               href="#custom-tabs-four-payment" role="tab" aria-controls="custom-tabs-four-payment"
+                               aria-selected="false">Forma de pago</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="">
+                    <div class="tab-content" id="custom-tabs-four-tabContent">
+                        <div class="tab-pane fade active show" id="custom-tabs-four-detalle" role="tabpanel"
+                             aria-labelledby="custom-tabs-four-detalle-tab">
+                            {# ROW FOR THE TABLE INSERT PRODUCT #}
+                            <table class="table table-active" id="tblProducts">
+                                <thead>
+                                <tr>
+                                    <th>id</th>
+                                    <th>Producto</th>
+                                    <th>Cant</th>
+                                    <th>Precio</th>
+                                    <th>Sub</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+
+                            {# PARTE DEL DETALLE #}
+                        </div>
+                        <div class="tab-pane fade" id="custom-tabs-four-payment" role="tabpanel"
+                             aria-labelledby="custom-tabs-four-payment-tab">
+
+                            <div class="form-group">
+                                <label>{{ form.payment.label }}</label>
+                                {{ form.payment|add_class:'form-control'|attr:'autocomplete:off' }}
+                            </div>
+
+                            <div class="row" id="block-credit" style="display: none">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label>{{ form.days.label }}</label>
+                                        {{ form.days|add_class:'form-control'|attr:'autocomplete:off' }}
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label>{{ form.end.label }}</label>
+                                        {{ form.end|add_class:'form-control'|attr:'autocomplete:off' }}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            {# PART OF DETAIL OF INVOICE #}
+            <div class="fixed-bottom border-top bg-gradient-gray-dark">
+                {#SE DEJA AFUERA PORQUE NO SE REQUIERE VISUALIZAR#}
+                <input type="hidden" name="action" value="{{ action }}">
+                {{ form.date_joined }}
+                {# FIN AFUERA#}
+
+                {# FILA DEL SUB TOTAL Y CUANTO DEL IVA#}
+                <div class="row p-2">
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label>Subtotal:</label>
+                            {{ form.subtotal }}
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-group">
+                            <label>IVA:</label>
+                            {{ form.iva }}
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label>calculado:</label>
+                            <input readonly type="text"
+                                   style="color: white; border: none; width: 100%; background-color: transparent;"
+                                   name="ivacalc"
+                                   value="0.00">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label>Total:</label>
+                            {{ form.total }}
+                        </div>
+                    </div>
+                </div>
+
+                {#PARTE DEL IVA CALCULADO Y DEL TOTAL A PAGAR#}
+            </div>
+        </div>
+        </div>
+    </form>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModalClient" tabindex="-1" role="dialog" aria-hidden="true">
+        <form id="frmClient" enctype="multipart/form-data" method="post">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">
+                            <b><i class="fas fa-user-plus"></i> Nuevo registro de un cliente</b>
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% for field in frmClient.visible_fields %}
+                            <div class="form-group">
+                                <label for="email">{{ field.label }}:</label>
+                                {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">
+                            <i class="fas fa-save"></i> Guardar Cliente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal fade" id="myModalSearchProducts" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        <b><i class="fas fa-search"></i> Búsqueda de Productos</b>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-sm" id="tblSearchProducts">
+                        <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Imagen</th>
+                            <th>Stock</th>
+                            <th>Precio Unitario</th>
+                            <th>Opciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        sale.details.products = {{ products|safe }};
+        sale.details.products_review = {{ products|safe }};
+        // Se removio el vents.list(); para calcular bien el iva en el editar. Revisar al final del archivo form.js se lo puso.
+    </script>
+{% endblock %}

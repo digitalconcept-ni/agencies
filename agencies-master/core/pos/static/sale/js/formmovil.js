@@ -426,6 +426,35 @@ $(function () {
             });
     });
 
+    const calculateCanceled = () => {
+        let today = $('#id_days').val()
+        let end = $('#id_end')
+        let date = new Date().getTime() + (today * 24 * 60 * 60 * 1000);
+        let f = new Date(date).toLocaleDateString().split('/').reverse();
+        let canceledDate = f.join('-')
+        end.val(canceledDate)
+    }
+    if ($('#id_payment').val() == 'credit') {
+        $('#block-credit').css('display', 'flex');
+    }
+
+    $('#id_payment').on('change', function () {
+        let _this = $(this).val();
+
+        if (_this == 'credit') {
+            $('#block-credit').css('display', 'flex');
+            calculateCanceled()
+        } else {
+            $('#block-credit').css('display', 'none');
+        }
+    })
+
+
+    $('#id_days').on('change', function () {
+        calculateCanceled()
+
+    })
+
     sale.listProducts();
 });
 

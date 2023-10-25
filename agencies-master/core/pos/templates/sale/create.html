@@ -49,7 +49,8 @@
                                                 {#                                               placeholder="Ingrese una descripción" maxlength="50" name="search">#}
                                                 <div class="input-group-append">
                                                     <button class="btn btn-primary dropdown-toggle" type="button"
-                                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            data-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false">
                                                         Opciones
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-right">
@@ -88,15 +89,13 @@
                         <div class="col-lg-4">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title"><b><i class="fas fa-shopping-cart"></i> Datos de la factura</b></h3>
+                                    <h3 class="card-title"><b><i class="fas fa-shopping-cart"></i> Datos de la
+                                        factura</b></h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="container-fluid">
                                         <input type="hidden" name="action" value="{{ action }}">
-                                        <div class="form-group">
-                                            <label>Fecha de venta:</label>
-                                            {{ form.date_joined }}
-                                        </div>
+                                        {{ form.date_joined }}
                                         <div class="form-group">
                                             <label>Cliente:</label>
                                             <div class="input-group">
@@ -118,11 +117,32 @@
                                         </div>
                                         <div class="form-group">
                                             <label>IVA Calculado:</label>
-                                            <input type="text" class="form-control" readonly name="ivacalc" value="0.00">
+                                            <input type="text" class="form-control" readonly name="ivacalc"
+                                                   value="0.00">
                                         </div>
                                         <div class="form-group">
                                             <label>Total a pagar:</label>
                                             {{ form.total }}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>{{ form.payment.label }}</label>
+                                            {{ form.payment|add_class:'form-control'|attr:'autocomplete:off' }}
+                                        </div>
+
+                                        <div class="row" id="block-credit" style="display: none">
+                                            <div class="col">
+                                                <div class="form-group">
+                                                    <label>{{ form.days.label }}</label>
+                                                    {{ form.days|add_class:'form-control'|attr:'autocomplete:off' }}
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="form-group">
+                                                    <label>{{ form.end.label }}</label>
+                                                    {{ form.end|add_class:'form-control'|attr:'autocomplete:off' }}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

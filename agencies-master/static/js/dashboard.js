@@ -20,19 +20,12 @@ var info = {
                 destroy: true,
                 orderable: false,
                 data: data.maximumsold,
-                dom: 'Bfrtip',
+                // dom: 'Bfrtip',
                 // order: false,
                 paging: false,
                 ordering: false,
                 info: false,
                 searching: false,
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        text: 'Descargar Excel <i class="fas fa-file-excel"></i>',
-                        titleAttr: 'Excel',
-                        className: 'btn btn-success btn-flat'
-                    }],
                 columnDefs: [
                     {
                         targets: [0, 2],
@@ -158,12 +151,30 @@ $(function () {
         drawTables(data);
     })
 
-    $('#salestoday').on('click', function () {
-        let header = `<h3 class="card-title"><i class="fas fa-info-circle"> </i> Seguimiento</h3>`
+    $('#sale').on('click', function () {
+        let config = [
+            {
+                targets: [0],
+                visible: false,
+            },
+            {
+                targets: [1, 2, 3, 4],
+                class: 'text-center',
+                render: function (data, type, row) {
+                    return `<span class="badge bg-success">${data[0]}</span> - C$ ${parseFloat(data[1]).toFixed(2)}`;
+                    // return 'C$ ' + parseFloat(data).toFixed(2);
+                }
+            },
+        ]
         let data = {
-            'modalHeaderBody': header,
+            'data': {'action': 'search_payment_method'},
+            'inserInto': 'rowModal',
+            'th': ['Nro', 'Efectivo', 'POS', 'Transferencia', 'Credito'],
+            'table': 'tableModal',
+            'config': config,
+            'modal': true,
         }
-        drawModal(data)
+        drawTables(data);
     })
 
     // $('#selectPreSales').on('change', function () {

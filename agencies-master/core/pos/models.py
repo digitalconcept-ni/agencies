@@ -6,7 +6,7 @@ from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 
 from config import settings
-from core.pos.choices import genders
+from core.pos.choices import genders, payment
 from core.user.models import User
 
 
@@ -32,7 +32,7 @@ class Product(models.Model):
     code = models.CharField(max_length=6, unique=True, verbose_name='Codigo de producto')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
     image = models.ImageField(upload_to='product/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
-    is_inventoried = models.BooleanField(default=True, blank= True, null=True, verbose_name='¿Es inventariado?')
+    is_inventoried = models.BooleanField(default=True, blank=True, null=True, verbose_name='¿Es inventariado?')
     stock = models.IntegerField(default=0, verbose_name='Stock')
     cost = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de compra')
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta')
@@ -229,6 +229,9 @@ class Sale(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     date_joined = models.DateField(default=datetime.now)
     time_joined = models.TimeField(default=datetime.now)
+    payment = models.CharField(max_length=14, choices=payment, default='cash', verbose_name='Metodo de pago')
+    days = models.CharField(max_length=2, null=True, blank=True, verbose_name='Dias de gracia')
+    end = models.DateField(null=True, blank=True, verbose_name='Fecha cancelacion')
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total_iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)

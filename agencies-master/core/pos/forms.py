@@ -75,7 +75,7 @@ class ClientForm(ModelForm):
         fields = '__all__'
         widgets = {
             'names': forms.TextInput(attrs={'placeholder': 'Ingrese un nombre'}),
-            'dni': forms. TextInput(attrs={'placeholder': 'Ingrese un número de cedula'}),
+            'dni': forms.TextInput(attrs={'placeholder': 'Ingrese un número de cedula'}),
             'birthdate': forms.DateInput(format='%Y-%m-%d', attrs={
                 'class': 'form-control datetimepicker-input',
                 'id': 'birthdate',
@@ -168,7 +168,7 @@ class SaleForm(ModelForm):
                 'data-target': '#date_joined',
                 'data-toggle': 'datetimepicker',
             }
-                                           ),
+            ),
             'iva': forms.TextInput(attrs={
                 'class': 'form-control',
             }),
@@ -181,6 +181,7 @@ class SaleForm(ModelForm):
                 'class': 'form-control',
             })
         }
+
 
 class SaleMovilForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -203,7 +204,7 @@ class SaleMovilForm(ModelForm):
                 'data-target': '#date_joined',
                 'data-toggle': 'datetimepicker',
             }
-                                           ),
+            ),
             'iva': forms.TextInput(attrs={
                 'style': 'border: none; width: 100%; background: transparent; color: white;'
             }),
@@ -216,6 +217,7 @@ class SaleMovilForm(ModelForm):
                 'style': 'border: none; width: 100%; background: transparent; color: white;'
             })
         }
+
 
 class ShoppingForm(ModelForm):
     def __init__(self, *args, **kwargs):

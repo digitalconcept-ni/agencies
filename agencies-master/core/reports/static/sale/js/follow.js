@@ -1,6 +1,5 @@
 $(function () {
     $('#btnSearchPresaleInfo').on('click', function () {
-        console.log('follow')
         var Selector = $('#selectPreSales').val();
 
         if (Selector !== '') {
@@ -34,7 +33,6 @@ $(function () {
                 'config': config,
                 'modal': false,
             }
-            console.log(data)
             drawTables(data);
         }
     })

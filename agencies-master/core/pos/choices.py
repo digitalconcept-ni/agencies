@@ -1,4 +1,11 @@
 genders = (
-    ('male','Masculino'),
-    ('female','Femenino'),
+    ('male', 'Masculino'),
+    ('female', 'Femenino'),
+)
+
+payment = (
+    ('cash', 'Efectivo'),
+    ('credit', 'Credito'),
+    ('transfer', 'Transferencia'),
+    ('pos', 'POS'),
 )
