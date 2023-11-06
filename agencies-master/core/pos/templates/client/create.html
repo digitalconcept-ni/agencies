@@ -46,7 +46,11 @@
                     {% for field in form.visible_fields %}
                         {% if not field|is_checkbox %}
                             {% if field == form.user %}
-                                {{ field|attr:'hidden:true' }}
+                                {% if request.user.is_superuser %}
+                                    {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+                                {% else %}
+                                    {{ field|attr:'hidden:true' }}
+                                {% endif %}
                             {% else %}
                                 <div class="form-group">
                                     <label>{{ field.label }}:</label>
