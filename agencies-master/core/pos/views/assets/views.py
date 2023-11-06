@@ -83,7 +83,7 @@ class AssetsCreateView(ValidatePermissionRequiredMixin, CreateView):
     model = Assets
     form_class = AssetsForm
     template_name = 'assets/create.html'
-    success_url = reverse_lazy('assets_list_list')
+    success_url = reverse_lazy('assets_list')
     url_redirect = success_url
     permission_required = 'add_assets'
 
