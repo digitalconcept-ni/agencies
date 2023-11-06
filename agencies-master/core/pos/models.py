@@ -17,6 +17,12 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def toLIST(self):
+        data = [
+            self.id, self.name, self.desc, self.id
+        ]
+        return data
+
     def toJSON(self):
         item = model_to_dict(self)
         return item
@@ -46,7 +52,14 @@ class Product(models.Model):
             result=Sum(F('cost'), 0.00, output_field=FloatField())).get('result')
         print('models')
         print(s)
-        return s
+        return
+
+    def toLIST(self):
+        data = [
+            self.id, self.__str__(), self.category.name, self.get_image(),
+            self.is_inventoried, self.stock, self.cost, self.pvp, self.id
+        ]
+        return data
 
     def toJSON(self):
         item = model_to_dict(self)
@@ -83,6 +96,13 @@ class Supplier(models.Model):
     def get_full_name(self):
         return f'{self.name} ({self.responsible})'
 
+    def toLIST(self):
+        data = [
+            self.id, self.name, self.phone_number, self.email,
+            self.responsible, self.id
+        ]
+        return data
+
     def toJSON(self):
         item = model_to_dict(self)
         item['full_name'] = self.get_full_name()
@@ -109,6 +129,18 @@ class Shopping(models.Model):
 
     def get_number(self):
         return f'{self.id:06d}'
+
+    def toLIST(self):
+        modify = False
+        if self.date_joined.strftime("%Y-%m-%d") < str(datetime.now().date()):
+            modify = True
+        date_joined = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%H:%M:%S")}'
+        data = [
+            self.get_number(), self.user.username, self.supplier.get_full_name(), self.invoice_number,
+            self.cant, date_joined, f'{self.subtotal:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}',
+            modify
+        ]
+        return data
 
     def toJSON(self):
         item = model_to_dict(self)
@@ -165,11 +197,20 @@ class ShoppingDetail(models.Model):
 
 
 class Client(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     names = models.CharField(max_length=150, verbose_name='Nombres')
     dni = models.CharField(max_length=14, unique=True, default='0010101010034S', verbose_name='Número de cedula')
     birthdate = models.DateField(default=datetime.now, verbose_name='Fecha de nacimiento')
     address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')
     gender = models.CharField(max_length=10, choices=genders, default='male', verbose_name='Genero')
+    frequent = models.BooleanField(verbose_name='Frecuente', default=True, null=True, blank=True)
+    mon = models.BooleanField(verbose_name='Lunes', null=True, blank=True)
+    tue = models.BooleanField(verbose_name='Martes', null=True, blank=True)
+    wed = models.BooleanField(verbose_name='Miercoles', null=True, blank=True)
+    thu = models.BooleanField(verbose_name='Jueves', null=True, blank=True)
+    fri = models.BooleanField(verbose_name='Viernes', null=True, blank=True)
+    sat = models.BooleanField(verbose_name='Sabados', null=True, blank=True)
+    is_active = models.BooleanField(verbose_name='activo', default=True)
 
     def __str__(self):
         return self.get_full_name()
@@ -177,10 +218,30 @@ class Client(models.Model):
     def get_full_name(self):
         return f'{self.names}'
 
+    def toLIST(self):
+        item = model_to_dict(self)
+        visit = {'frequent': 'Frecuente', 'mon': 'Lunes',
+                 'tue': 'Martes', 'wed': 'Miercoles', 'thu': 'Jueves', 'fri': 'Viernes', 'sat': 'Sabados'}
+        frequent = []
+        for v in visit:
+            if item[v]:
+                frequent.append(visit[v])
+        data = [self.id, self.is_active, self.user.username, self.names, self.dni, self.birthdate.strftime('%Y-%m-%d'),
+                self.get_gender_display(), self.address, frequent, self.id
+                ]
+        return data
+
     def toJSON(self):
+        visit = {'frequent': 'Frecuente', 'mon': 'Lunes',
+                 'tue': 'Martes', 'wed': 'Miercoles', 'thu': 'Jueves', 'fri': 'Viernes', 'sat': 'Sabados'}
+        frequent = []
         item = model_to_dict(self)
         item['gender'] = {'id': self.gender, 'name': self.get_gender_display()}
         item['birthdate'] = self.birthdate.strftime('%Y-%m-%d')
+        for v in visit:
+            if item[v]:
+                frequent.append(visit[v])
+        item['visit'] = frequent
         item['full_name'] = self.get_full_name()
         return item
 
@@ -188,6 +249,34 @@ class Client(models.Model):
         verbose_name = 'Cliente'
         verbose_name_plural = 'Clientes'
         ordering = ['id']
+
+
+class Assets(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    asset = models.CharField(max_length=50, verbose_name='Activo')
+    code = models.CharField(max_length=20, verbose_name='Codigo')
+    date_joined = models.DateField(default=datetime.now, verbose_name='Fecha de entrega')
+    cant = models.CharField(max_length=5, verbose_name='Cantidad')
+    brand = models.CharField(max_length=20, verbose_name='Marca', null=True, blank=True)
+    serie = models.CharField(max_length=20, verbose_name='Número de serie', null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.client.names} - {self.asset}'
+
+    def toLIST(self):
+        data = [
+            self.id, self.client.names, self.asset, self.cant, self.date_joined.strftime("%Y-%m-%d"),
+            self.brand, self.code, self.serie, self.id
+        ]
+        return data
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
+    class Meta:
+        verbose_name = 'Activos'
+        verbose_name_plural = 'Activos'
+        ordering = ['-date_joined']
 
 
 class Company(models.Model):
@@ -255,6 +344,18 @@ class Sale(models.Model):
 
     def get_number(self):
         return f'{self.id:06d}'
+
+    def toLIST(self):
+        modify = False
+        if self.date_joined.strftime("%Y-%m-%d") < str(datetime.now().date()):
+            modify = True
+        opt = [modify, self.endofday]
+        data = [
+            self.get_number(), self.user.username, self.client.get_full_name(),
+            f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%H:%M:%S")}',
+            self.payment, f'{self.subtotal:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}', opt
+        ]
+        return data
 
     def toJSON(self):
         item = model_to_dict(self)

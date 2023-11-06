@@ -33,11 +33,11 @@ class ShoppingListView(ValidatePermissionRequiredMixin, FormView):
                 data = []
                 start_date = request.POST['start_date']
                 end_date = request.POST['end_date']
-                queryset = Shopping.objects.all()
+                queryset = Shopping.objects.select_related()
                 if len(start_date) and len(end_date):
                     queryset = queryset.filter(date_joined__range=[start_date, end_date])
                 for i in queryset:
-                    data.append(i.toJSON())
+                    data.append(i.toLIST())
             elif action == 'delete':
                 sho = Shopping.objects.get(id=request.POST['id'])
                 for s in sho.shoppingdetail_set.all():
@@ -50,7 +50,6 @@ class ShoppingListView(ValidatePermissionRequiredMixin, FormView):
                 queryset = queryset.filter(invoice_number=request.POST['invoice'])
                 data = [i.toJSON() for i in queryset]
                 # data.append(queryset.toJSON())
-                print(data)
             elif action == 'search_products_detail':
                 data = []
                 for i in ShoppingDetail.objects.filter(shopping_id=request.POST['id']):

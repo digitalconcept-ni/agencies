@@ -20,8 +20,8 @@ class ProductListView(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'search':
                 data = []
-                for i in Product.objects.all():
-                    data.append(i.toJSON())
+                for i in Product.objects.select_related():
+                    data.append(i.toLIST())
             elif action == 'delete':
                 pro = Product.objects.get(id=request.POST['id'])
                 pro.delete()

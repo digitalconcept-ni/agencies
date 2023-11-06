@@ -60,12 +60,28 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'client_list' %}" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
                         <p>
                             Clientes
                         </p>
+                        <i class="fas fa-angle-left right"></i>
+
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'client_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Listado de clientes</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'assets_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Activos Comerciales</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 <li class="nav-item">
                     <a href="{% url 'sale_list' %}" class="nav-link">

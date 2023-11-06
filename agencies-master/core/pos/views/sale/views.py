@@ -130,7 +130,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 data = []
                 start_date = request.POST['start_date']
                 end_date = request.POST['end_date']
-                queryset = Sale.objects.select_related()
+                queryset = Sale.objects.select_related().order_by('date_joined')
                 if len(start_date) and len(end_date) and request.user.is_superuser:
                     queryset = queryset.filter(date_joined__range=[start_date, end_date])
                 elif len(start_date) and len(end_date) and not request.user.is_superuser:
@@ -140,13 +140,12 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     queryset = queryset.filter(user_id=request.user.id)
 
                 for i in queryset:
-                    data.append(i.toJSON())
+                    data.append(i.toLIST())
             elif action == 'search_products_detail':
                 data = []
                 for i in SaleProduct.objects.filter(sale_id=request.POST['id']):
                     data.append(i.toJSON())
             elif action == 'delete':
-                print('delete')
                 sale = Sale.objects.get(id=request.POST['id'])
                 set = sale.saleproduct_set.all()
                 for s in set:
@@ -197,8 +196,6 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                 ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
-                print(term)
-                print(data)
                 # products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
                 products = Product.objects.filter(Q(name__icontains=term) | Q(code__icontains=term)).filter(
                     Q(stock__gt=0) | Q(is_inventoried=False))
@@ -237,8 +234,26 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                     data = {'id': sale.id}
             elif action == 'search_client':
                 data = []
+                today = datetime.today().strftime('%A')[:3].lower()
+                query = Client.objects.select_related().filter(Q(is_active=True) & Q(frequent=True))
+
+                if today == 'mon':
+                    queryFilter = query.filter(mon=True)
+                elif today == 'tue':
+                    queryFilter = query.filter(tue=True)
+                elif today == 'wed':
+                    queryFilter = query.filter(wed=True)
+                elif today == 'thu':
+                    queryFilter = query.filter(thu=True)
+                elif today == 'fri':
+                    queryFilter = query.filter(fri=True)
+                elif today == 'sat':
+                    queryFilter = query.filter(sat=True)
+                else:
+                    queryFilter = query
+
                 term = request.POST['term']
-                clients = Client.objects.filter(
+                clients = queryFilter.filter(
                     Q(names__icontains=term) | Q(dni__icontains=term))[0:10]
                 for i in clients:
                     item = i.toJSON()
@@ -261,7 +276,10 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
         context['list_url'] = self.success_url
         context['action'] = 'add'
         context['products'] = []
-        context['frmClient'] = ClientForm()
+        id = self.request.user.id
+        form = ClientForm(initial={'user': User.objects.get(id=id)})
+        # form.fields['user'].widget.attrs['hidden'] = True
+        context['frmClient'] = form
         return context
 
 

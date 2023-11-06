@@ -20,11 +20,11 @@ class AccessUsersListView(ValidatePermissionRequiredMixin, FormView):
                 data = []
                 start_date = request.POST['start_date']
                 end_date = request.POST['end_date']
-                queryset = AccessUsers.objects.all()
+                queryset = AccessUsers.objects.select_related()
                 if len(start_date) and len(end_date):
                     queryset = queryset.filter(date_joined__range=[start_date, end_date])
                 for i in queryset:
-                    data.append(i.toJSON())
+                    data.append(i.toLIST())
             elif action == 'delete':
                 print('pass')
                 s = AccessUsers.objects.get(id=request.POST['id'])

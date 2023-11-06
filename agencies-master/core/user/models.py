@@ -20,6 +20,16 @@ class User(AbstractUser):
             return f'{settings.MEDIA_URL}{self.image}'
         return f'{settings.STATIC_URL}img/empty.png'
 
+    def toLIST(self):
+        last_login = ' ' if self.last_login is None else self.last_login.strftime('%Y-%m-%d')
+        groups = [{'id': g.id, 'name': g.name} for g in self.groups.all()]
+        data = [
+            self.id, self.get_full_name(), self.username, self.date_joined.strftime('%Y-%m-%d'),
+            self.get_image(), self.is_superuser, last_login, self.is_active,
+            groups, self.presale
+        ]
+        return data
+
     def toJSON(self):
         item = model_to_dict(self, exclude=['password', 'user_permissions', 'last_login'])
         item['last_login'] = '' if self.last_login is None else self.last_login.strftime('%Y-%m-%d')

@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, inlineformset_factory
 
 from core.pos.models import *
 
@@ -69,11 +69,17 @@ class ClientForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['names'].widget.attrs['autofocus'] = True
+        # self.fields['user'].queryset = User.objects.filter(id=self.request.user.id)
 
     class Meta:
         model = Client
-        fields = '__all__'
+        fields = 'user', 'names', 'dni', 'birthdate', 'address', 'gender', 'is_active', 'frequent', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'
         widgets = {
+            # 'user': forms.Select(attrs={
+            #     'class': 'custom-select select2',
+            #     # 'style': 'width: 100%'
+            # }),
+            'user': forms.Select(),
             'names': forms.TextInput(attrs={'placeholder': 'Ingrese un nombre'}),
             'dni': forms.TextInput(attrs={'placeholder': 'Ingrese un número de cedula'}),
             'birthdate': forms.DateInput(format='%Y-%m-%d', attrs={
@@ -89,8 +95,34 @@ class ClientForm(ModelForm):
             'gender': forms.Select(attrs={
                 'class': 'select2',
                 'style': 'width: 100%'
-            })
+            }),
+            'frequent': forms.CheckboxInput(),
+            'mon': forms.CheckboxInput(),
+            'tue': forms.CheckboxInput(),
+            'wed': forms.CheckboxInput(),
+            'thu': forms.CheckboxInput(),
+            'fri': forms.CheckboxInput(),
+            'sat': forms.CheckboxInput(),
         }
+
+    def save(self, commit=True):
+        data = {}
+        form = super()
+        try:
+            if form.is_valid():
+                instance = form.save()
+                data = instance.toJSON()
+            else:
+                data['error'] = form.errors
+        except Exception as e:
+            data['error'] = str(e)
+        return data
+
+
+class AssetsForm(ModelForm):
+    class Meta:
+        model = Assets
+        fields = '__all__'
 
     def save(self, commit=True):
         data = {}

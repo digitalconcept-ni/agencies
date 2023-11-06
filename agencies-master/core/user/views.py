@@ -21,9 +21,9 @@ class UserListView(ValidatePermissionRequiredMixin, ListView):
         try:
             action = request.POST['action']
             if action == 'search':
-                data = []
-                for i in User.objects.all():
-                    data.append(i.toJSON())
+                data = [i.toLIST() for i in User.objects.select_related()]
+                # for i in User.objects.all():
+                #     data.append(i.toJSON())
             elif action == 'delete':
                 u = User.objects.get(id=request.POST['id'])
                 u.delete()

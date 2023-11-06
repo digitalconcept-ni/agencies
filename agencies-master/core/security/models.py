@@ -20,6 +20,16 @@ class AccessUsers(models.Model):
     def __str__(self):
         return self.ip_address
 
+    def toLIST(self):
+        accuracy = f'{self.accuracy} Metros'
+        type = {'id': self.type, 'name': self.get_type_display()}
+        register = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%H:%M:%S")}'
+        data = [
+            self.id, self.user.username, register,
+            self.ip_address, self.coords, accuracy, type, self.id
+        ]
+        return data
+
     def toJSON(self):
         item = model_to_dict(self)
         item['type'] = {'id': self.type, 'name': self.get_type_display()}

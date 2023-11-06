@@ -18,9 +18,9 @@ class CategoryListView(ValidatePermissionRequiredMixin, ListView):
         try:
             action = request.POST['action']
             if action == 'search':
-                data = []
-                for i in Category.objects.all():
-                    data.append(i.toJSON())
+                data = [i.toLIST() for i in Category.objects.select_related()]
+                # for i in Category.objects.all():
+                #     data.append(i.toJSON())
             elif action == 'delete':
                 cat = Category.objects.get(id=request.POST['id'])
                 cat.delete()

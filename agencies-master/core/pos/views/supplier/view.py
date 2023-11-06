@@ -17,9 +17,8 @@ class SupplierListView(ValidatePermissionRequiredMixin, ListView):
         try:
             action = request.POST['action']
             if action == 'search':
-                data = []
-                for i in Supplier.objects.all():
-                    data.append(i.toJSON())
+                data = [i.toLIST() for i in Supplier.objects.select_related()]
+                # data.append(i.toJSON())
             elif action == 'delete':
                 sup = Supplier.objects.get(id=request.POST['id'])
                 sup.delete()

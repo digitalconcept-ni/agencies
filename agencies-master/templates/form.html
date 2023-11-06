@@ -36,16 +36,37 @@
                             </ul>
                         </div>
                     {% endif %}
+                    {#                    {% for field in form.visible_fields %}#}
+                    {#                        <div class="form-group">#}
+                    {#                            <label>{{ field.label }}:</label>#}
+                    {#                            {% if field|is_checkbox %}#}
+                    {#                               <br>{{ field }}#}
+                    {#                            {% else %}#}
+                    {#                                {{ field|add_class:'form-control'|attr:'autocomplete:off' }}#}
+                    {#                            {% endif %}#}
+                    {#                        </div>#}
+                    {#                    {% endfor %}#}
+
                     {% for field in form.visible_fields %}
-                        <div class="form-group">
-                            <label>{{ field.label }}:</label>
-                            {% if field|is_checkbox %}
-                               <br>{{ field }}
-                            {% else %}
+                        {% if not field|is_checkbox %}
+                            <div class="form-group">
+                                <label>{{ field.label }}:</label>
                                 {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-                            {% endif %}
-                        </div>
+                            </div>
+                        {% endif %}
                     {% endfor %}
+                    <div class="row">
+                        {% for field in form.visible_fields %}
+                            {% if field|is_checkbox %}
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label>{{ field.label }}: </label>
+                                        {{ field }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
             <div class="card-footer">

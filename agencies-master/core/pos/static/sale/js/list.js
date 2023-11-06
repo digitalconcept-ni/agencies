@@ -2,6 +2,55 @@ var tblSale;
 var input_daterange;
 
 var sale = {
+    config: [
+        {
+            targets: [0],
+            class: 'text-center',
+            render: function (data, type, row) {
+                if (row[8][1] === true) {
+                    return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
+                } else {
+                    return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
+                }
+            }
+        },
+        {
+            targets: [4],
+            class: 'text-center',
+            render: function (data, type, row) {
+                if (data === 'cash') {
+                    return '<a class="badge badge-success badge-pill" rel="number">' + data + '</a>'
+                } else if (data === 'credit') {
+                    return '<a class="badge badge-danger badge-pill" rel="number">' + data + '</a>'
+                } else if (data === 'transfer') {
+                    return '<a class="badge badge-dark badge-pill" rel="number">' + data + '</a>'
+                } else if (data === 'pos') {
+                    return '<a class="badge badge-info badge-pill" rel="number">' + data + '</a>'
+                }
+            }
+        },
+        {
+            targets: [5, 6, 7],
+            class: 'text-center',
+            render: function (data) {
+                return 'C$' + parseFloat(data).toFixed(2);
+            }
+        },
+        {
+            targets: [-1],
+            class: 'text-center',
+            orderable: false,
+            render: function (data, type, row) {
+                var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
+                if (row[8][0] === false) {
+                    buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
+                    buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+                }
+                buttons += '<a href="' + pathname + 'invoice/pdf/' + row[0] + '/" target="_blank" class="btn btn-info btn-xs btn-flat"><i class="fas fa-file-pdf"></i></a> ';
+                return buttons;
+            }
+        },
+    ],
     list: function (all) {
         var parameters = {
             'action': 'search',
@@ -12,91 +61,118 @@ var sale = {
             parameters['start_date'] = '';
             parameters['end_date'] = '';
         }
-        tblSale = $('#data').DataTable({
-            responsive: true,
-            // scrollX: true,
-            // autoWidth: false,
-            destroy: true,
-            deferRender: true,
-            ajax: {
-                url: pathname,
-                type: 'POST',
-                data: parameters,
-                dataSrc: "",
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                    'X-Screen': '1080'
-                }
-            },
-            columns: [{
-                "data": "number"
-            },
-                {
-                    "data": "user"
-                },
-                {
-                    "data": "client.full_name"
-                },
-                {
-                    "data": "date_joined"
-                },
-                {
-                    "data": "subtotal"
-                },
-                {
-                    "data": "iva"
-                },
-                {
-                    "data": "total_iva"
-                },
-                {
-                    "data": "total"
-                },
-                {
-                    "data": "id"
-                },
-            ],
-            order: [
-                [0, "desc"],
-                [2, "desc"]
-            ],
-            columnDefs: [{
-                targets: [0],
-                class: 'text-center',
-                render: function (data, type, row) {
-                    if (row.endofday === true) {
-                        return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
-                    } else {
-                        return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
-                    }
-                }
-            },
-                {
-                    targets: [-2, -3, -4, -5],
-                    class: 'text-center',
-                    render: function (data) {
-                        return '$' + parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    targets: [-1],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
-                        if (row.modify === false) {
-                            buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
-                            buttons += '<a href="' + pathname + 'update/' + row.id + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
-                        }
-                        buttons += '<a href="' + pathname + 'invoice/pdf/' + row.id + '/" target="_blank" class="btn btn-info btn-xs btn-flat"><i class="fas fa-file-pdf"></i></a> ';
-                        return buttons;
-                    }
-                },
-            ],
-            initComplete: function (settings, json) {
 
-            }
-        });
+        let data = {
+            'data': parameters,
+            'inserInto': 'rowList',
+            'th': ['Nro', 'Usuario', 'Cliente', 'Registro', 'Pago', 'Sub total', 'Iva', 'Total', 'Opciones'],
+            'table': 'tableList',
+            'config': sale.config,
+            'modal': false,
+        }
+        drawTables(data);
+
+
+        // tblSale = $('#data').DataTable({
+        //     responsive: true,
+        //     // scrollX: true,
+        //     // autoWidth: false,
+        //     destroy: true,
+        //     deferRender: true,
+        //     ajax: {
+        //         url: pathname,
+        //         type: 'POST',
+        //         data: parameters,
+        //         dataSrc: "",
+        //         headers: {
+        //             'X-CSRFToken': csrftoken,
+        //             'X-Screen': '1080'
+        //         }
+        //     },
+        //     columns: [{
+        //         "data": "number"
+        //     },
+        //         {
+        //             "data": "user"
+        //         },
+        //         {
+        //             "data": "client.full_name"
+        //         },
+        //         {
+        //             "data": "date_joined"
+        //         },
+        //         {
+        //             "data": "payment"
+        //         },
+        //         {
+        //             "data": "subtotal"
+        //         },
+        //         {
+        //             "data": "total_iva"
+        //         },
+        //         {
+        //             "data": "total"
+        //         },
+        //         {
+        //             "data": "id"
+        //         },
+        //     ],
+        //     order: [
+        //         [0, "desc"],
+        //         [2, "desc"]
+        //     ],
+        //     columnDefs: [{
+        //         targets: [0],
+        //         class: 'text-center',
+        //         render: function (data, type, row) {
+        //             if (row.endofday === true) {
+        //                 return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
+        //             } else {
+        //                 return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
+        //             }
+        //         }
+        //     },
+        //         {
+        //             targets: [4],
+        //             class: 'text-center',
+        //             render: function (data, type, row) {
+        //                 if (data === 'cash') {
+        //                     return '<a class="badge badge-success badge-pill" rel="number">' + data + '</a>'
+        //                 } else if (data === 'credit') {
+        //                     return '<a class="badge badge-danger badge-pill" rel="number">' + data + '</a>'
+        //                 } else if (data === 'transfer') {
+        //                     return '<a class="badge badge-dark badge-pill" rel="number">' + data + '</a>'
+        //                 } else if (data === 'pos') {
+        //                     return '<a class="badge badge-info badge-pill" rel="number">' + data + '</a>'
+        //                 }
+        //             }
+        //         },
+        //         {
+        //             targets: [5, 6, 7],
+        //             class: 'text-center',
+        //             render: function (data) {
+        //                 return '$' + parseFloat(data).toFixed(2);
+        //             }
+        //         },
+        //         {
+        //             targets: [-1],
+        //             class: 'text-center',
+        //             orderable: false,
+        //             render: function (data, type, row) {
+        //                 var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
+        //                 if (row.modify === false) {
+        //                     buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
+        //                     buttons += '<a href="' + pathname + 'update/' + row.id + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+        //                 }
+        //                 buttons += '<a href="' + pathname + 'invoice/pdf/' + row.id + '/" target="_blank" class="btn btn-info btn-xs btn-flat"><i class="fas fa-file-pdf"></i></a> ';
+        //                 return buttons;
+        //             }
+        //         },
+        //     ],
+        //     initComplete: function (settings, json) {
+        //
+        //     }
+        // });
     },
     formatRowHtml: function (d) {
         var html = '<table class="table">';
@@ -181,11 +257,11 @@ $(function () {
         sale.list(true);
     });
 
-    $('#data tbody')
+    $('#tableList tbody')
         .off()
         .on('click', 'a[rel="details"]', function () {
-            var tr = tblSale.cell($(this).closest('td, li')).index();
-            var data = tblSale.row(tr.row).data();
+            var tr = tableData.cell($(this).closest('td, li')).index();
+            var data = tableData.row(tr.row).data();
             $('#tblProducts').DataTable({
                 responsive: true,
                 autoWidth: false,
@@ -197,7 +273,7 @@ $(function () {
                     type: 'POST',
                     data: {
                         'action': 'search_products_detail',
-                        'id': data.id
+                        'id': data[0]
                     },
                     dataSrc: "",
                     headers: {
