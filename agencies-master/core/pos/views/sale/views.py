@@ -235,20 +235,23 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
             elif action == 'search_client':
                 data = []
                 today = datetime.today().strftime('%A')[:3].lower()
-                query = Client.objects.select_related().filter(Q(is_active=True) & Q(frequent=True))
+                if request.user.is_superuser:
+                    query = Client.objects.select_related().filter(is_active=True)
+                else:
+                    query = Client.objects.select_related().filter(Q(is_active=True) & Q(user_id=request.user.id))
 
                 if today == 'mon':
-                    queryFilter = query.filter(mon=True)
+                    queryFilter = query.filter(Q(frequent=True) | Q(mon=True))
                 elif today == 'tue':
-                    queryFilter = query.filter(tue=True)
+                    queryFilter = query.filter(Q(frequent=True) | Q(tue=True))
                 elif today == 'wed':
-                    queryFilter = query.filter(wed=True)
+                    queryFilter = query.filter(Q(frequent=True) | Q(wed=True))
                 elif today == 'thu':
-                    queryFilter = query.filter(thu=True)
+                    queryFilter = query.filter(Q(frequent=True) | Q(thu=True))
                 elif today == 'fri':
-                    queryFilter = query.filter(fri=True)
+                    queryFilter = query.filter(Q(frequent=True) | Q(fri=True))
                 elif today == 'sat':
-                    queryFilter = query.filter(sat=True)
+                    queryFilter = query.filter(Q(frequent=True) | Q(sat=True))
                 else:
                     queryFilter = query
 

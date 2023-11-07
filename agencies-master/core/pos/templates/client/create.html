@@ -47,6 +47,7 @@
                         {% if not field|is_checkbox %}
                             {% if field == form.user %}
                                 {% if request.user.is_superuser %}
+                                    <label>{{ field.label }}:</label>
                                     {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
                                 {% else %}
                                     {{ field|attr:'hidden:true' }}
