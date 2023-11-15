@@ -130,7 +130,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 data = []
                 start_date = request.POST['start_date']
                 end_date = request.POST['end_date']
-                queryset = Sale.objects.select_related().order_by('date_joined')
+                queryset = Sale.objects.select_related()
                 if len(start_date) and len(end_date) and request.user.is_superuser:
                     queryset = queryset.filter(date_joined__range=[start_date, end_date])
                 elif len(start_date) and len(end_date) and not request.user.is_superuser:
@@ -206,32 +206,47 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
             elif action == 'add':
                 with transaction.atomic():
                     products = json.loads(request.POST['products'])
-                    sale = Sale()
-                    sale.user_id = request.user.id
-                    sale.date_joined = request.POST['date_joined']
-                    sale.client_id = int(request.POST['client'])
-                    if request.POST['payment'] == 'credit':
-                        sale.payment = request.POST['payment']
-                        sale.days = request.POST['days']
-                        sale.end = request.POST['end']
+                    now = datetime.now()
+                    today = str(now.date())
+                    exist = Sale.objects.filter(Q(date_joined=today) & Q(client_id=request.POST['client'])).exists()
+                    if exist:
+                        data['error'] = 'El cliente ya cuenta con una factura, favor de modificar la actual'
                     else:
-                        sale.payment = request.POST['payment']
-                    sale.iva = float(request.POST['iva'])
-                    sale.save()
-                    for i in products:
-                        detail = SaleProduct()
-                        detail.sale_id = sale.id
-                        detail.product_id = int(i['id'])
-                        detail.cant = int(i['cant'])
-                        detail.price = float(i['pvp'])
-                        detail.subtotal = detail.cant * detail.price
-                        detail.save()
-                        if detail.product.is_inventoried:
-                            detail.product.stock -= detail.cant
-                            detail.product.save()
+                        sale = Sale()
+                        sale.user_id = request.user.id
+                        sale.date_joined = request.POST['date_joined']
+                        sale.client_id = int(request.POST['client'])
+                        if request.POST['payment'] == 'credit':
+                            sale.payment = request.POST['payment']
+                            sale.days = request.POST['days']
+                            sale.end = request.POST['end']
+                        else:
+                            sale.payment = request.POST['payment']
+                        sale.iva = float(request.POST['iva'])
+                        sale.save()
+                        for i in products:
+                            detail = SaleProduct()
+                            detail.sale_id = sale.id
+                            detail.product_id = int(i['id'])
+                            detail.cant = int(i['cant'])
+                            detail.price = float(i['pvp'])
+                            detail.subtotal = detail.cant * detail.price
+                            detail.save()
+                            if detail.product.is_inventoried:
+                                detail.product.stock -= detail.cant
+                                detail.product.save()
 
-                    sale.calculate_invoice()
-                    data = {'id': sale.id}
+                        sale.calculate_invoice()
+                        data = {'id': sale.id}
+            elif action == 'search_if_exits_client':
+                now = datetime.now()
+                today = str(now.date())
+                exists = Sale.objects.filter(Q(date_joined=today) & Q(client_id=request.POST['id_client'])).exists()
+                if exists:
+                    data['exists'] = True
+                    data['success_url'] = self.success_url
+                else:
+                    data['exists'] = False
             elif action == 'search_client':
                 data = []
                 today = datetime.today().strftime('%A')[:3].lower()

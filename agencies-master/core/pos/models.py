@@ -134,7 +134,7 @@ class Shopping(models.Model):
         modify = False
         if self.date_joined.strftime("%Y-%m-%d") < str(datetime.now().date()):
             modify = True
-        date_joined = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%H:%M:%S")}'
+        date_joined = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}'
         data = [
             self.get_number(), self.user.username, self.supplier.get_full_name(), self.invoice_number,
             self.cant, date_joined, f'{self.subtotal:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}',
@@ -154,7 +154,7 @@ class Shopping(models.Model):
         item['iva'] = f'{self.iva:.2f}'
         item['total_iva'] = f'{self.total_iva:.2f}'
         item['total'] = f'{self.total:.2f}'
-        item['date_joined'] = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%H:%M:%S")}'
+        item['date_joined'] = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}'
         item['saleproduct'] = [i.toJSON() for i in self.shoppingdetail_set.all()]
         return item
 
@@ -352,7 +352,7 @@ class Sale(models.Model):
         opt = [modify, self.endofday]
         data = [
             self.get_number(), self.user.username, self.client.get_full_name(),
-            f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%H:%M:%S")}',
+            f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}',
             self.payment, f'{self.subtotal:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}', opt
         ]
         return data
@@ -369,7 +369,7 @@ class Sale(models.Model):
         item['iva'] = f'{self.iva:.2f}'
         item['total_iva'] = f'{self.total_iva:.2f}'
         item['total'] = f'{self.total:.2f}'
-        item['date_joined'] = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%H:%M:%S")}'
+        item['date_joined'] = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}'
         item['saleproduct'] = [i.toJSON() for i in self.saleproduct_set.all()]
         return item
 
@@ -390,7 +390,7 @@ class Sale(models.Model):
     class Meta:
         verbose_name = 'Venta'
         verbose_name_plural = 'Ventas'
-        ordering = ['id']
+        ordering = ['-id']
 
 
 class SaleProduct(models.Model):

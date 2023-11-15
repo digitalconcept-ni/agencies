@@ -123,7 +123,7 @@ $(function () {
         language: 'es'
     });
 
-    // Supplier
+    // Client
 
     select_client.select2({
         theme: "bootstrap4",
@@ -150,7 +150,34 @@ $(function () {
         },
         placeholder: 'Ingrese una descripción',
         minimumInputLength: 1,
-    });
+    })
+        .on('select2:select', function (e) {
+            var data = e.params.data;
+            console.log(data.id)
+            $.ajax({
+                url: window.location.pathname,
+                type: 'POST',
+                data: {'action': 'search_if_exits_client', 'id_client': data.id},
+                dataType: 'json',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            }).done(function (data) {
+                if (data.exists) {
+                    Swal.fire({
+                        title: "Notificación",
+                        text: "El cliente seleccionado ya cuenta con una venta",
+                        icon: "warning",
+                        confirmButtonColor: "#3085d6",
+                        confirmButtonText: "Ok!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.href = data.success_url;
+                        }
+                    });
+                }
+            })
+        });
 
     $('.btnAddClient').on('click', function () {
         $('#myModalClient').modal('show');
@@ -449,7 +476,7 @@ $(function () {
         end.val(canceledDate)
     }
 
-    if ($('#id_payment').val() == 'credit'){
+    if ($('#id_payment').val() == 'credit') {
         $('#block-credit').css('display', 'flex');
     }
 

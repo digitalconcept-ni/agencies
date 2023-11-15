@@ -41,44 +41,45 @@ var info = {
 $(function () {
     info.callInfo();
 
-    const ProductSoldToday = () => {
-        let config = [
-            {
-                targets: [0],
-                class: 'text-center',
-                visible: false
-            },
-            {
-                targets: [3],
-                class: 'text-center',
-                render: function (data, type, row) {
-                    if (row.stock > 6) {
-                        return '<span class="badge badge-success">' + data + '</span>';
-                    } else if (row.stock === 0) {
-                        return '<span class="badge badge-secondary">Sin stock</span>';
-                    } else {
-                        return '<span class="badge badge-danger">' + data + '</span>';
-                    }
-                }
-            },
-            {
-                targets: [4],
-                class: 'text-center',
-                render: function (data, type, row) {
-                    return '$' + parseFloat(data).toFixed(2);
-                }
-            },
-        ]
-        let data = {
-            'data': {'action': 'search_lower_inventory'},
-            'inserInto': 'rowModal',
-            'th': ['id', 'Nombre', 'Categoria', 'Stock', 'Costo'],
-            'table': 'tableModal',
-            'config': config,
-            'modal': true,
-        }
-        drawTables(data);
-    }
+    // const ProductSoldToday = () => {
+    //     let config = [
+    //         {
+    //             targets: [0],
+    //             class: 'text-center',
+    //             visible: false
+    //         },
+    //         {
+    //             targets: [3],
+    //             class: 'text-center',
+    //             render: function (data, type, row) {
+    //                 if (row.stock > 6) {
+    //                     return '<span class="badge badge-success">' + data + '</span>';
+    //                 } else if (row.stock === 0) {
+    //                     return '<span class="badge badge-secondary">Sin stock</span>';
+    //                 } else {
+    //                     return '<span class="badge badge-danger">' + data + '</span>';
+    //                 }
+    //             }
+    //         },
+    //         {
+    //             targets: [4],
+    //             class: 'text-center',
+    //             render: function (data, type, row) {
+    //                 return '$' + parseFloat(data).toFixed(2);
+    //             }
+    //         },
+    //     ]
+    //     let data = {
+    //         'data': {'action': 'search_lower_inventory'},
+    //         'inserInto': 'rowModal',
+    //         'th': ['id', 'Nombre', 'Categoria', 'Stock', 'Costo'],
+    //         'table': 'tableModal',
+    //         'config': config,
+    //         'modal': true,
+    //     }
+    //     drawTables(data);
+    // }
+
     setInterval(function () {
         info.callInfo()
     }, 15000)
@@ -107,9 +108,10 @@ $(function () {
             {
                 targets: [4],
                 class: 'text-center',
-                render: function (data, type, row) {
-                    return '$' + parseFloat(data).toFixed(2);
-                }
+                visible: false,
+                // render: function (data, type, row) {
+                //     return '$' + parseFloat(data).toFixed(2);
+                // }
             },
         ]
         let data = {
@@ -161,8 +163,17 @@ $(function () {
                 targets: [1, 2, 3, 4],
                 class: 'text-center',
                 render: function (data, type, row) {
-                    return `<span class="badge bg-success">${data[0]}</span> - C$ ${parseFloat(data[1]).toFixed(2)}`;
+                    var html = `<div class="row">
+                        <div class="col-12">
+                            <span class="badge bg-success" style="font-size: 14px">${data[0]}</span>
+                        </div>
+                        <div class="col-12">
+                            <span>C$ ${parseFloat(data[1]).toFixed(2)}</span>
+                        </div>
+                    </div>`
+                    // return `<span class="badge bg-success">${data[0]}</span> - C$ ${parseFloat(data[1]).toFixed(2)}`;
                     // return 'C$ ' + parseFloat(data).toFixed(2);
+                    return html;
                 }
             },
         ]
@@ -170,6 +181,34 @@ $(function () {
             'data': {'action': 'search_payment_method'},
             'inserInto': 'rowModal',
             'th': ['Nro', 'Efectivo', 'POS', 'Transferencia', 'Credito'],
+            'table': 'tableModal',
+            'config': config,
+            'modal': true,
+        }
+        drawTables(data);
+    })
+
+    $('#programing-clients').on('click', function () {
+
+        let config = [
+            {
+                targets: [0],
+                visible: false
+            },
+            {
+                targets: [1, 2, 3, 4],
+                class: 'text-center',
+            },
+            {
+                targets: [4],
+                render: function (data, type, row) {
+                    return parseFloat(data).toFixed(2);
+                }
+            },]
+        let data = {
+            'data': {'action': 'search_presale_info'},
+            'inserInto': 'rowModal',
+            'th': ['Nro', 'Preventa', 'Clientes Programados', 'Clientes Efectivos', 'Efectividad'],
             'table': 'tableModal',
             'config': config,
             'modal': true,

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum, FloatField, Q, F, Func, Count, Max
+from django.db.models import Sum, FloatField, Q, F, Func, Count, Max, Avg, Min, Case, When
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 
 from core.pos.models import Sale, Product, SaleProduct, Client
+from core.pos.query import visitFrequency
 from core.user.models import User
 
 
@@ -26,7 +27,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             action = request.POST['action']
             if action == 'search_investment':
                 if request.user.is_superuser:
-                    investment = Product.objects.all().aggregate(
+                    investment = Product.objects.select_related().aggregate(
                         result=Coalesce(Sum(F('stock') * F('cost')), 0.00, output_field=FloatField())).get('result')
                     pvp = Product.objects.all().aggregate(
                         result=Coalesce(Sum(F('stock') * F('pvp')), 0.00, output_field=FloatField())).get('result')
@@ -55,14 +56,43 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 countSalesTodayMoney = sale.aggregate(
                     result=Coalesce(Sum(F('total')), 0.00, output_field=FloatField())).get('result')
 
+                # QUERY PROGRAMING CLIENT TODAY
+
                 data = {
                     'sales-today': countSalesToday,
                     'sales': countSalesTodayMoney,
                     'products': totalProductsQuery,
                     'clients': totalClientsQuery,
                     'lower-inventory': lowInventory,
-                    'maximumsold': sold
+                    'maximumsold': sold,
+                    'programing-clients': visitFrequency(request).count()
                 }
+            elif action == 'search_presale_info':
+                today = str(now.date())
+                # today = '2023-11-11'
+                data = []
+                query = visitFrequency(request)
+                cantProgramingCLients = query.filter(user__presale=True).values('user__username').annotate(
+                    client=Count(F('id')))
+                print(cantProgramingCLients)
+                cantSales = query.filter(Q(sale__date_joined=today) & Q(user__presale=True)).values(
+                    'user__username').annotate(sale=Coalesce(Count('id'), 0))
+                print(cantSales)
+
+                presales = [i.get('user__username') for i in cantSales]
+                print(presales)
+
+                for s in cantProgramingCLients:
+                    if s['user__username'] in presales:
+                        i = presales.index(s['user__username'])
+                        sale = int(cantSales[i]['sale'])
+                        effectiveness = (sale * 100) / s['client']
+                        data.append([1, s['user__username'], s['client'],
+                                     sale, effectiveness])
+                    else:
+                        effectiveness = (0 * 100) / s['client']
+                        data.append([1, s['user__username'], s['client'],
+                                     0, effectiveness])
             elif action == 'search_lower_inventory':
                 queryProducts = Product.objects.filter(stock__lte=10)
                 data = []

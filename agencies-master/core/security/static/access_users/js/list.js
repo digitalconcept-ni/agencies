@@ -3,6 +3,10 @@ var input_daterange;
 var access_users = {
     config: [
         {
+            targets: [0],
+            visible: false,
+        },
+        {
             targets: [-2],
             class: 'text-center',
             render: function (data, type, row) {
@@ -36,7 +40,7 @@ var access_users = {
         let data = {
             'data': parameters,
             'inserInto': 'rowList',
-            'th': ['Nro', 'usuario', 'Registro', 'Direccion IP', 'Coordenadas', 'Exactitud', 'Intento', 'Opciones'],
+            'th': ['Nro', 'Usuario', 'Registro', 'Direccion IP', 'Coordenadas', 'Exactitud', 'Intento', 'Opciones'],
             'table': 'tableList',
             'config': access_users.config,
             'modal': false,

@@ -190,7 +190,7 @@
                                     {{ field|attr:'hidden:true' }}
                                 {% else %}
                                     <div class="form-group">
-                                        <label>{{ field.label }}:</label>
+                                        <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
                                         {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
                                     </div>
                                 {% endif %}
@@ -201,7 +201,7 @@
                                 {% if field|is_checkbox %}
                                     <div class="col">
                                         <div class="form-group">
-                                            <label>{{ field.label }}: </label>
+                                            <label for="{{ field.id_for_label }}">{{ field.label }}: </label>
                                             {{ field }}
                                         </div>
                                     </div>

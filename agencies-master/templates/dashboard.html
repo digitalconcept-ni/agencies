@@ -26,7 +26,17 @@
 
 {% block content %}
     <div class="container">
-        <div class="row">
+        <div class="row mb-3">
+
+            <div class="col-md-3 col-sm-6 col-12">
+                <div class="info-box bg-gradient-secondary shadow">
+                    <span class="info-box-icon"><i class="fa fa-user-friends"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Clientes Programados</span>
+                        <h3 class="info-box-number" id="programing-clients">0</h3>
+                    </div>
+                </div>
+            </div>
 
             <div class="col-md-3 col-sm-6 col-12">
                 <div class="info-box bg-olive shadow-lg" id="sale">
@@ -76,8 +86,7 @@
                 </div>
                 {# //END FOUR #}
             {% endif %}
-        </div>
-        <div class="row">
+
             <div class="col-md-3 col-sm-6 col-12" id="lower">
                 <div class="info-box bg-gradient-danger products shadow">
                     <span class="info-box-icon"><i class="fa fa-arrow-down"></i></span>
@@ -295,10 +304,10 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="modal-footer">
-                    <a id="btn-sale-products" href="{{ create_url }}" target="_blank"
-                       class="btn btn-success">Comprar</a>
-                </div>
+{#                <div class="modal-footer">#}
+{#                    <a id="btn-sale-products" href="{{ create_url }}" target="_blank"#}
+{#                       class="btn btn-success">Comprar</a>#}
+{#                </div>#}
             </div>
         </div>
     </div>

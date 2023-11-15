@@ -23,7 +23,7 @@ class AccessUsers(models.Model):
     def toLIST(self):
         accuracy = f'{self.accuracy} Metros'
         type = {'id': self.type, 'name': self.get_type_display()}
-        register = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%H:%M:%S")}'
+        register = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}'
         data = [
             self.id, self.user.username, register,
             self.ip_address, self.coords, accuracy, type, self.id
@@ -36,7 +36,7 @@ class AccessUsers(models.Model):
         item['user'] = self.user.toJSON()
         item['accuracy'] = f'{self.accuracy} Metros'
         item['date_joined'] = self.date_joined.strftime('%Y-%m-%d')
-        item['time_joined'] = self.time_joined.strftime('%H:%M:%S')
+        item['time_joined'] = self.time_joined.strftime('%I:%M:%S %p')
         return item
 
     def save(self, force_insert=False, force_update=False, using=None,
@@ -56,4 +56,4 @@ class AccessUsers(models.Model):
             ('view_access_users', 'Can view Acceso de Usuario'),
             ('delete_access_users', 'Can delete Acceso de Usuario'),
         )
-        ordering = ['id']
+        ordering = ['-id']

@@ -65,7 +65,7 @@
                 <label>Rangos de fechas:</label>
                 <div class="input-group mb-3">
                     {{ form.date_range }}
-                    <div class="input-group-append">
+                    <div class="input-group-append col-md-12">
                         <button class="btn btn-success btnSearch" type="button">
                             <i class="fas fa-calendar-check"></i> Buscar por rangos
                         </button>
@@ -88,7 +88,7 @@
                                 <option value="{{ u.id }}">{{ u.username }}</option>
                             {% endfor %}
                         </select>   
-                        <div class="input-group-append">
+                        <div class="input-group-append col-md-12">
                             <button class="btn btn-success disabled" type="button" id="btnDonwloadGuide">
                                 <i class="fas fa-download"></i> Descargar
                             </button>

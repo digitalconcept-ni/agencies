@@ -11,17 +11,17 @@
 {% block content_list_before %}
     <div class="row">
         {% if request.user.is_superuser == True %}
-            <div class="col-lg-12">
+            <div class="col-md-12 col-lg-6">
                 <div class="form-group">
-                    <label>Busqueda de cliente: </label>
-                    <div class="input-group mb-3">
-                        <select class="form-control select2" id="search_client" name="client">
-                            {#                            <option value="">Busqueda de clientes</option>#}
-                            {#                            {% for u in frmClient %}#}
-                            {#                                <option value="{{ u.id }}">{{ u.names }} - {{ u.dni }}</option>#}
-                            {#                            {% endfor %}#}
-                        </select>
-                        <div class="input-group-append">
+                    <label for="search_client">Busqueda de cliente: </label>
+                    <select class="form-control select2" id="search_client" name="client">
+                        {#                            <option value="">Busqueda de clientes</option>#}
+                        {#                            {% for u in frmClient %}#}
+                        {#                                <option value="{{ u.id }}">{{ u.names }} - {{ u.dni }}</option>#}
+                        {#                            {% endfor %}#}
+                    </select>
+                    <div class="input-group ">
+                        <div class="input-group-append col-md-12">
                             <button class="btn btn-success" id="btnSearch" type="button">
                                 <i class="fas fa-search"></i> Buscar
                             </button>

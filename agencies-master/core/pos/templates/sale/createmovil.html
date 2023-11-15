@@ -136,7 +136,7 @@
                     <div class="modal-body">
                         {% for field in frmClient.visible_fields %}
                             <div class="form-group">
-                                <label for="email">{{ field.label }}:</label>
+                                <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
                                 {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
                             </div>
                         {% endfor %}
