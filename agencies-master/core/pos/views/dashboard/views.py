@@ -74,13 +74,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 query = visitFrequency(request)
                 cantProgramingCLients = query.filter(user__presale=True).values('user__username').annotate(
                     client=Count(F('id')))
-                print(cantProgramingCLients)
                 cantSales = query.filter(Q(sale__date_joined=today) & Q(user__presale=True)).values(
                     'user__username').annotate(sale=Coalesce(Count('id'), 0))
-                print(cantSales)
 
                 presales = [i.get('user__username') for i in cantSales]
-                print(presales)
+
+                cpGeneral = 0  # Total clients programs today
+                ceGeneral = 0  # Total effectiveness clients
 
                 for s in cantProgramingCLients:
                     if s['user__username'] in presales:
@@ -89,10 +89,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                         effectiveness = (sale * 100) / s['client']
                         data.append([1, s['user__username'], s['client'],
                                      sale, effectiveness])
+                        ceGeneral += sale
                     else:
                         effectiveness = (0 * 100) / s['client']
                         data.append([1, s['user__username'], s['client'],
                                      0, effectiveness])
+                    cpGeneral += s['client']
+
+                eGeneral = (ceGeneral * 100) / cpGeneral
+                data.append([1, '--------', cpGeneral, ceGeneral, eGeneral])
+
             elif action == 'search_lower_inventory':
                 queryProducts = Product.objects.filter(stock__lte=10)
                 data = []
