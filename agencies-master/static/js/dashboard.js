@@ -188,7 +188,7 @@ $(function () {
         drawTables(data);
     })
 
-    $('#programing-clients').on('click', function () {
+    $('#programingClients').on('click', function () {
 
         let config = [
             {
