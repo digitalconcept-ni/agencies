@@ -31,11 +31,15 @@ class LoginFormView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        compuName = self.request.environ['COMPUTERNAME']
+        print(compuName)
         login(self.request, user=form.get_user())
         return super(LoginFormView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        compuName = self.request.environ['COMPUTERNAME']
+        context['computername'] = compuName
         context['title'] = 'Iniciar sesión'
         return context
 

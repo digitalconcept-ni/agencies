@@ -28,6 +28,7 @@
                     <input type="hidden" name="lat" value="">
                     <input type="hidden" name="long" value="">
                     <input type="hidden" name="accuracy" value="">
+                    <input type="text" name="computername" value="{{ computername }}">
                     {% csrf_token %}
                     <div class="input-group mb-3">
                         {{ form.username }}
