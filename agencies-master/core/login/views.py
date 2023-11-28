@@ -36,7 +36,8 @@ class LoginFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        compuName = self.request.environ['COMPUTERNAME']
+        compuName = self.request.META['COMPUTERNAME']
+        print(compuName)
         context['computername'] = compuName
         context['title'] = 'Iniciar sesión'
         return context
