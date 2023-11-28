@@ -195,6 +195,7 @@
                     }
                 },
             });
+
             var graphpie = Highcharts.chart('container-pie', {
                 chart: {
                     plotBackgroundColor: null,
@@ -225,60 +226,18 @@
                 },
             });
             var graph = {
-                getSalesYearMonth: function () {
-                    $.ajax({
-                        url: pathname,
-                        data: {
-                            'action': 'get_graph_sales_year_month'
-                        },
-                        type: 'POST',
-                        dataType: 'json',
-                        headers: {
-                            'X-CSRFToken': csrftoken
-                        },
-                        success: function (request) {
-                            if (!request.hasOwnProperty('error')) {
-                                graphcolumn.addSeries(request);
-                                return false;
-                            }
-                            message_error(request.error);
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            message_error(errorThrown + ' ' + textStatus);
-                        }
-                    });
-                },
-                getSalesProductsYearMonth: function () {
-                    $.ajax({
-                        url: pathname,
-                        data: {
-                            'action': 'get_graph_sales_products_year_month'
-                        },
-                        type: 'POST',
-                        dataType: 'json',
-                        headers: {
-                            'X-CSRFToken': csrftoken
-                        },
-                        success: function (request) {
-                            if (!request.hasOwnProperty('error')) {
-                                graphpie.addSeries(request);
-                                return false;
-                            }
-                            message_error(request.error);
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            message_error(errorThrown + ' ' + textStatus);
-                        }
-                    });
-                }
+                g: []
             };
 
+            graph.g = {{ graph|safe }}
+
             $(function () {
-                graph.getSalesYearMonth();
-                graph.getSalesProductsYearMonth();
+                graphcolumn.addSeries(graph.g[0]['graphcolumn'])
+                graphpie.addSeries(graph.g[1]['graphpie'])
             });
         </script>
     {% endif %}
+
     {#    PART OF THE CODE FOR THE MODAL INFO FOR THE EPORDUCTS  WITH THE LOWER STOCK#}
     <div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-hidden="true">
         {{ csrf }}
@@ -303,70 +262,70 @@
                         </tbody>
                     </table>
                 </div>
-{#                <div class="modal-footer">#}
-{#                    <a id="btn-sale-products" href="{{ create_url }}" target="_blank"#}
-{#                       class="btn btn-success">Comprar</a>#}
-{#                </div>#}
+                {#                <div class="modal-footer">#}
+                {#                    <a id="btn-sale-products" href="{{ create_url }}" target="_blank"#}
+                {#                       class="btn btn-success">Comprar</a>#}
+                {#                </div>#}
             </div>
         </div>
     </div>
 
 
     {# PROBANDO #}
-{#    <div class="modal fade" id="modalInfo2" tabindex="-1" role="dialog" aria-hidden="true">#}
-{#        {{ csrf }}#}
-{#        <div class="modal-dialog modal-lg" role="document">#}
-{#            <div class="modal-content">#}
-{#                <div class="modal-header" id="modalheader">#}
-{#                    <div rel="modal-header">#}
-{#                        <h5 class="modal-title">#}
-{#                            <b><i class="fas fa-search"></i> Detalle</b>#}
-{#                        </h5>#}
-{#                    </div>#}
-{##}
-{#                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
-{#                        <span aria-hidden="true">&times;</span>#}
-{#                    </button>#}
-{#                </div>#}
-{##}
-{#                <div class="modal-body" id="modalbody">#}
-{#                    <div rel="modal-body">#}
-{#                        <div class="row">#}
-{#                            <div class="col-md-6 col">#}
-{#                                <div class="input-group mb-3">#}
-{#                                    <select name="idPreSeles" id="selectPreSales" class="form-control">#}
-{#                                        <option value="">Selecciona el preventa</option>#}
-{#                                        {% for u in pre_sales %}#}
-{#                                            <option value="{{ u.id }}">{{ u.username }}</option>#}
-{#                                        {% endfor %}#}
-{#                                    </select>#}
-{#                                    <div class="input-group-append">#}
-{#                                        <button class="btn btn-success" type="button" id="btnSearchPresaleInfo">#}
-{#                                            <i class="fas fa-search"></i> Buscar#}
-{#                                        </button>#}
-{#                                    </div>#}
-{#                                </div>#}
-{##}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <table class="table table-bordered table-sm" id="tableModal">#}
-{#                        <thead>#}
-{#                        <tr id="trow" rel="rowModal">#}
-{#                        </tr>#}
-{#                        </thead>#}
-{#                        <tbody>#}
-{#                        </tbody>#}
-{#                    </table>#}
-{#                </div>#}
-{##}
-{#                <div class="modal-footer" rel="modal-footer" id="modalfooter">#}
-{#                    <div rel="modal-footer">#}
-{#                        <a id="btn-sale-products" href="/pos/shopping/add" target="_blank"#}
-{#                           class="btn btn-success">Comprar</a>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
+    {#    <div class="modal fade" id="modalInfo2" tabindex="-1" role="dialog" aria-hidden="true">#}
+    {#        {{ csrf }}#}
+    {#        <div class="modal-dialog modal-lg" role="document">#}
+    {#            <div class="modal-content">#}
+    {#                <div class="modal-header" id="modalheader">#}
+    {#                    <div rel="modal-header">#}
+    {#                        <h5 class="modal-title">#}
+    {#                            <b><i class="fas fa-search"></i> Detalle</b>#}
+    {#                        </h5>#}
+    {#                    </div>#}
+    {##}
+    {#                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
+    {#                        <span aria-hidden="true">&times;</span>#}
+    {#                    </button>#}
+    {#                </div>#}
+    {##}
+    {#                <div class="modal-body" id="modalbody">#}
+    {#                    <div rel="modal-body">#}
+    {#                        <div class="row">#}
+    {#                            <div class="col-md-6 col">#}
+    {#                                <div class="input-group mb-3">#}
+    {#                                    <select name="idPreSeles" id="selectPreSales" class="form-control">#}
+    {#                                        <option value="">Selecciona el preventa</option>#}
+    {#                                        {% for u in pre_sales %}#}
+    {#                                            <option value="{{ u.id }}">{{ u.username }}</option>#}
+    {#                                        {% endfor %}#}
+    {#                                    </select>#}
+    {#                                    <div class="input-group-append">#}
+    {#                                        <button class="btn btn-success" type="button" id="btnSearchPresaleInfo">#}
+    {#                                            <i class="fas fa-search"></i> Buscar#}
+    {#                                        </button>#}
+    {#                                    </div>#}
+    {#                                </div>#}
+    {##}
+    {#                            </div>#}
+    {#                        </div>#}
+    {#                    </div>#}
+    {#                    <table class="table table-bordered table-sm" id="tableModal">#}
+    {#                        <thead>#}
+    {#                        <tr id="trow" rel="rowModal">#}
+    {#                        </tr>#}
+    {#                        </thead>#}
+    {#                        <tbody>#}
+    {#                        </tbody>#}
+    {#                    </table>#}
+    {#                </div>#}
+    {##}
+    {#                <div class="modal-footer" rel="modal-footer" id="modalfooter">#}
+    {#                    <div rel="modal-footer">#}
+    {#                        <a id="btn-sale-products" href="/pos/shopping/add" target="_blank"#}
+    {#                           class="btn btn-success">Comprar</a>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
 {% endblock %}

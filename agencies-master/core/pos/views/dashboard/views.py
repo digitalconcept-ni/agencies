@@ -1,7 +1,8 @@
+import json
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum, FloatField, Q, F, Func, Count, Max, Avg, Min, Case, When
+from django.db.models import Sum, FloatField, Q, F, Count
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -10,7 +11,6 @@ from django.views.generic import TemplateView
 
 from core.pos.models import Sale, Product, SaleProduct, Client
 from core.pos.query import visitFrequency
-from core.user.models import User
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -19,6 +19,41 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         request.user.get_group_session()
         return super().get(request, *args, **kwargs)
+
+    def graph(self):
+        data = []
+        # QUERY GRAPH COLUM BAR graphcolumn
+        graphColumnPoints = []
+        year = datetime.now().year
+        for m in range(1, 13):
+            total = Sale.objects.filter(date_joined__year=year, date_joined__month=m).aggregate(
+                result=Coalesce(Sum('total'), 0.00, output_field=FloatField())).get('result')
+            graphColumnPoints.append(float(total))
+        graphcolumn = {
+            'name': 'Porcentaje de venta',
+            'showInLegend': False,
+            'colorByPoint': True,
+            'data': graphColumnPoints
+        }
+
+        graphPiePoints = []
+        year = datetime.now().year
+        month = datetime.now().month
+        for p in Product.objects.filter():
+            total = SaleProduct.objects.filter(sale__date_joined__year=year, sale__date_joined__month=month,
+                                               product_id=p.id).aggregate(
+                result=Coalesce(Sum('subtotal'), 0, output_field=FloatField())).get('result')
+            if total > 0:
+                graphPiePoints.append({'name': p.name, 'y': float(total)})
+        graphpie = {
+            'name': 'Porcentaje',
+            'colorByPoint': True,
+            'data': graphPiePoints
+        }
+
+        data.append({'graphcolumn': graphcolumn})
+        data.append({'graphpie': graphpie})
+        return json.dumps(data)
 
     def post(self, request, *args, **kwargs):
         data = {}
@@ -56,8 +91,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 countSalesTodayMoney = sale.aggregate(
                     result=Coalesce(Sum(F('total')), 0.00, output_field=FloatField())).get('result')
 
-                # QUERY PROGRAMING CLIENT TODAY
-
                 data = {
                     'sales-today': countSalesToday,
                     'sales': countSalesTodayMoney,
@@ -65,11 +98,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'clients': totalClientsQuery,
                     'lower-inventory': lowInventory,
                     'maximumsold': sold,
-                    'programing-clients': visitFrequency(request).count()
+                    'programing-clients': visitFrequency(request).count(),
                 }
             elif action == 'search_presale_info':
                 today = str(now.date())
-                # today = '2023-11-11'
                 data = []
                 query = visitFrequency(request)
                 cantProgramingCLients = query.filter(user__presale=True).values('user__username').annotate(
@@ -98,7 +130,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
                 eGeneral = (ceGeneral * 100) / cpGeneral
                 data.append([1, '--------', cpGeneral, ceGeneral, eGeneral])
-
             elif action == 'search_lower_inventory':
                 queryProducts = Product.objects.filter(stock__lte=10)
                 data = []
@@ -127,7 +158,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                      [creditPayment.count(), credit]])
                 # data.append(
                 #     [1, cashPayment.count(), posPayment.count(), transferPayment.count(), creditPayment.count()])
-
             elif action == 'get_graph_sales_year_month':
                 points = []
                 year = datetime.now().year
@@ -167,6 +197,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['create_url'] = reverse_lazy('shopping_create')
         context['sales_url'] = reverse_lazy('sale_list')
         context['clients_url'] = reverse_lazy('client_list')
+        context['graph'] = self.graph()
         return context
 
 
