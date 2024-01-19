@@ -28,6 +28,7 @@ class ProductListView(ValidatePermissionRequiredMixin, ListView):
             else:
                 data['error'] = 'Ha ocurrido un error revise sus valores'
         except Exception as e:
+            print(str(e))
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
