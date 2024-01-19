@@ -102,7 +102,11 @@ class Product(models.Model):
     pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta')
 
     def __str__(self):
-        return f'{self.code} - {self.brand.name} {self.name} {self.um}'
+        if self.brand is None:
+            brand = '(Marca no registrada)'
+        else:
+            brand = self.brand.name
+        return f'{self.code} - {brand} {self.name} {self.um}'
 
     def get_total_earnings(self):
         # return sum([payment.amount for payment in self.objects.all()])
