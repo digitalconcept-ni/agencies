@@ -94,7 +94,7 @@ class Product(models.Model):
     name = models.CharField(max_length=150, verbose_name='Nombre')
     code = models.CharField(max_length=6, unique=True, verbose_name='Codigo de producto')
     um = models.CharField(max_length=10, default='UND', verbose_name='Unidad de medida')
-    expiration = models.DateField(default='2024-01-19', verbose_name='Fecha de vencimiento', null=True, blank=True)
+    expiration = models.DateField(verbose_name='Fecha de vencimiento', null=True, blank=True)
     image = models.ImageField(upload_to='product/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
     is_inventoried = models.BooleanField(default=True, blank=True, null=True, verbose_name='¿Es inventariado?')
     stock = models.IntegerField(default=0, verbose_name='Stock')
@@ -119,8 +119,12 @@ class Product(models.Model):
             brand = 1
         else:
             brand = self.brand.get_full_name()
+        if self.expiration is None:
+            ex = '2000-01-01'
+        else:
+            ex = self.expiration.strftime('%Y-%m-%d')
         data = [
-            self.id, brand, self.__str__(), self.expiration.strftime('%Y-%m-%d'), self.get_image(),
+            self.id, brand, self.__str__(), ex, self.get_image(),
             self.is_inventoried, self.stock, f'{self.cost:.2f}', f'{self.pvp:.2f}', self.id
         ]
         return data
