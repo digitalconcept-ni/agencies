@@ -290,6 +290,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
             else:
                 data['error'] = 'No ha ingresado a ninguna opción'
         except Exception as e:
+            print(str(e))
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
