@@ -18,7 +18,7 @@ from core.pos.choices import personalized_invoice
 from core.pos.mergerPdfFiles import mergerPdf
 from core.user.models import User
 
-os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
+# os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
 from weasyprint import HTML, CSS
 
 from core.pos.forms import SaleForm, ClientForm, SaleMovilForm
