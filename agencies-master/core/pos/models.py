@@ -89,7 +89,7 @@ class Brands(models.Model):
 
 class Product(models.Model):
     # supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, verbose_name='Proveedor')
-    brand = models.ForeignKey(Brands, on_delete=models.CASCADE, default=1,verbose_name='Marca', null=True, blank=True)
+    brand = models.ForeignKey(Brands, on_delete=models.CASCADE, verbose_name='Marca', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
     name = models.CharField(max_length=150, verbose_name='Nombre')
     code = models.CharField(max_length=6, unique=True, verbose_name='Codigo de producto')
@@ -112,7 +112,7 @@ class Product(models.Model):
 
     def toLIST(self):
         if self.brand is None:
-            brand = "No resgistrado"
+            brand = 1
         else:
             brand = self.brand.get_full_name()
         data = [
