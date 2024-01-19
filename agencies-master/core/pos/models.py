@@ -131,12 +131,16 @@ class Product(models.Model):
 
     def toJSON(self):
         if self.brand is None:
-            brand = "No registrado"
+            brand = 1
         else:
             brand = self.brand.toJSON()
+        if self.expiration is None:
+            ex = '2000-01-01'
+        else:
+            ex = self.expiration.strftime('%Y-%m-%d')
         item = model_to_dict(self)
         item['full_name'] = self.__str__()
-        item['expiration'] = self.expiration.strftime('%Y-%m-%d')
+        item['expiration'] = ex
         item['brand'] = brand
         item['image'] = self.get_image()
         item['pvp'] = f'{self.pvp:.2f}'
