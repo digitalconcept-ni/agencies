@@ -461,8 +461,8 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         try:
-            tenantName = 'disam'
-            # tenantName = request.tenant.name
+            # tenantName = 'disam'
+            tenantName = request.tenant.name
             templateName = tenantName + '.html'
 
             sale = Sale.objects.get(pk=self.kwargs['pk'])
