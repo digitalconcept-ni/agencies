@@ -195,6 +195,13 @@ $(function () {
         maxDate: new Date()
     });
 
+    $('input[name="end"]').datetimepicker({
+        useCurrent: false,
+        format: 'YYYY-MM-DD',
+        locale: 'es',
+        keepOpen: false,
+    });
+
     $('#frmClient').on('submit', function (e) {
         e.preventDefault();
         var parameters = new FormData(this);

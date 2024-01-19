@@ -11,6 +11,7 @@ from django.views.generic import TemplateView
 
 from core.pos.models import Sale, Product, SaleProduct, Client
 from core.pos.query import visitFrequency
+from core.user.models import User
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -56,8 +57,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         return json.dumps(data)
 
     def post(self, request, *args, **kwargs):
-        data = {}
         try:
+            data = {}
             now = datetime.now()
             action = request.POST['action']
             if action == 'search_investment':
@@ -79,17 +80,18 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     sold.append([x + 1, maximumProductSold['product__name'], maximumProductSold['total']])
 
                 queryProducts = Product.objects.select_related()
-                querySales = Sale.objects.select_related().filter(date_joined__exact=now)
+                querySales = Sale.objects.select_related()
                 if request.user.is_superuser:
-                    sale = querySales
+                    sale = querySales.filter(date_joined__exact=now)
                 else:
-                    sale = querySales.filter(user_id=request.user.id)
+                    sale = querySales.filter(Q(user_id=request.user.id) & Q(date_joined__exact=now))
                 lowInventory = queryProducts.filter(stock__lte=15).count()
                 totalProductsQuery = queryProducts.count()
                 totalClientsQuery = Client.objects.count()
                 countSalesToday = sale.count()
                 countSalesTodayMoney = sale.aggregate(
                     result=Coalesce(Sum(F('total')), 0.00, output_field=FloatField())).get('result')
+                appliedCredit = querySales.filter(Q(payment='credit') & Q(applied=False)).count()
 
                 data = {
                     'sales-today': countSalesToday,
@@ -99,43 +101,49 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'lower-inventory': lowInventory,
                     'maximumsold': sold,
                     'programing-clients': visitFrequency(request).count(),
+                    'applied-credit': appliedCredit
                 }
             elif action == 'search_presale_info':
                 today = str(now.date())
                 data = []
-                query = visitFrequency(request)
-                cantProgramingCLients = query.filter(user__presale=True).values('user__username').annotate(
-                    client=Count(F('id')))
-                cantSales = query.filter(Q(sale__date_joined=today) & Q(user__presale=True)).values(
-                    'user__username').annotate(sale=Coalesce(Count('id'), 0))
+                exist = User.objects.filter(presale=True).exists()
+                if exist:
+                    query = visitFrequency(request)
+                    cantProgramingCLients = query.filter(user__presale=True).values('user__username').annotate(
+                        client=Count(F('id')))
+                    cantSales = query.filter(Q(sale__date_joined=today) & Q(user__presale=True)).values(
+                        'user__username').annotate(sale=Coalesce(Count('id'), 0))
 
-                presales = [i.get('user__username') for i in cantSales]
+                    presales = [i.get('user__username') for i in cantSales]
 
-                cpGeneral = 0  # Total clients programs today
-                ceGeneral = 0  # Total effectiveness clients
+                    cpGeneral = 0  # Total clients programs today
+                    ceGeneral = 0  # Total effectiveness clients
 
-                for s in cantProgramingCLients:
-                    if s['user__username'] in presales:
-                        i = presales.index(s['user__username'])
-                        sale = int(cantSales[i]['sale'])
-                        effectiveness = (sale * 100) / s['client']
-                        data.append([1, s['user__username'], s['client'],
-                                     sale, effectiveness])
-                        ceGeneral += sale
-                    else:
-                        effectiveness = (0 * 100) / s['client']
-                        data.append([1, s['user__username'], s['client'],
-                                     0, effectiveness])
-                    cpGeneral += s['client']
+                    for s in cantProgramingCLients:
+                        if s['user__username'] in presales:
+                            i = presales.index(s['user__username'])
+                            sale = int(cantSales[i]['sale'])
+                            effectiveness = (sale * 100) / s['client']
+                            data.append([1, s['user__username'], s['client'],
+                                         sale, effectiveness])
+                            ceGeneral += sale
+                        else:
+                            effectiveness = (0 * 100) / s['client']
+                            data.append([1, s['user__username'], s['client'],
+                                         0, effectiveness])
+                        cpGeneral += s['client']
 
-                eGeneral = (ceGeneral * 100) / cpGeneral
-                data.append([1, '--------', cpGeneral, ceGeneral, eGeneral])
+                    eGeneral = (ceGeneral * 100) / cpGeneral
+                    data.append([1, '--------', cpGeneral, ceGeneral, eGeneral])
+                else:
+                    data = {'info': 'No hay pre ventas activos para calcular el reporte'}
+                    return JsonResponse(data, safe=False)
             elif action == 'search_lower_inventory':
                 queryProducts = Product.objects.filter(stock__lte=10)
-                data = []
-                for p in queryProducts:
-                    data.append([p.id, p.name, p.category.name, p.stock,
-                                 f'{p.cost:.2f}'])
+                data = [p.toLIST() for p in queryProducts]
+                # for p in queryProducts:
+                #     data.append([p.id, p.name, p.brand.name, p.stock,
+                #                  f'{p.cost:.2f}'])
             elif action == 'search_payment_method':
                 data = []
                 query = Sale.objects.select_related().filter(date_joined=now)
@@ -186,7 +194,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'colorByPoint': True,
                     'data': points
                 }
+            elif action == 'view-credit-noapplied':
+                appliedCredit = Sale.objects.filter(Q(payment='credit') & Q(applied=False))
+                data = []
+                total = 0
+                for i in appliedCredit:
+                    total += i.total
+                    data.append([i.id, i.purchase_order, i.user.username, i.client.names, i.end, i.total])
+                data.append(['--', '----', '----', '----', 'Total', total])
         except Exception as e:
+            print(str(e))
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
 

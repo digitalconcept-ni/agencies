@@ -11,6 +11,15 @@
     <div class="container">
         <div class="card">
             <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <select name="select-load" id="selecLoad">
+                            <option value="product">Productos</option>
+                            <option value="brands">Marcas</option>
+                        </select>
+                    </div>
+                    <div class="col-12"></div>
+                </div>
                 <label for="file-csv">Seleciona un archivo: </label>
                 <input type="file" name="file-csv" id="insert_file">
                 <button type="button" class="btn btn-success" id="btn_insert_csv">Insertar</button>

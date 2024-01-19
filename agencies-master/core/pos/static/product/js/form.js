@@ -8,6 +8,14 @@ $(function () {
         language: 'es'
     });
 
+     $('input[name="expiration"]').datetimepicker({
+        useCurrent: false,
+        format: 'YYYY-MM-DD',
+        locale: 'es',
+        keepOpen: false,
+        maxDate: new Date()
+    });
+
     $('input[name="pvp"]')
         .TouchSpin({
             min: 0.01,

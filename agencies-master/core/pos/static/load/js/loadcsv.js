@@ -2,14 +2,16 @@ $(function () {
 
     $('#btn_insert_csv').on('click', function () {
 
+
         if ($('#insert_file').val() === '') {
             message_error({'error': 'Selecciones un documento para poder insertarlo'})
         } else {
             let loader = document.querySelector('.preloader-container');
+            var select = $('#selecLoad').val();
 
             const data = new FormData();
             data.append('file', $('#insert_file')[0].files[0]);
-            data.append('action', 'insert_file');
+            data.append('selection', select);
 
             $.ajax('.', {
                 method: "POST",

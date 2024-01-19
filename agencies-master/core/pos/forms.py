@@ -28,7 +28,39 @@ class CategoryForm(ModelForm):
         except Exception as e:
             data['error'] = str(e)
         return data
+class BrandsForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs['autofocus'] = True
 
+    class Meta:
+        model = Brands
+        fields = '__all__'
+        # widgets = {
+        #     'expiration': forms.DateInput(format='%Y-%m-%d', attrs={
+        #         'class': 'form-control datetimepicker-input',
+        #         'id': 'expiration',
+        #         'value': datetime.now().strftime('%Y-%m-%d'),
+        #         'data-toggle': 'datetimepicker',
+        #         'data-target': '#birthdate'
+        #     }),
+        #     'category': forms.Select(attrs={
+        #             'class': 'select2',
+        #             'style': 'width: 100%'
+        #         }),
+        # }
+
+    def save(self, commit=True):
+        data = {}
+        form = super()
+        try:
+            if form.is_valid():
+                form.save()
+            else:
+                data['error'] = form.errors
+        except Exception as e:
+            data['error'] = str(e)
+        return data
 
 class ProductForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -39,18 +71,18 @@ class ProductForm(ModelForm):
         model = Product
         fields = '__all__'
         widgets = {
-            # 'name': forms.TextInput(attrs={
-            #     'placeholder': 'Ingrese un nombre',
-            # }),
+            'expiration': forms.DateInput(format='%Y-%m-%d', attrs={
+                'class': 'form-control datetimepicker-input',
+                'id': 'expiration',
+                'value': datetime.now().strftime('%Y-%m-%d'),
+                'data-toggle': 'datetimepicker',
+                'data-target': '#birthdate'
+            }),
             'category': forms.Select(attrs={
                 'class': 'select2',
                 'style': 'width: 100%'
             }),
-            'stock': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
         }
-        exclude = ['old_stock']
 
     def save(self, commit=True):
         data = {}
@@ -73,7 +105,7 @@ class ClientForm(ModelForm):
 
     class Meta:
         model = Client
-        fields = 'user', 'names', 'dni', 'birthdate', 'address', 'gender', 'is_active', 'frequent', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'
+        fields = 'user', 'names', 'dni', 'birthdate', 'address', 'municipality', 'gender', 'is_active', 'frequent', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'
         widgets = {
             # 'user': forms.Select(attrs={
             #     'class': 'custom-select select2',
@@ -188,6 +220,16 @@ class SaleForm(ModelForm):
         model = Sale
         fields = '__all__'
         widgets = {
+            'end': forms.DateInput(format='%Y-%m-%d', attrs={
+                'class': 'form-control datetimepicker-input',
+                'id': 'end',
+                'value': datetime.now().strftime('%Y-%m-%d'),
+                'data-toggle': 'datetimepicker',
+                'data-target': '#end'
+            }),
+            'purchase_order': forms.TextInput(attrs={
+                'class': 'form-control',
+            }),
             'client': forms.Select(attrs={
                 'class': 'custom-select select2',
                 # 'style': 'width: 100%'

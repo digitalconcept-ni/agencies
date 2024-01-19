@@ -14,10 +14,11 @@ from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, FormView, DeleteView, UpdateView, View
 import os
 
+from core.pos.choices import personalized_invoice
 from core.pos.mergerPdfFiles import mergerPdf
 from core.user.models import User
 
-# os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
+os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
 from weasyprint import HTML, CSS
 
 from core.pos.forms import SaleForm, ClientForm, SaleMovilForm
@@ -116,7 +117,11 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
         data = {}
         try:
             action = request.POST['action']
-            if action == 'download_guides':
+            if action == 'apply_credit':
+                s = Sale.objects.get(id=request.POST['id'])
+                s.applied = True
+                s.save()
+            elif action == 'download_guides':
                 data = []
                 param = {
                     'id': request.POST['id'],
@@ -215,6 +220,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                         sale = Sale()
                         sale.user_id = request.user.id
                         sale.date_joined = request.POST['date_joined']
+                        sale.purchase_order = request.POST['purchase_order']
                         sale.client_id = int(request.POST['client'])
                         if request.POST['payment'] == 'credit':
                             sale.payment = request.POST['payment']
@@ -327,10 +333,12 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
     def get_details_product(self):
         data = []
         sale = self.get_object()
+        print(sale)
         for i in sale.saleproduct_set.all():
             item = i.product.toJSON()
             item['cant'] = i.cant
             data.append(item)
+        print(data)
         return json.dumps(data)
 
     def post(self, request, *args, **kwargs):
@@ -452,17 +460,34 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         try:
-            template = get_template('sale/invoice.html')
+            tenantName = 'disam'
+            # tenantName = request.tenant.name
+            templateName = tenantName + '.html'
+
+            sale = Sale.objects.get(pk=self.kwargs['pk'])
+
+            if tenantName in personalized_invoice:
+                template = get_template('sale/' + templateName)
+                saleLines = sale.saleproduct_set.all().count()
+                lines = personalized_invoice[tenantName]
+                jump = (lines - saleLines) + 1
+                print(jump)
+                listJump = [i for i in range(jump)]
+            else:
+                template = get_template('sale/invoice.html')
+                listJump = []
             context = {
-                'sale': Sale.objects.get(pk=self.kwargs['pk']),
-                'icon': f'{settings.MEDIA_URL}logo.png'
+                'sale': sale,
+                'icon': f'{settings.MEDIA_URL}logo.png',
+                'jump': listJump,
             }
+
             html = template.render(context)
             css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
             pdf = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[CSS(css_url)])
             return HttpResponse(pdf, content_type='application/pdf')
-        except:
-            pass
+        except Exception as e:
+            print(e)
         return HttpResponseRedirect(reverse_lazy('sale_list'))
 
 # class SaleInvoiceGuidesPdfView(LoginRequiredMixin, View):

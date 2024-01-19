@@ -41,45 +41,6 @@ var info = {
 $(function () {
     info.callInfo();
 
-    // const ProductSoldToday = () => {
-    //     let config = [
-    //         {
-    //             targets: [0],
-    //             class: 'text-center',
-    //             visible: false
-    //         },
-    //         {
-    //             targets: [3],
-    //             class: 'text-center',
-    //             render: function (data, type, row) {
-    //                 if (row.stock > 6) {
-    //                     return '<span class="badge badge-success">' + data + '</span>';
-    //                 } else if (row.stock === 0) {
-    //                     return '<span class="badge badge-secondary">Sin stock</span>';
-    //                 } else {
-    //                     return '<span class="badge badge-danger">' + data + '</span>';
-    //                 }
-    //             }
-    //         },
-    //         {
-    //             targets: [4],
-    //             class: 'text-center',
-    //             render: function (data, type, row) {
-    //                 return '$' + parseFloat(data).toFixed(2);
-    //             }
-    //         },
-    //     ]
-    //     let data = {
-    //         'data': {'action': 'search_lower_inventory'},
-    //         'inserInto': 'rowModal',
-    //         'th': ['id', 'Nombre', 'Categoria', 'Stock', 'Costo'],
-    //         'table': 'tableModal',
-    //         'config': config,
-    //         'modal': true,
-    //     }
-    //     drawTables(data);
-    // }
-
     setInterval(function () {
         info.callInfo()
     }, 15000)
@@ -88,12 +49,12 @@ $(function () {
 
         let config = [
             {
-                targets: [0],
+                targets: [0, 3, 4, 5, 7, 8, 9],
                 class: 'text-center',
                 visible: false
             },
             {
-                targets: [3],
+                targets: [6],
                 class: 'text-center',
                 render: function (data, type, row) {
                     if (row.stock > 6) {
@@ -117,7 +78,7 @@ $(function () {
         let data = {
             'data': {'action': 'search_lower_inventory'},
             'inserInto': 'rowModal',
-            'th': ['id', 'Nombre', 'Categoria', 'Stock', 'Costo'],
+            'th': ['Nro', 'Marca', 'Nombre', 'Vencimiento', 'Imagen', '¿Es inventariado?', 'Stock', 'Costo', 'Precio venta', 'Opciones'],
             'table': 'tableModal',
             'config': config,
             'modal': true,
@@ -216,36 +177,32 @@ $(function () {
         drawTables(data);
     })
 
-    // $('#selectPreSales').on('change', function () {
-    //     if ($(this).val() !== '') {
-    //         var id = $(this).val();
-    //         let config = [
-    //             {
-    //                 targets: [0],
-    //                 visible: false
-    //             },
-    //             {
-    //                 targets: [1],
-    //                 class: 'text-center',
-    //             },
-    //             {
-    //                 targets: [2],
-    //                 class: 'text-center',
-    //                 render: function (data, type, row) {
-    //                     return 'C$ ' + parseFloat(data).toFixed(2);
-    //                 }
-    //             },
-    //         ]
-    //         let data = {
-    //             'data': {'action': 'search_presale_info', 'id': id},
-    //             'inserInto': 'rowDash',
-    //             'th': ['Nro', 'Cantidad de facturas', 'Total C$', 'Ultimo Cliente', 'Hora ultimo pedido'],
-    //             'table': 'tableDash',
-    //             'config': config,
-    //             'modal': false,
-    //         }
-    //         drawTables(data);
-    //     }
-    // })
+    $('#pending-invoices').on('click', function () {
+
+        let config = [
+            {
+                targets: [0],
+                visible: false
+            },
+            {
+                targets: [1, 2, 3, 4],
+                class: 'text-center',
+            },
+            {
+                targets: [4],
+                render: function (data, type, row) {
+                    return parseFloat(data).toFixed(2);
+                }
+            },]
+        let data = {
+            'data': {'action': 'view-credit-noapplied'},
+            'inserInto': 'rowModal',
+            'th': ['Nro', 'Orden de compra', 'Usuario', 'Cliente', 'Cancelacion', 'Monto'],
+            'table': 'tableModal',
+            'config': [],
+            'modal': true,
+        }
+        drawTables(data);
+    })
 
 })

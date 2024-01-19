@@ -5,7 +5,7 @@ var product = {
             visible: false,
         },
         {
-            targets: [3],
+            targets: [4],
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
@@ -13,7 +13,7 @@ var product = {
             }
         },
         {
-            targets: [4],
+            targets: [5],
             class: 'text-center',
             render: function (data, type, row) {
                 if (data) {
@@ -23,7 +23,7 @@ var product = {
             }
         },
         {
-            targets: [5],
+            targets: [6],
             class: 'text-center',
             render: function (data, type, row) {
                 if (data === 0) {
@@ -35,7 +35,7 @@ var product = {
             }
         },
         {
-            targets: [6, 7],
+            targets: [7, 8],
             class: 'text-center',
             render: function (data, type, row) {
                 return 'C$' + parseFloat(data).toFixed(2);
@@ -57,7 +57,7 @@ var product = {
         let data = {
             'data': {'action': 'search'},
             'inserInto': 'rowList',
-            'th': ['Nro', 'Nombre', 'Categoria', 'Imagen', '¿Es inventariado?', 'Stock', 'Costo', 'Precio venta', 'Opciones'],
+            'th': ['Nro', 'Marca', 'Nombre', 'Vencimiento', 'Imagen', '¿Es inventariado?', 'Stock', 'Costo', 'Precio venta', 'Opciones'],
             'table': 'tableList',
             'config': product.config,
             'modal': false,

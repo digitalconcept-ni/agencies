@@ -8,6 +8,7 @@ from config import settings
 
 
 class User(AbstractUser):
+    phone_number = models.CharField(max_length=8,  default=87878787, verbose_name='Numero de telefono')
     image = models.ImageField(upload_to='users/%Y/%m/%d', null=True, blank=True)
     token = models.UUIDField(primary_key=False, editable=False, null=True, blank=True)
     presale = models.BooleanField(default=False)

@@ -2,7 +2,10 @@ var client = {
     config: [
         {
             targets: [0],
-            visible: false,
+            class: 'text-center',
+            render: function (data, type, row) {
+                return '<a class="badge badge-secondary  badge-pill pointer" rel="number">' + data + '</a>'
+            }
         },
         {
             targets: [1],
@@ -43,7 +46,7 @@ var client = {
         let data = {
             'data': action,
             'inserInto': 'rowList',
-            'th': ['Nro', 'Estado', 'Vendedor', 'Nombres', 'Número de cédula', 'Fecha de nacimiento', 'Sexo', 'Dirección', 'Visita', 'Opciones'],
+            'th': ['Codigo', 'Estado', 'Vendedor', 'Nombres', 'Número de cédula', 'Fecha de nacimiento', 'Sexo', 'Dirección', 'Visita', 'Opciones'],
             'table': 'tableList',
             'config': client.config,
             'modal': false,

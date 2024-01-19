@@ -1,6 +1,7 @@
 from django.urls import path
 
 from core.pos.views.assets.views import *
+from core.pos.views.brands.views import *
 from core.pos.views.category.views import *
 from core.pos.views.client.views import *
 from core.pos.views.company.views import CompanyUpdateView
@@ -19,12 +20,17 @@ urlpatterns = [
     path('category/add/', CategoryCreateView.as_view(), name='category_create'),
     path('category/update/<int:pk>/', CategoryUpdateView.as_view(), name='category_update'),
 
+    # brand
+    path('brand/', BrandListView.as_view(), name='brand_list'),
+    path('brand/add/', BrandsCreateView.as_view(), name='brand_create'),
+    path('brand/update/<int:pk>/', BrandsUpdateView.as_view(), name='brand_update'),
+
     # client
     path('client/', ClientListView.as_view(), name='client_list'),
     path('client/add/', ClientCreateView.as_view(), name='client_create'),
     path('client/update/<int:pk>/', ClientUpdateView.as_view(), name='client_update'),
 
-    #assets
+    # assets
     path('assets/', AssetsListView.as_view(), name='assets_list'),
     path('assets/add/', AssetsCreateView.as_view(), name='assets_create'),
     path('assets/update/<int:pk>/', AssetsUpdateView.as_view(), name='assets_update'),
@@ -50,10 +56,11 @@ urlpatterns = [
     path('sale/update/<int:pk>/', SaleUpdateView.as_view(), name='sale_update'),
     # path('sale/guides/', SaleInvoiceGuidesPdfView.as_view(), name='sale_guides_pdf'),
     path('sale/invoice/pdf/<int:pk>/', SaleInvoicePdfView.as_view(), name='sale_invoice_pdf'),
+
     # company
     path('company/update/', CompanyUpdateView.as_view(), name='company_update'),
 
-    #load
+    # load
     path('load/', loadCsvView.as_view(), name='load_csv'),
 
 ]

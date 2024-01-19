@@ -6,7 +6,7 @@ from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 
 from config import settings
-from core.pos.choices import genders, payment
+from core.pos.choices import genders, payment, municipality
 from core.user.models import User
 
 
@@ -33,57 +33,6 @@ class Category(models.Model):
         ordering = ['id']
 
 
-class Product(models.Model):
-    name = models.CharField(max_length=150, verbose_name='Nombre', unique=True)
-    code = models.CharField(max_length=6, unique=True, verbose_name='Codigo de producto')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
-    image = models.ImageField(upload_to='product/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
-    is_inventoried = models.BooleanField(default=True, blank=True, null=True, verbose_name='¿Es inventariado?')
-    stock = models.IntegerField(default=0, verbose_name='Stock')
-    cost = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de compra')
-    pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta')
-
-    def __str__(self):
-        return f'{self.code} - {self.name}'
-
-    def get_total_earnings(self):
-        # return sum([payment.amount for payment in self.objects.all()])
-        s = self.objects.all().aggregate(
-            result=Sum(F('cost'), 0.00, output_field=FloatField())).get('result')
-        print('models')
-        print(s)
-        return
-
-    def toLIST(self):
-        data = [
-            self.id, self.__str__(), self.category.name, self.get_image(),
-            self.is_inventoried, self.stock, self.cost, self.pvp, self.id
-        ]
-        return data
-
-    def toJSON(self):
-        item = model_to_dict(self)
-        item['full_name'] = self.__str__()
-        item['category'] = self.category.toJSON()
-        item['image'] = self.get_image()
-        item['pvp'] = f'{self.pvp:.2f}'
-        if item['cost']:
-            item['cost'] = f'{self.cost:.2f}'
-        else:
-            item['pvpc'] = f'{100.20:.2f}'
-        return item
-
-    def get_image(self):
-        if self.image:
-            return f'{settings.MEDIA_URL}{self.image}'
-        return f'{settings.STATIC_URL}img/empty.png'
-
-    class Meta:
-        verbose_name = 'Producto'
-        verbose_name_plural = 'Productos'
-        ordering = ['id']
-
-
 class Supplier(models.Model):
     name = models.CharField(max_length=100, verbose_name='Nombre', unique=True)
     phone_number = models.CharField(max_length=8, verbose_name='Numero de telefono')
@@ -91,7 +40,7 @@ class Supplier(models.Model):
     responsible = models.CharField(max_length=30, verbose_name='Responsable', null=True, blank=True)
 
     def __str__(self):
-        return self.get_full_name()
+        return self.name
 
     def get_full_name(self):
         return f'{self.name} ({self.responsible})'
@@ -111,6 +60,92 @@ class Supplier(models.Model):
     class Meta:
         verbose_name = 'Proveedor'
         verbose_name_plural = 'Proveedores'
+        ordering = ['id']
+
+
+class Brands(models.Model):
+    name = models.CharField(max_length=50, verbose_name='Nombre')
+    description = models.CharField(max_length=100, verbose_name='Descripcion', null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.name}'
+
+    def get_full_name(self):
+        return f'{self.name}'
+
+    def toLIST(self):
+        data = [self.id, self.name, self.description, self.id]
+        return data
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
+    class Meta:
+        verbose_name = 'Marca'
+        verbose_name_plural = 'Marcas'
+        ordering = ['-id']
+
+
+class Product(models.Model):
+    # supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, verbose_name='Proveedor')
+    brand = models.ForeignKey(Brands, on_delete=models.CASCADE, verbose_name='Marca', null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
+    name = models.CharField(max_length=150, verbose_name='Nombre')
+    code = models.CharField(max_length=6, unique=True, verbose_name='Codigo de producto')
+    um = models.CharField(max_length=10, default='UND', verbose_name='Unidad de medida')
+    expiration = models.DateField(verbose_name='Fecha de vencimiento', null=True, blank=True)
+    image = models.ImageField(upload_to='product/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
+    is_inventoried = models.BooleanField(default=True, blank=True, null=True, verbose_name='¿Es inventariado?')
+    stock = models.IntegerField(default=0, verbose_name='Stock')
+    cost = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de compra')
+    pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta')
+
+    def __str__(self):
+        return f'{self.code} - {self.brand.name} {self.name} {self.um}'
+
+    def get_total_earnings(self):
+        # return sum([payment.amount for payment in self.objects.all()])
+        s = self.objects.all().aggregate(
+            result=Sum(F('cost'), 0.00, output_field=FloatField())).get('result')
+        return
+
+    def toLIST(self):
+        if self.brand is None:
+            brand = "No resgistrado"
+        else:
+            brand = self.brand.get_full_name()
+        data = [
+            self.id, brand, self.__str__(), self.expiration.strftime('%Y-%m-%d'), self.get_image(),
+            self.is_inventoried, self.stock, f'{self.cost:.2f}', f'{self.pvp:.2f}', self.id
+        ]
+        return data
+
+    def toJSON(self):
+        if self.brand is None:
+            brand = "No registrado"
+        else:
+            brand = self.brand.toJSON()
+        item = model_to_dict(self)
+        item['full_name'] = self.__str__()
+        item['expiration'] = self.expiration.strftime('%Y-%m-%d')
+        item['brand'] = brand
+        item['image'] = self.get_image()
+        item['pvp'] = f'{self.pvp:.2f}'
+        if item['cost']:
+            item['cost'] = f'{self.cost:.2f}'
+        else:
+            item['pvpc'] = f'{100.20:.2f}'
+        return item
+
+    def get_image(self):
+        if self.image:
+            return f'{settings.MEDIA_URL}{self.image}'
+        return f'{settings.STATIC_URL}img/empty.png'
+
+    class Meta:
+        verbose_name = 'Producto'
+        verbose_name_plural = 'Productos'
         ordering = ['id']
 
 
@@ -136,7 +171,7 @@ class Shopping(models.Model):
             modify = True
         date_joined = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}'
         data = [
-            self.get_number(), self.user.username, self.supplier.get_full_name(), self.invoice_number,
+            self.get_number(), self.user.username,self.supplier.name, self.invoice_number,
             self.cant, date_joined, f'{self.subtotal:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}',
             modify
         ]
@@ -149,7 +184,6 @@ class Shopping(models.Model):
             item['modify'] = True
         item['number'] = self.get_number()
         item['username'] = self.user.username
-        item['supplier'] = self.supplier.get_full_name()
         item['subtotal'] = f'{self.subtotal:.2f}'
         item['iva'] = f'{self.iva:.2f}'
         item['total_iva'] = f'{self.total_iva:.2f}'
@@ -199,10 +233,12 @@ class ShoppingDetail(models.Model):
 class Client(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     names = models.CharField(max_length=150, verbose_name='Nombres')
-    dni = models.CharField(max_length=14, unique=True, default='0010101010034S', verbose_name='Número de cedula')
+    dni = models.CharField(max_length=14, unique=True, default='0010101010034S', verbose_name='RUC')
+    phone_number = models.CharField(max_length=8, default=87878787, verbose_name='Numero de telefono')
     birthdate = models.DateField(default=datetime.now, verbose_name='Fecha de nacimiento')
     address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')
     gender = models.CharField(max_length=10, choices=genders, default='male', verbose_name='Genero')
+    municipality = models.CharField(max_length=13, choices=municipality, default='managua', verbose_name='Municipio')
     frequent = models.BooleanField(verbose_name='Frecuente', default=True, null=True, blank=True)
     mon = models.BooleanField(verbose_name='Lunes', null=True, blank=True)
     tue = models.BooleanField(verbose_name='Martes', null=True, blank=True)
@@ -215,6 +251,9 @@ class Client(models.Model):
     def __str__(self):
         return self.get_full_name()
 
+    def get_number(self):
+        return f'{self.id:06d}'
+
     def get_full_name(self):
         return f'{self.names}'
 
@@ -226,7 +265,8 @@ class Client(models.Model):
         for v in visit:
             if item[v]:
                 frequent.append(visit[v])
-        data = [self.id, self.is_active, self.user.username, self.names, self.dni, self.birthdate.strftime('%Y-%m-%d'),
+        data = [self.get_number(), self.is_active, self.user.username, self.names, self.dni,
+                self.birthdate.strftime('%Y-%m-%d'),
                 self.get_gender_display(), self.address, frequent, self.id
                 ]
         return data
@@ -269,6 +309,7 @@ class Assets(models.Model):
             self.brand, self.code, self.serie, self.id
         ]
         return data
+
     def toJSON(self):
         item = model_to_dict(self)
         return item
@@ -315,6 +356,9 @@ class Sale(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario')
     endofday = models.BooleanField(default=False)
+    applied = models.BooleanField(default=False)
+    purchase_order = models.CharField(max_length=15, blank=True, null=True, default='OC-000000000001',
+                                      verbose_name='Orden de Compra')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     date_joined = models.DateField(default=datetime.now)
     time_joined = models.TimeField(default=datetime.now)
@@ -349,9 +393,9 @@ class Sale(models.Model):
         modify = False
         if self.date_joined.strftime("%Y-%m-%d") < str(datetime.now().date()):
             modify = True
-        opt = [modify, self.endofday]
+        opt = [modify, self.endofday, self.applied]
         data = [
-            self.get_number(), self.user.username, self.client.get_full_name(),
+            self.get_number(), self.purchase_order, self.user.username, self.client.get_full_name(),
             f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}',
             self.payment, f'{self.subtotal:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}', opt
         ]

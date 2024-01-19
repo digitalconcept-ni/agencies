@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura - {{ sale.client.names }}</title>
+    <style>
+
+        * {
+            color: black;
+        }
+
+        body {
+            font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            color: black;
+        }
+
+        .name-company {
+            font-size: 30px;
+            padding: 0;
+            margin: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .img-logo {
+            margin-top: 10px;
+            width: 75px;
+            height: 75px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    {#    <img alt="" src="{{ sale.company.get_image }}" class="img-fluid d-block mx-auto img-logo">#}
+    {#    <h1 class="name-company mb-5">{{ sale.company.name }}</h1>#}
+
+    <div class="row justify-content-end mt-5">
+        <div class="col-3 border-dark">
+            <span style="font-size: 22px; word-spacing: 10px"> {{ sale.date_joined|date:'d   m   Y' }}</span>
+        </div>
+    </div>
+
+    <div class="row justify-content-end" style="margin-top: 60px">
+        <div class="col-2">
+            {{ sale.days }}
+        </div>
+    </div>
+
+    {# FRAME FOR THE INFOMRATION  #}
+
+    <div class="row" style="margin-top: 100px">
+        <div class="col">
+            <span style="margin-left:100px">{{ sale.client.get_full_name }}</span>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col">
+            <span style="margin-left: 85px">{{ sale.client.dni }}</span>
+        </div>
+        <div class="col">
+            <span style="margin-left: 100px">{{ sale.client.phone_number }}</span>
+        </div>
+    </div>
+
+    {#  ROW TO ADDRES  #}
+    <div class="row mt-3">
+        <div class="col">
+            <span style="margin-left: 100px"> {{ sale.client.address }} </span>
+        </div>
+    </div>
+
+    {# ROW FOR THE PUSRCHACE ORDER #}
+
+    <div class="row ">
+        <div class="col-10">
+
+        </div>
+        <div class="col-2">
+            <span style="margin-left: 50px">{{ sale.purchase_order }}</span>
+        </div>
+    </div>
+
+    {#  ROW FOR SALES INFORMATION  #}
+    <div class="row" style="margin-top: 40px">
+        <div class="col-4">
+            <span style="margin-left: 100px">{{ sale.user.first_name }} {{ sale.user.last_name }}</span>
+        </div>
+
+        <div class="col-4">
+
+        </div>
+        <div class="col-4"></div>
+
+    </div>
+    <table class="" style="width: 100%; margin-top: 3em">
+        <thead>
+        <tr>
+            <th scope="col" style="width: 5%;"></th>
+            <th scope="col" style="width: 55%;"></th>
+            <th scope="col" style="width: 15%;"></th>
+            <th scope="col" style="width: 20%;" class="text-right"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for det in sale.saleproduct_set.all %}
+            <tr>
+                <td class="text-center">{{ det.cant }}</td>
+                <td style="padding-left: 50px">{{ det.product }}</td>
+                <td class="text-center">{{ det.price|floatformat:2 }}</td>
+                <td class="text-center">{{ det.subtotal|floatformat:2 }}</td>
+            </tr>
+        {% endfor %}
+        {% for i in jump %}
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="3" class="text-right"><b></b></td>
+            <td class="text-center">{{ sale.subtotal|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="text-right"><b></b></td>
+            <td class="text-center">{{ sale.total_iva|floatformat:2 }}</td>
+        </tr>
+         <tr>
+            <td colspan="3" class="text-right"><b></b></td>
+            <td class="text-center">0.00</td>
+        </tr>
+        <tr >
+            <td colspan="3" class="text-right " style="padding-top: 30px"><b></b></td>
+            <td class="text-center" >{{ sale.iva|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="text-right"><b></b></td>
+            <td class="text-center">{{ sale.total|floatformat:2 }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
