@@ -7,7 +7,7 @@ var sale = {
             targets: [0],
             class: 'text-center',
             render: function (data, type, row) {
-                if (row[8][1] === true) {
+                if (row[9][1] === true) {
                     return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
                 } else {
                     return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
