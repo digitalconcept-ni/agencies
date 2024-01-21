@@ -93,7 +93,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
     name = models.CharField(max_length=150, verbose_name='Nombre')
     code = models.CharField(max_length=6, unique=True, verbose_name='Codigo de producto')
-    um = models.CharField(max_length=10, default='UND', verbose_name='Unidad de medida')
+    um = models.CharField(max_length=20, null=True, blank=True, verbose_name='Unidad de medida')
     expiration = models.DateField(verbose_name='Fecha de vencimiento', null=True, blank=True)
     image = models.ImageField(upload_to='product/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
     is_inventoried = models.BooleanField(default=True, blank=True, null=True, verbose_name='¿Es inventariado?')
