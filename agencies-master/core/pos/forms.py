@@ -297,6 +297,10 @@ class SaleMovilForm(ModelForm):
             'iva': forms.TextInput(attrs={
                 'style': 'border: none; width: 100%; background: transparent; color: white;'
             }),
+            'subtotal_exempt': forms.TextInput(attrs={
+                'readonly': True,
+                'class': 'form-control',
+            }),
             'subtotal': forms.TextInput(attrs={
                 'readonly': True,
                 'style': 'border: none; width: 100%; background: transparent; color: white;'
