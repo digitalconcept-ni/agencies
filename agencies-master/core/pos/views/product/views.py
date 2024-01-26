@@ -60,7 +60,7 @@ class ProductCreateView(ValidatePermissionRequiredMixin, CreateView):
                 form = self.get_form()
                 data = form.save()
             else:
-                data['error'] = 'No ha ingresado a ninguna opción'
+                data['error'] = 'Ha ocurrido un problema con el action'
         except Exception as e:
             data['error'] = str(e)
         return JsonResponse(data)

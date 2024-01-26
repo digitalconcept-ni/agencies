@@ -114,23 +114,54 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Subtotal:</label>
-                                            {{ form.subtotal }}
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>Subtotal Exento:</label>
+                                                    {{ form.subtotal_exempt }}
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>Subtotal:</label>
+                                                    {{ form.subtotal }}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>IVA:</label>
-                                            {{ form.iva }}
+
+                                        {# FILA INFORMACION SOBRE EL IVA#}
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label for="{{ form.discount.id_for_label }}">Descuento: </label>
+                                                {{ form.discount }}
+
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>IVA Calculado:</label>
+                                                    <input type="text" class="form-control" readonly name="ivacalc"
+                                                           value="0.00">
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>IVA Calculado:</label>
-                                            <input type="text" class="form-control" readonly name="ivacalc"
-                                                   value="0.00">
+
+                                        {# FILA INFORMACION SOBRE EL DESCUENTO Y EL TOTAL A PAGAR#}
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>IVA:</label>
+                                                    {{ form.iva }}
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label>Total a pagar:</label>
+                                                    {{ form.total }}
+                                                </div>
+
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Total a pagar:</label>
-                                            {{ form.total }}
-                                        </div>
+
 
                                         <div class="form-group">
                                             <label>{{ form.payment.label }}</label>

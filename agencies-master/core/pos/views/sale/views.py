@@ -182,8 +182,8 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
     permission_required = 'add_sale'
 
     def post(self, request, *args, **kwargs):
-        data = {}
         try:
+            data = {}
             action = request.POST['action']
             if action == 'search_products':
                 data = []
@@ -229,6 +229,8 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                         else:
                             sale.payment = request.POST['payment']
                         sale.iva = float(request.POST['iva'])
+                        sale.subtotal_exempt = float(request.POST['subtotal_exempt'])
+                        sale.discount = float(request.POST['discount'])
                         sale.save()
                         for i in products:
                             detail = SaleProduct()
@@ -288,7 +290,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                     form = ClientForm(request.POST)
                     data = form.save()
             else:
-                data['error'] = 'No ha ingresado a ninguna opción'
+                data['error'] = 'Ha ocurrido un error con el action'
         except Exception as e:
             print(str(e))
             data['error'] = str(e)
@@ -382,6 +384,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     else:
                         sale.payment = request.POST['payment']
                     sale.iva = float(request.POST['iva'])
+                    sale.discount = float(request.POST['discount'])
                     sale.save()
 
                     sale.saleproduct_set.all().delete()

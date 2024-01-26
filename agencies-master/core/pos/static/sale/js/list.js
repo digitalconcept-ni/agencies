@@ -46,7 +46,7 @@ var sale = {
             orderable: false,
             render: function (data, type, row) {
                 var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
-                if (row[9][0] === false) {
+                if (row[11][0] === false) {
                     buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
                     buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
                 }
@@ -69,7 +69,7 @@ var sale = {
         let data = {
             'data': parameters,
             'inserInto': 'rowList',
-            'th': ['Nro', 'Orden de compra', 'Usuario', 'Cliente', 'Registro', 'Pago', 'Sub total', 'Iva', 'Total', 'Opciones'],
+            'th': ['Nro', 'Orden de compra', 'Usuario', 'Cliente', 'Registro', 'Pago', 'Sub Total Exento', 'Sub total', 'Descuento', 'Iva', 'Total', 'Opciones'],
             'table': 'tableList',
             'config': sale.config,
             'modal': false,

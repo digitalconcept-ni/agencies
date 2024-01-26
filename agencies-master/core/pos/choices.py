@@ -17,6 +17,11 @@ payment = (
     ('pos', 'POS'),
 )
 
+tax_type = (
+    ('exento', 'EXENTO'),
+    ('grabado', 'GRABADO'),
+)
+
 municipality = (
     ('boaco', 'BOACO'),
     ('carazo', 'CARAZO'),

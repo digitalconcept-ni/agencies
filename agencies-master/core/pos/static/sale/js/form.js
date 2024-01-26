@@ -4,8 +4,10 @@ var tblSearchProducts;
 
 var sale = {
     details: {
+        subtotal_exempt: 0.00,
         subtotal: 0.00,
         iva: 0.00,
+        discount: 0.00,
         total: 0.00,
         products: [],
         products_review: []
@@ -14,20 +16,36 @@ var sale = {
         return this.details.products.map(value => value.id);
     },
     calculateInvoice: function () {
-        var subtotal = 0.00;
+        var subtotal_exempt = 0.00;
+        var subtotal_iva = 0.00;
         var iva = $('input[name="iva"]').val();
+        var discount = $('input[name="discount"]').val();
         this.details.products.forEach(function (value, index, array) {
             value.index = index;
-            value.cant = parseInt(value.cant);
-            value.subtotal = value.cant * parseFloat(value.pvp);
-            subtotal += value.subtotal;
+
+            if (value.tax === 'e' || value.tax === 'exento') {
+                value.cant = parseInt(value.cant);
+                value.subtotal = value.cant * parseFloat(value.pvp);
+                subtotal_exempt += value.subtotal;
+            } else if (value.tax === 'grabado') {
+                value.cant = parseInt(value.cant);
+                value.subtotal = value.cant * parseFloat(value.pvp);
+                subtotal_iva += value.subtotal;
+            }
         });
 
-        this.details.subtotal = subtotal;
-        this.details.iva = this.details.subtotal * iva;
-        this.details.total = this.details.subtotal + this.details.iva;
+        console.log("subtotal_exento: ", subtotal_exempt)
+        console.log("subtotal_iva: ", subtotal_iva)
+
+        this.details.subtotal_exempt = subtotal_exempt;
+        this.details.subtotal = subtotal_iva;
+        this.details.discount = discount;
+
+        this.details.iva = (this.details.subtotal - this.details.discount) * iva;
+        this.details.total = ((this.details.subtotal + this.details.subtotal_exempt) - this.details.discount) + this.details.iva;
 
         $('input[name="subtotal"]').val(this.details.subtotal.toFixed(2));
+        $('input[name="subtotal_exempt"]').val(this.details.subtotal_exempt.toFixed(2));
         $('input[name="ivacalc"]').val(this.details.iva.toFixed(2));
         $('input[name="total"]').val(this.details.total.toFixed(2));
     },
@@ -108,9 +126,6 @@ var sale = {
             }
         });
     },
-    calculateTotalItems: function () {
-
-    }
 };
 
 $(function () {
@@ -283,18 +298,26 @@ $(function () {
 
             var stock = repo.is_inventoried ? repo.stock : 'Sin stock';
 
+            var tax = '';
+
+            if (repo.tax === 'e' || repo.tax === 'exonerado') {
+                tax = 'Exento';
+            } else if (repo.tax === 'g' || repo.tax === 'grabado') {
+                tax = 'Grabado'
+            }
             return $(
                 '<div class="wrapper container">' +
                 '<div class="row">' +
-                '<div class="col-lg-1">' +
-                '<img alt="" src="' + repo.image + '" class="img-fluid img-thumbnail d-block mx-auto rounded">' +
-                '</div>' +
+                // '<div class="col-lg-1">' +
+                // '<img alt="" src="' + repo.image + '" class="img-fluid img-thumbnail d-block mx-auto rounded">' +
+                // '</div>' +
                 '<div class="col-lg-11 text-left shadow-sm">' +
                 //'<br>' +
                 '<p style="margin-bottom: 0;">' +
                 '<b>Nombre:</b> ' + repo.full_name + '<br>' +
                 '<b>Stock:</b> ' + stock + '<br>' +
-                '<b>PVP:</b> <span class="badge badge-warning">$' + repo.pvp + '</span>' +
+                '<b>PVP:</b> <span class="badge badge-warning">$' + repo.pvp + '</span>' + '<br>' +
+                '<b>Tipo:</b> <span class="badge badge-dark">' + tax + '</span>' +
                 '</p>' +
                 '</div>' +
                 '</div>' +
@@ -441,7 +464,7 @@ $(function () {
 
     $("input[name='iva']").TouchSpin({
         min: 0,
-        max: 100,
+        max: 1,
         step: 0.01,
         decimals: 2,
         boostat: 5,
@@ -450,6 +473,18 @@ $(function () {
     }).on('change', function () {
         sale.calculateInvoice();
     }).val(0.15);
+
+    $("input[name='discount']").TouchSpin({
+        min: 0,
+        max: 1000000,
+        step: 0.01,
+        decimals: 2,
+        boostat: 5,
+        maxboostedstep: 10,
+        postfix: 'C$'
+    }).on('change', function () {
+        sale.calculateInvoice();
+    })
 
     $('#frmSale').on('submit', function (e) {
         e.preventDefault();
@@ -479,7 +514,7 @@ $(function () {
         let end = $('#id_end')
         let date = new Date().getTime() + (today * 24 * 60 * 60 * 1000);
         let f = new Date(date).toLocaleDateString().split('/').reverse();
-        let canceledDate = f.join('-')
+        let canceledDate = f.join('-');
         end.val(canceledDate)
     }
 

@@ -6,6 +6,7 @@ var sale = {
     details: {
         subtotal: 0.00,
         iva: 0.00,
+        discount: 0.00,
         total: 0.00,
         products: [],
         products_review: []
@@ -16,6 +17,7 @@ var sale = {
     calculateInvoice: function () {
         var subtotal = 0.00;
         var iva = $('input[name="iva"]').val();
+        var discount = $('input[name="discount"]').val();
         this.details.products.forEach(function (value, index, array) {
             value.index = index;
             value.cant = parseInt(value.cant);
@@ -24,8 +26,9 @@ var sale = {
         });
 
         this.details.subtotal = subtotal;
-        this.details.iva = this.details.subtotal * iva;
-        this.details.total = this.details.subtotal + this.details.iva;
+        this.details.discount = discount;
+        this.details.iva = (this.details.subtotal - this.details.discount) * iva;
+        this.details.total = (this.details.subtotal - this.details.discount) + this.details.iva;
 
         $('input[name="subtotal"]').val(this.details.subtotal.toFixed(2));
         $('input[name="ivacalc"]').val(this.details.iva.toFixed(2));
@@ -410,6 +413,10 @@ $(function () {
         sale.calculateInvoice();
     }).val(0.00);
 
+    // $("input[name='discount']").on('change', function () {
+    //     sale.calculateInvoice();
+    // })
+
     $('#frmSale').on('submit', function (e) {
         e.preventDefault();
 
@@ -438,7 +445,7 @@ $(function () {
         let end = $('#id_end')
         let date = new Date().getTime() + (today * 24 * 60 * 60 * 1000);
         let f = new Date(date).toLocaleDateString().split('/').reverse();
-        let canceledDate = f.join('-')
+        let canceledDate = f.join('-');
         end.val(canceledDate)
     }
     if ($('#id_payment').val() == 'credit') {

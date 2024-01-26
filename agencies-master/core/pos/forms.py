@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm, inlineformset_factory
 
+from core.pos.choices import random_code
 from core.pos.models import *
 
 
@@ -28,6 +29,8 @@ class CategoryForm(ModelForm):
         except Exception as e:
             data['error'] = str(e)
         return data
+
+
 class BrandsForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -62,6 +65,7 @@ class BrandsForm(ModelForm):
             data['error'] = str(e)
         return data
 
+
 class ProductForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -81,6 +85,9 @@ class ProductForm(ModelForm):
             'category': forms.Select(attrs={
                 'class': 'select2',
                 'style': 'width: 100%'
+            }),
+            'code': forms.TextInput(attrs={
+                'readonly': True,
             }),
         }
 
@@ -220,12 +227,9 @@ class SaleForm(ModelForm):
         model = Sale
         fields = '__all__'
         widgets = {
-            'end': forms.DateInput(format='%Y-%m-%d', attrs={
-                'class': 'form-control datetimepicker-input',
-                'id': 'end',
+            'end': forms.DateInput(attrs={
+                'readonly': True,
                 'value': datetime.now().strftime('%Y-%m-%d'),
-                'data-toggle': 'datetimepicker',
-                'data-target': '#end'
             }),
             'purchase_order': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -248,6 +252,13 @@ class SaleForm(ModelForm):
             }),
             'subtotal': forms.TextInput(attrs={
                 'readonly': True,
+                'class': 'form-control',
+            }),
+            'subtotal_exempt': forms.TextInput(attrs={
+                'readonly': True,
+                'class': 'form-control',
+            }),
+            'discount': forms.TextInput(attrs={
                 'class': 'form-control',
             }),
             'total': forms.TextInput(attrs={
@@ -279,12 +290,19 @@ class SaleMovilForm(ModelForm):
                 'data-toggle': 'datetimepicker',
             }
             ),
+            'end': forms.DateInput(attrs={
+                'readonly': True,
+                'value': datetime.now().strftime('%Y-%m-%d'),
+            }),
             'iva': forms.TextInput(attrs={
                 'style': 'border: none; width: 100%; background: transparent; color: white;'
             }),
             'subtotal': forms.TextInput(attrs={
                 'readonly': True,
                 'style': 'border: none; width: 100%; background: transparent; color: white;'
+            }),
+            'discount': forms.TextInput(attrs={
+                'class': 'form-control'
             }),
             'total': forms.TextInput(attrs={
                 'readonly': True,

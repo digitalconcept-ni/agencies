@@ -6,7 +6,7 @@ from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 
 from config import settings
-from core.pos.choices import genders, payment, municipality
+from core.pos.choices import genders, payment, municipality, tax_type, random_code
 from core.user.models import User
 
 
@@ -92,7 +92,8 @@ class Product(models.Model):
     brand = models.ForeignKey(Brands, on_delete=models.CASCADE, verbose_name='Marca', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
     name = models.CharField(max_length=150, verbose_name='Nombre')
-    code = models.CharField(max_length=6, unique=True, verbose_name='Codigo de producto')
+    code = models.CharField(max_length=6, default=random_code(), unique=True, verbose_name='Codigo de producto')
+    tax = models.CharField(max_length=7, default='exento', choices=tax_type, verbose_name='Impuesto')
     um = models.CharField(max_length=20, null=True, blank=True, verbose_name='Unidad de medida')
     expiration = models.DateField(verbose_name='Fecha de vencimiento', null=True, blank=True)
     image = models.ImageField(upload_to='product/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
@@ -103,7 +104,7 @@ class Product(models.Model):
 
     def __str__(self):
         if self.brand is None:
-            brand = '(Marca no registrada)'
+            brand = ' '
         else:
             brand = self.brand.name
         return f'{self.code} - {brand} {self.name} {self.um}'
@@ -124,7 +125,7 @@ class Product(models.Model):
         else:
             ex = self.expiration.strftime('%Y-%m-%d')
         data = [
-            self.id, brand, self.__str__(), ex, self.get_image(),
+            self.id, brand, self.__str__(), ex, self.tax,
             self.is_inventoried, self.stock, f'{self.cost:.2f}', f'{self.pvp:.2f}', self.id
         ]
         return data
@@ -183,7 +184,7 @@ class Shopping(models.Model):
             modify = True
         date_joined = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}'
         data = [
-            self.get_number(), self.user.username,self.supplier.name, self.invoice_number,
+            self.get_number(), self.user.username, self.supplier.name, self.invoice_number,
             self.cant, date_joined, f'{self.subtotal:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}',
             modify
         ]
@@ -378,8 +379,10 @@ class Sale(models.Model):
     days = models.CharField(max_length=2, null=True, blank=True, verbose_name='Dias de gracia')
     end = models.DateField(null=True, blank=True, verbose_name='Fecha cancelacion')
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    subtotal_exempt = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total_iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    discount = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
 
     def __str__(self):
@@ -409,7 +412,8 @@ class Sale(models.Model):
         data = [
             self.get_number(), self.purchase_order, self.user.username, self.client.get_full_name(),
             f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}',
-            self.payment, f'{self.subtotal:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}', opt
+            self.payment, f'{self.subtotal_exempt:.2f}',f'{self.subtotal:.2f}', f'{self.discount:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}',
+            opt
         ]
         return data
 
@@ -422,6 +426,7 @@ class Sale(models.Model):
         item['client'] = self.client.toJSON()
         item['user'] = self.user.username
         item['subtotal'] = f'{self.subtotal:.2f}'
+        item['discount'] = f'{self.discount:.2f}'
         item['iva'] = f'{self.iva:.2f}'
         item['total_iva'] = f'{self.total_iva:.2f}'
         item['total'] = f'{self.total:.2f}'
@@ -436,11 +441,12 @@ class Sale(models.Model):
         super(Sale, self).delete()
 
     def calculate_invoice(self):
-        subtotal = self.saleproduct_set.all().aggregate(
+        subtotal = self.saleproduct_set.all().filter(product__tax='grabado').aggregate(
             result=Coalesce(Sum(F('price') * F('cant')), 0.00, output_field=FloatField())).get('result')
         self.subtotal = subtotal
-        self.total_iva = self.subtotal * float(self.iva)
-        self.total = float(self.subtotal) + float(self.total_iva)
+        self.total_iva = (self.subtotal - self.discount) * float(self.iva)
+        self.total = ((float(self.subtotal) + float(self.subtotal_exempt)) - float(self.discount)) + float(
+            self.total_iva)
         self.save()
 
     class Meta:

@@ -13,7 +13,6 @@ $(function () {
         format: 'YYYY-MM-DD',
         locale: 'es',
         keepOpen: false,
-        maxDate: new Date()
     });
 
     $('input[name="pvp"]')
