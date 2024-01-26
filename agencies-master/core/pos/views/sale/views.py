@@ -475,7 +475,6 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
                 saleLines = sale.saleproduct_set.all().count()
                 lines = personalized_invoice[tenantName]
                 jump = (lines - saleLines) + 1
-                print(jump)
                 listJump = [i for i in range(jump)]
             else:
                 template = get_template('sale/invoice.html')

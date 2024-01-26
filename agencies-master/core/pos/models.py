@@ -107,7 +107,7 @@ class Product(models.Model):
             brand = ' '
         else:
             brand = self.brand.name
-        return f'{self.code} - {brand} {self.name} {self.um}'
+        return f'{self.code} - {self.name} {brand} {self.um}'
 
     def get_total_earnings(self):
         # return sum([payment.amount for payment in self.objects.all()])
@@ -412,7 +412,8 @@ class Sale(models.Model):
         data = [
             self.get_number(), self.purchase_order, self.user.username, self.client.get_full_name(),
             f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}',
-            self.payment, f'{self.subtotal_exempt:.2f}',f'{self.subtotal:.2f}', f'{self.discount:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}',
+            self.payment, f'{self.subtotal_exempt:.2f}', f'{self.subtotal:.2f}', f'{self.discount:.2f}',
+            f'{self.total_iva:.2f}', f'{self.total:.2f}',
             opt
         ]
         return data

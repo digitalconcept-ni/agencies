@@ -79,12 +79,16 @@
             </tr>
         {% endfor %}
         <tr>
-            <td colspan="3" class="text-right"><b>Subtotal</b></td>
+            <td colspan="3" class="text-right"><b>Subtotal Exento: </b></td>
+            <td class="text-right">{{ sale.subtotal_exempt|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="text-right"><b>Sub Total Iva: </b></td>
             <td class="text-right">{{ sale.subtotal|floatformat:2 }}</td>
         </tr>
         <tr>
-            <td colspan="3" class="text-right"><b>Iva %</b></td>
-            <td class="text-right">{{ sale.iva|floatformat:2 }}</td>
+            <td colspan="3" class="text-right"><b>Descuento: </b></td>
+            <td class="text-right">{{ sale.discount|floatformat:2 }}</td>
         </tr>
         <tr>
             <td colspan="3" class="text-right"><b>Iva calculado</b></td>
