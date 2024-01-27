@@ -384,6 +384,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     else:
                         sale.payment = request.POST['payment']
                     sale.iva = float(request.POST['iva'])
+                    sale.subtotal_exempt = float(request.POST['subtotal_exempt'])
                     sale.discount = float(request.POST['discount'])
                     sale.save()
 
