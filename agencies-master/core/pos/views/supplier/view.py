@@ -40,7 +40,7 @@ class SupplierListView(ValidatePermissionRequiredMixin, ListView):
 class SupplierCreateView(ValidatePermissionRequiredMixin, CreateView):
     model = Supplier
     form_class = SupplierForm
-    template_name = 'Supplier/create.html'
+    template_name = 'supplier/create.html'
     success_url = reverse_lazy('supplier_list')
     url_redirect = success_url
     permission_required = 'add_supplier'
