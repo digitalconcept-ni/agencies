@@ -158,7 +158,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     s.save()
                 sale.delete()
             else:
-                data['error'] = 'No se ha encontrado el acttion'
+                data['error'] = 'No se ha encontrado el action'
         except Exception as e:
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
@@ -177,6 +177,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
     model = Sale
     # form_class = ''
     # template_name = ''
+    # initial = {'user_commissions': User.objects.all().values_list('username')}
     success_url = reverse_lazy('sale_list')
     url_redirect = success_url
     permission_required = 'add_sale'
@@ -219,6 +220,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                     else:
                         sale = Sale()
                         sale.user_id = request.user.id
+                        sale.user_commissions = request.POST['user_com']
                         sale.date_joined = request.POST['date_joined']
                         sale.purchase_order = request.POST['purchase_order']
                         sale.client_id = int(request.POST['client'])
@@ -228,7 +230,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                             sale.end = request.POST['end']
                         else:
                             sale.payment = request.POST['payment']
-                        sale.iva = float(request.POST['iva'])
+                        # sale.iva = float(request.POST['iva'])
                         sale.subtotal_exempt = float(request.POST['subtotal_exempt'])
                         sale.discount = float(request.POST['discount'])
                         sale.save()
@@ -258,10 +260,10 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
             elif action == 'search_client':
                 data = []
                 today = datetime.today().strftime('%A')[:3].lower()
-                if request.user.is_superuser:
-                    query = Client.objects.select_related().filter(is_active=True)
-                else:
-                    query = Client.objects.select_related().filter(Q(is_active=True) & Q(user_id=request.user.id))
+                # if request.user.is_superuser:
+                query = Client.objects.select_related().filter(is_active=True)
+                # else:
+                #     query = Client.objects.select_related().filter(Q(is_active=True) & Q(user_id=request.user.id))
 
                 if today == 'mon':
                     queryFilter = query.filter(Q(frequent=True) | Q(mon=True))
@@ -326,22 +328,22 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                 if self.request.headers['Sec-Ch-Ua-Mobile'] == '?1':
                     form = SaleMovilForm(instance=instance)
                     form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
+                    # self.fields['user_com'].required = False
                     self.template_name = 'sale/createmovil2.html'
                 elif self.request.headers['Sec-Ch-Ua-Mobile'] == '?0':
                     form = SaleForm(instance=instance)
                     form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
+                    # self.fields['user_com'].required = False
                     self.template_name = 'sale/create.html'
                 return form
 
     def get_details_product(self):
         data = []
         sale = self.get_object()
-        print(sale)
         for i in sale.saleproduct_set.all():
             item = i.product.toJSON()
             item['cant'] = i.cant
             data.append(item)
-        print(data)
         return json.dumps(data)
 
     def post(self, request, *args, **kwargs):
@@ -375,6 +377,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     products_review = json.loads(request.POST['products_review'])
 
                     sale = self.get_object()
+                    sale.user_commissions = request.POST['user_com']
                     sale.date_joined = request.POST['date_joined']
                     sale.client_id = int(request.POST['client'])
                     if request.POST['payment'] == 'credit':
@@ -383,7 +386,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                         sale.end = request.POST['end']
                     else:
                         sale.payment = request.POST['payment']
-                    sale.iva = float(request.POST['iva'])
+                    # sale.iva = float(request.POST['iva'])
                     sale.subtotal_exempt = float(request.POST['subtotal_exempt'])
                     sale.discount = float(request.POST['discount'])
                     sale.save()
@@ -465,8 +468,8 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         try:
-            # tenantName = 'disam'
-            tenantName = request.tenant.name
+            tenantName = 'disam'
+            # tenantName = request.tenant.name
             templateName = tenantName + '.html'
 
             sale = Sale.objects.get(pk=self.kwargs['pk'])

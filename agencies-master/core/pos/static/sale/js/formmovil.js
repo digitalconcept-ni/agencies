@@ -18,7 +18,6 @@ var sale = {
     calculateInvoice: function () {
         var subtotal_exempt = 0.00;
         var subtotal_iva = 0.00;
-        var iva = $('input[name="iva"]').val();
         var discount = $('input[name="discount"]').val();
         this.details.products.forEach(function (value, index, array) {
             value.index = index;
@@ -34,14 +33,11 @@ var sale = {
             }
         });
 
-        console.log("subtotal_exento: ", subtotal_exempt)
-        console.log("subtotal_iva: ", subtotal_iva)
-
         this.details.subtotal_exempt = subtotal_exempt;
         this.details.subtotal = subtotal_iva;
         this.details.discount = discount;
 
-        this.details.iva = (this.details.subtotal - this.details.discount) * iva;
+        this.details.iva = (this.details.subtotal - this.details.discount) * 0.15;
         this.details.total = ((this.details.subtotal + this.details.subtotal_exempt) - this.details.discount) + this.details.iva;
 
         $('input[name="subtotal"]').val(this.details.subtotal.toFixed(2));
@@ -61,7 +57,7 @@ var sale = {
             destroy: true,
             paging: false,
             dom: 't',
-            scrollY: 400,
+            scrollY: '58vh',
             scrollCollapse: true,
             data: this.details.products,
             columns: [
@@ -86,7 +82,7 @@ var sale = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<a rel="remove" class="btn-xs" style="font-size: 14px; font-weight: bold">' + data + '</a>';
+                        return '<a rel="remove" class="btn-xs" style="font-size: 12px; font-weight: bold">' + data + '</a>';
                     }
                 },
                 {
@@ -200,37 +196,6 @@ $(function () {
                 $('#myModalClient').modal('hide');
             });
     });
-
-    // Products
-    /*select_search_product.autocomplete({
-        source: function (request, response) {
-            $.ajax({
-                url: pathname,
-                type: 'POST',
-                data: {
-                    'action': 'search_products',
-                    'term': request.term
-                },
-                dataType: 'json',
-            }).done(function (data) {
-                response(data);
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                //alert(textStatus + ': ' + errorThrown);
-            }).always(function (data) {
-
-            });
-        },
-        delay: 500,
-        minLength: 1,
-        select: function (event, ui) {
-            event.preventDefault();
-            console.clear();
-            ui.item.cant = 1;
-            ui.item.subtotal = 0.00;
-            sale.addProduct(ui.item);
-            $(this).val('');
-        }
-    });*/
 
     select_search_product.select2({
         theme: "bootstrap4",
@@ -432,13 +397,13 @@ $(function () {
         keepOpen: false
     });
 
-    $("input[name='iva']").on('change', function () {
-        sale.calculateInvoice();
-    }).val(0.00);
-
-    // $("input[name='discount']").on('change', function () {
+    // $("input[name='iva']").on('change', function () {
     //     sale.calculateInvoice();
-    // })
+    // }).val(0.00);
+
+    $("input[name='discount']").on('change', function () {
+        sale.calculateInvoice();
+    })
 
     $('#frmSale').on('submit', function (e) {
         e.preventDefault();

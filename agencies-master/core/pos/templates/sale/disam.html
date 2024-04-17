@@ -40,23 +40,29 @@
     {#    <img alt="" src="{{ sale.company.get_image }}" class="img-fluid d-block mx-auto img-logo">#}
     {#    <h1 class="name-company mb-5">{{ sale.company.name }}</h1>#}
 
-    <div class="row justify-content-end mt-5">
-        <div class="col-3 border-dark">
-            <span style="font-size: 22px; word-spacing: 10px"> {{ sale.date_joined|date:'d   m   Y' }}</span>
+    <br><br><br>
+    <div class="row justify-content-end">
+        <div class="col-3" style="position: relative">
+{#            <span style="font-size: 18px; word-spacing: 2rem"> {{ sale.date_joined|date:'d   m   Y' }}</span>#}
+            <span style="font-size: 18px; word-spacing: 2rem; position: absolute; right: 0"> {{ sale.date_joined|date:'d   m   y' }}</span>
         </div>
     </div>
 
+    <br>
+
     <div class="row justify-content-end" style="margin-top: 60px">
-        <div class="col-2">
+        <div class="col-2" style="position: relative">
             {% if sale.days is not None %}
-                {{ sale.days }}
+                <span style="font-size: 14px; position: absolute; right: 2.8rem"> {{ sale.days }} </span>
             {% endif %}
         </div>
     </div>
 
+    <br><br><br>
+
     {# FRAME FOR THE INFOMRATION  #}
 
-    <div class="row" style="margin-top: 100px">
+    <div class="row" style="margin-top: 80px">
         <div class="col">
             <span style="margin-left:100px">{{ sale.client.get_full_name }}</span>
         </div>
@@ -84,23 +90,25 @@
         <div class="col-10">
 
         </div>
-        <div class="col-2">
-            <span style="margin-left: 50px">{{ sale.purchase_order }}</span>
+        <div class="col-2" style="position: relative;">
+            <span style="margin-left: 50px; position: absolute; margin-top: 1rem">{{ sale.purchase_order }}</span>
         </div>
     </div>
 
     {#  ROW FOR SALES INFORMATION  #}
     <div class="row" style="margin-top: 40px">
         <div class="col-4">
-            <span style="margin-left: 100px">{{ sale.user.first_name }} {{ sale.user.last_name }}</span>
+            <span style="margin-left: 70px">{{ sale.user.first_name }} {{ sale.user.last_name }}</span>
         </div>
 
         <div class="col-4">
+            <span style="margin-left: 160px">{{ sale.user.phone_number }}</span>
 
         </div>
         <div class="col-4"></div>
 
     </div>
+    <br><br>
     <table class="" style="width: 100%; margin-top: 3em">
         <thead>
         <tr>
@@ -113,10 +121,10 @@
         <tbody>
         {% for det in sale.saleproduct_set.all %}
             <tr>
-                <td class="text-center">{{ det.cant }}</td>
-                <td style="padding-left: 50px">{{ det.product }}</td>
-                <td class="text-center">{{ det.price|floatformat:2 }}</td>
-                <td class="text-center">{{ det.subtotal|floatformat:2 }}</td>
+                <td class="" style="padding-left: 2px">{{ det.cant }}</td>
+                <td style="padding-left: 35px">{{ det.product }}</td>
+                <td class="text-center pl-5">{{ det.price|floatformat:2 }}</td>
+                <td class="text-center pl-5">{{ det.subtotal|floatformat:2 }}</td>
             </tr>
         {% endfor %}
         {% for i in jump %}
@@ -126,23 +134,23 @@
         {% endfor %}
         <tr>
             <td colspan="3" class="text-right"><b></b></td>
-            <td class="text-center">{{ sale.subtotal_exempt|floatformat:2 }}</td>
+            <td class="text-center pl-5">{{ sale.subtotal_exempt|floatformat:2 }}</td>
         </tr>
         <tr>
             <td colspan="3" class="text-right"><b></b></td>
-            <td class="text-center">{{ sale.subtotal|floatformat:2 }}</td>
+            <td class="text-center pl-5">{{ sale.subtotal|floatformat:2 }}</td>
         </tr>
         <tr>
             <td colspan="3" class="text-right"><b></b></td>
-            <td class="text-center">{{ sale.discount|floatformat:2 }}</td>
+            <td class="text-center pl-5">{{ sale.discount|floatformat:2 }}</td>
         </tr>
         <tr>
             <td colspan="3" class="text-right " style="padding-top: 30px"><b></b></td>
-            <td class="text-center">{{ sale.total_iva|floatformat:2 }}</td>
+            <td class="text-center pl-5">{{ sale.total_iva|floatformat:2 }}</td>
         </tr>
         <tr>
             <td colspan="3" class="text-right"><b></b></td>
-            <td class="text-center">{{ sale.total|floatformat:2 }}</td>
+            <td class="text-center pl-5">{{ sale.total|floatformat:2 }}</td>
         </tr>
         </tbody>
     </table>

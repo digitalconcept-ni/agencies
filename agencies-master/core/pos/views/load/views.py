@@ -17,31 +17,37 @@ class loadCsvView(LoginRequiredMixin, ListView):
         data = {}
         try:
             selection = request.POST['selection']
+            update = request.POST['update']
             if selection == 'product':
-                print('products')
                 product_list = []
                 file = request.FILES['file']
                 decode_file = file.read().decode("utf-8").splitlines()
                 reader = csv.reader(decode_file)
-                for row in reader:
-                    product = Product(
-                        # supplier_id=row[0],
-                        brand_id=row[0],
-                        category_id=row[1],
-                        name=row[2],
-                        code=random_code(),
-                        tax=row[3],
-                        um=row[4],
-                        expiration=row[5],
-                        image='',
-                        is_inventoried=True,
-                        stock=row[6],
-                        cost=row[7],
-                        pvp=row[8]
-                    )
-                    product_list.append(product)
-                Product.objects.bulk_create(product_list)
-                data['success'] = 'Proceso terminado con exito'
+                if update == 'true':
+                    print('update')
+                    product = Product()
+
+                else:
+                    print('products')
+                    for row in reader:
+                        product = Product(
+                            # supplier_id=row[0],
+                            brand_id=row[0],
+                            category_id=row[1],
+                            name=row[2],
+                            code=random_code(),
+                            tax=row[3],
+                            um=row[4],
+                            expiration=row[5],
+                            image='',
+                            is_inventoried=True,
+                            stock=row[6],
+                            cost=row[7],
+                            pvp=row[8]
+                        )
+                        product_list.append(product)
+                    Product.objects.bulk_create(product_list)
+                    data['success'] = 'Proceso terminado con exito'
             elif selection == 'brands':
                 brand_list = []
                 file = request.FILES['file']

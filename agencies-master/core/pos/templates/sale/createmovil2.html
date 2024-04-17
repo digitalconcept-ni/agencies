@@ -63,7 +63,7 @@
                 </div>
             </div>
 
-            <div class="card-outline card-outline-tabs">
+            <div class="card-outline card-outline-tabs" style="height: auto;">
                 <div class="card-header p-0 border-bottom-0">
                     <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
                         <li class="nav-item">
@@ -83,7 +83,7 @@
                         <div class="tab-pane fade active show" id="custom-tabs-four-detalle" role="tabpanel"
                              aria-labelledby="custom-tabs-four-detalle-tab">
                             {# ROW FOR THE TABLE INSERT PRODUCT #}
-                            <table class="table table-active" id="tblProducts">
+                            <table class="table table-active display" id="tblProducts">
                                 <thead>
                                 <tr>
                                     <th>id</th>
@@ -106,6 +106,10 @@
                                 <label>{{ form.purchase_order.label }}</label>
                                 {{ form.purchase_order|add_class:'form-control'|attr:'autocomplete:off' }}
                             </div>
+                            <div class="form-group">
+                                <label>Descuento:</label>
+                                {{ form.discount }}
+                            </div>
 
                             <div class="form-group">
                                 <label>{{ form.payment.label }}</label>
@@ -127,15 +131,6 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label>Subtotal Exento:</label>
-                                {{ form.subtotal_exempt }}
-                            </div>
-
-                            <div class="form-group">
-                                <label>Descuento:</label>
-                                {{ form.discount }}
-                            </div>
 
                         </div>
                     </div>
@@ -145,35 +140,38 @@
 
 
             {# PART OF DETAIL OF INVOICE #}
-            <div class="fixed-bottom border-top bg-gradient-gray-dark">
+            <div class="fixed-bottom border-top bg-gradient-gray-dark" style="padding: 0.2rem 0 0 0">
                 {#SE DEJA AFUERA PORQUE NO SE REQUIERE VISUALIZAR#}
                 <input type="hidden" name="action" value="{{ action }}">
                 {{ form.date_joined }}
                 {# FIN AFUERA#}
 
                 {# FILA DEL SUB TOTAL Y CUANTO DEL IVA#}
-                <div class="row p-2">
+                <div class="row  ">
+                    <div class="col-3  text-center">
+                        <div class="form-group  text-center">
+                            <label>Subtotal Exento:</label>
+                            {{ form.subtotal_exempt }}
+                        </div>
+                    </div>
+
                     <div class="col-3">
                         <div class="form-group">
-                            <label>Subtotal:</label>
+                            <label>Subtotal IVA:</label>
                             {{ form.subtotal }}
                         </div>
                     </div>
+
                     <div class="col-3">
                         <div class="form-group">
                             <label>IVA:</label>
-                            {{ form.iva }}
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="form-group">
-                            <label>calculado:</label>
                             <input readonly type="text"
                                    style="color: white; border: none; width: 100%; background-color: transparent;"
                                    name="ivacalc"
                                    value="0.00">
                         </div>
                     </div>
+
                     <div class="col-3">
                         <div class="form-group">
                             <label>Total:</label>

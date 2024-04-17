@@ -368,10 +368,10 @@ class Company(models.Model):
 class Sale(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario')
+    user_commissions = models.CharField(max_length=20, null=True, blank=True, verbose_name='Usuario a comisionar')
     endofday = models.BooleanField(default=False)
     applied = models.BooleanField(default=False)
-    purchase_order = models.CharField(max_length=15, blank=True, null=True, default='OC-000000000001',
-                                      verbose_name='Orden de Compra')
+    purchase_order = models.CharField(max_length=15, blank=True, null=True, verbose_name='Orden de Compra')
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     date_joined = models.DateField(default=datetime.now)
     time_joined = models.TimeField(default=datetime.now)
@@ -380,7 +380,7 @@ class Sale(models.Model):
     end = models.DateField(null=True, blank=True, verbose_name='Fecha cancelacion')
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     subtotal_exempt = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
-    iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    # iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total_iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     discount = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
@@ -410,7 +410,7 @@ class Sale(models.Model):
             modify = True
         opt = [modify, self.endofday, self.applied]
         data = [
-            self.get_number(), self.purchase_order, self.user.username, self.client.get_full_name(),
+            self.get_number(), self.purchase_order, self.user.username, self.user_commissions,self.client.get_full_name(),
             f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}',
             self.payment, f'{self.subtotal_exempt:.2f}', f'{self.subtotal:.2f}', f'{self.discount:.2f}',
             f'{self.total_iva:.2f}', f'{self.total:.2f}',
@@ -428,7 +428,7 @@ class Sale(models.Model):
         item['user'] = self.user.username
         item['subtotal'] = f'{self.subtotal:.2f}'
         item['discount'] = f'{self.discount:.2f}'
-        item['iva'] = f'{self.iva:.2f}'
+        # item['iva'] = f'{self.iva:.2f}'
         item['total_iva'] = f'{self.total_iva:.2f}'
         item['total'] = f'{self.total:.2f}'
         item['date_joined'] = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}'
@@ -445,7 +445,7 @@ class Sale(models.Model):
         subtotal = self.saleproduct_set.all().filter(product__tax='grabado').aggregate(
             result=Coalesce(Sum(F('price') * F('cant')), 0.00, output_field=FloatField())).get('result')
         self.subtotal = subtotal
-        self.total_iva = (self.subtotal - self.discount) * float(self.iva)
+        self.total_iva = (self.subtotal - self.discount) * 0.15
         self.total = ((float(self.subtotal) + float(self.subtotal_exempt)) - float(self.discount)) + float(
             self.total_iva)
         self.save()

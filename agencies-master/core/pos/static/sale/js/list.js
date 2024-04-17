@@ -7,7 +7,7 @@ var sale = {
             targets: [0],
             class: 'text-center',
             render: function (data, type, row) {
-                if (row[11][1] === true) {
+                if (row[12][1] === true) {
                     return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
                 } else {
                     return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
@@ -15,13 +15,13 @@ var sale = {
             }
         },
         {
-            targets: [5],
+            targets: [6],
             class: 'text-center',
             render: function (data, type, row) {
                 if (data === 'cash') {
                     return '<a class="badge badge-success badge-pill" rel="number">' + data + '</a>'
                 } else if (data === 'credit') {
-                    if (row[9][2] === true) {
+                    if (row[10][2] === true) {
                         return '<a class="badge badge-success badge-pill">' + data + '</a>';
                     } else {
                         return '<a class="badge badge-danger badge-pill pointer" rel="credit">' + data + '</a>'
@@ -34,7 +34,7 @@ var sale = {
             }
         },
         {
-            targets: [6, 7, 8],
+            targets: [7, 8,9],
             class: 'text-center',
             render: function (data) {
                 return 'C$' + parseFloat(data).toFixed(2);
@@ -46,7 +46,7 @@ var sale = {
             orderable: false,
             render: function (data, type, row) {
                 var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
-                if (row[11][0] === false) {
+                if (row[12][0] === false) {
                     buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
                     buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
                 }
@@ -69,7 +69,7 @@ var sale = {
         let data = {
             'data': parameters,
             'inserInto': 'rowList',
-            'th': ['Nro', 'Orden de compra', 'Usuario', 'Cliente', 'Registro', 'Pago', 'Sub Total Exento', 'Sub total', 'Descuento', 'Iva', 'Total', 'Opciones'],
+            'th': ['Nro', 'Orden de compra', 'Creado por', 'Venta de','Cliente', 'Registro', 'Pago', 'Sub Total Exento', 'Sub total IVA', 'Descuento', 'Iva', 'Total', 'Opciones'],
             'table': 'tableList',
             'config': sale.config,
             'modal': false,

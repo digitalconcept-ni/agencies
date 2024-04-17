@@ -13,7 +13,7 @@ var user = {
             }
         },
         {
-            targets: [4],
+            targets: [5],
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
@@ -21,7 +21,7 @@ var user = {
             }
         },
         {
-            targets: [5],
+            targets: [6],
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
@@ -33,7 +33,7 @@ var user = {
             }
         },
         {
-            targets: [7],
+            targets: [8],
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
@@ -45,11 +45,10 @@ var user = {
             }
         },
         {
-            targets: [8],
+            targets: [9],
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                console.log(data[0])
                 var html = '';
                 $.each(data, function (key, value) {
                     html += '<span class="badge badge-success">' + value.name + '</span> ';
@@ -73,7 +72,7 @@ var user = {
         let data = {
             'data': {'action': 'search'},
             'inserInto': 'rowList',
-            'th': ['Nro', 'Nombres', 'Nombre de usuario', 'Registro', 'Imagen', '¿Es Super Usuario?', 'Ultimo ingreso', 'Estado', 'Grupos', 'Opciones'],
+            'th': ['Nro', 'Nombres', 'Nombre de usuario', 'Telefono','Registro', 'Imagen', '¿Es Super Usuario?', 'Ultimo ingreso', 'Estado', 'Grupos', 'Opciones'],
             'table': 'tableList',
             'config': user.config,
             'modal': false,

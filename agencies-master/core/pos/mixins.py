@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 
 from core.pos.forms import SaleMovilForm, SaleForm
 from core.pos.models import Company, Client
+from core.user.models import User
 
 
 class IsSuperuserMixin(object):
@@ -84,6 +85,8 @@ class deviceVerificationMixin(object):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
+        # module = self.request.path.split('/')[3]
+        #     if module == 'update':
         if 'Sec-Ch-Ua-Mobile' in request.headers:
             if request.headers['Sec-Ch-Ua-Mobile'] == '?1':
                 self.form_class = SaleMovilForm

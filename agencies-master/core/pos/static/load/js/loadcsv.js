@@ -8,10 +8,12 @@ $(function () {
         } else {
             let loader = document.querySelector('.preloader-container');
             var select = $('#selecLoad').val();
+            var check_update = $('input[name="check-update"]').prop("checked");
 
             const data = new FormData();
             data.append('file', $('#insert_file')[0].files[0]);
             data.append('selection', select);
+            data.append('update', check_update);
 
             $.ajax('.', {
                 method: "POST",

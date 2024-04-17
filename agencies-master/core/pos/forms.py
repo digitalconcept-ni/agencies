@@ -1,7 +1,5 @@
 from django import forms
-from django.forms import ModelForm, inlineformset_factory
-
-from core.pos.choices import random_code
+from django.forms import ModelForm
 from core.pos.models import *
 
 
@@ -222,14 +220,25 @@ class SaleForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['client'].queryset = Client.objects.none()
+        # self.fields['user_com'].required = False
+
+    user_com = forms.ModelChoiceField(queryset=User.objects.all(), to_field_name='username', widget=forms.Select(attrs={
+        'class': 'form-control select2'}))
+
+    # user_com = forms.Select()
 
     class Meta:
         model = Sale
         fields = '__all__'
         widgets = {
+
             'end': forms.DateInput(attrs={
                 'readonly': True,
                 'value': datetime.now().strftime('%Y-%m-%d'),
+            }),
+            'user_commissions': forms.TextInput(attrs={
+                'class': 'form-control',
+                'readonly': True
             }),
             'purchase_order': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -247,9 +256,9 @@ class SaleForm(ModelForm):
                 'data-toggle': 'datetimepicker',
             }
             ),
-            'iva': forms.TextInput(attrs={
-                'class': 'form-control',
-            }),
+            # 'iva': forms.TextInput(attrs={
+            #     'class': 'form-control',
+            # }),
             'subtotal': forms.TextInput(attrs={
                 'readonly': True,
                 'class': 'form-control',
@@ -294,11 +303,12 @@ class SaleMovilForm(ModelForm):
                 'readonly': True,
                 'value': datetime.now().strftime('%Y-%m-%d'),
             }),
-            'iva': forms.TextInput(attrs={
-                'style': 'border: none; width: 100%; background: transparent; color: white;'
-            }),
+            # 'iva': forms.TextInput(attrs={
+            #     'style': 'border: none; width: 100%; background: transparent; color: white;'
+            # }),
             'subtotal_exempt': forms.TextInput(attrs={
                 'readonly': True,
+                'style': 'border: none; width: 100%; background: transparent; color: white;',
                 'class': 'form-control',
             }),
             'subtotal': forms.TextInput(attrs={

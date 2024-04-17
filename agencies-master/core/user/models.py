@@ -8,7 +8,7 @@ from config import settings
 
 
 class User(AbstractUser):
-    phone_number = models.CharField(max_length=8,  default=87878787, verbose_name='Numero de telefono')
+    phone_number = models.CharField(max_length=8, null=True, blank=True, verbose_name='Numero de telefono')
     image = models.ImageField(upload_to='users/%Y/%m/%d', null=True, blank=True)
     token = models.UUIDField(primary_key=False, editable=False, null=True, blank=True)
     presale = models.BooleanField(default=False)
@@ -25,7 +25,7 @@ class User(AbstractUser):
         last_login = ' ' if self.last_login is None else self.last_login.strftime('%Y-%m-%d')
         groups = [{'id': g.id, 'name': g.name} for g in self.groups.all()]
         data = [
-            self.id, self.get_full_name(), self.username, self.date_joined.strftime('%Y-%m-%d'),
+            self.id, self.get_full_name(), self.username, self.phone_number, self.date_joined.strftime('%Y-%m-%d'),
             self.get_image(), self.is_superuser, last_login, self.is_active,
             groups, self.presale
         ]

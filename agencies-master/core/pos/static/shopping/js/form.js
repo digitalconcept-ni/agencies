@@ -45,7 +45,7 @@ var sale = {
             columns: [
                 {"data": "id"},
                 {"data": "full_name"},
-                {"data": "stock"},
+                {"data": "expiration"},
                 {"data": "cost"},
                 {"data": "pvp"},
                 {"data": "cant"},
@@ -53,21 +53,22 @@ var sale = {
             ],
             columnDefs: [
                 {
-                    targets: [2],
+                    targets: [0],
+                    class: 'text-center',
+                    visible: false
+                },
+                {
+                    targets: [1],
                     class: 'text-center',
                     render: function (data, type, row) {
-                        if (!row.is_inventoried) {
-                            return '<span class="badge badge-secondary">Sin stock</span>';
-                        }
-                        return '<span class="badge badge-secondary">' + data + '</span>';
+                        return '<a rel="remove" class="btn-xs" style="font-size: 14px; font-weight: bold">' + data + '</a>';
                     }
                 },
                 {
-                    targets: [0],
+                    targets: [2],
                     class: 'text-center',
-                    orderable: false,
                     render: function (data, type, row) {
-                        return '<a rel="remove" class="btn btn-danger btn-xs btn-flat" style="color: white;"><i class="fas fa-trash-alt"></i></a>';
+                        return `<input  type="text" maxlength="10" name="expiration" data-target="#expiration" data-toggle="datetimepicker" autocomplete="off" id="expiration" class="form-control form-control-sm input-sm datetimepicker-input" value="${data}"/>`;
                     }
                 },
                 {
@@ -77,7 +78,6 @@ var sale = {
                     render: function (data, type, row) {
                         // return '$' + parseFloat(data).toFixed(2);
                         return '<input type="text" name="cost" class="form-control form-control-sm input-sm" autocomplete="off" value="' + parseFloat(data).toFixed(2) + '">';
-
                     }
                 },
                 {
@@ -108,6 +108,13 @@ var sale = {
             ],
             rowCallback(row, data, displayNum, displayIndex, dataIndex) {
 
+                $(row).find('input[name="expiration"]').datetimepicker({
+                    useCurrent: false,
+                    format: 'YYYY-MM-DD',
+                    locale: 'es',
+                    keepOpen: false,
+                    // maxDate: new Date()
+                });
                 $(row).find('input[name="cant"]').TouchSpin({
                     min: 1,
                     max: 1000000,
@@ -132,6 +139,7 @@ var sale = {
 
             },
             initComplete: function (settings, json) {
+
 
             }
         });
@@ -198,14 +206,6 @@ $(function () {
     });
 
 
-    $('input[name="birthdate"]').datetimepicker({
-        useCurrent: false,
-        format: 'YYYY-MM-DD',
-        locale: 'es',
-        keepOpen: false,
-        maxDate: new Date()
-    });
-
     // Form to create a new Supplier
     $('#frmSupplier').on('submit', function (e) {
         e.preventDefault();
@@ -232,38 +232,6 @@ $(function () {
                 $('#myModalCreateProduct').modal('hide');
             });
     });
-
-
-    // Products
-    /*select_search_product.autocomplete({
-        source: function (request, response) {
-            $.ajax({
-                url: pathname,
-                type: 'POST',
-                data: {
-                    'action': 'search_products',
-                    'term': request.term
-                },
-                dataType: 'json',
-            }).done(function (data) {
-                response(data);
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                //alert(textStatus + ': ' + errorThrown);
-            }).always(function (data) {
-
-            });
-        },
-        delay: 500,
-        minLength: 1,
-        select: function (event, ui) {
-            event.preventDefault();
-            console.clear();
-            ui.item.cant = 1;
-            ui.item.subtotal = 0.00;
-            sale.addProduct(ui.item);
-            $(this).val('');
-        }
-    });*/
 
     select_search_product.select2({
         theme: "bootstrap4",
@@ -305,9 +273,9 @@ $(function () {
             return $(
                 '<div class="wrapper container">' +
                 '<div class="row">' +
-                '<div class="col-lg-1">' +
-                '<img alt="" src="' + repo.image + '" class="img-fluid img-thumbnail d-block mx-auto rounded">' +
-                '</div>' +
+                // '<div class="col-lg-1">' +
+                // '<img alt="" src="' + repo.image + '" class="img-fluid img-thumbnail d-block mx-auto rounded">' +
+                // '</div>' +
                 '<div class="col-lg-11 text-left shadow-sm">' +
                 //'<br>' +
                 '<p style="margin-bottom: 0;">' +

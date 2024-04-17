@@ -18,7 +18,7 @@ var sale = {
     calculateInvoice: function () {
         var subtotal_exempt = 0.00;
         var subtotal_iva = 0.00;
-        var iva = $('input[name="iva"]').val();
+        // var iva = $('input[name="iva"]').val();
         var discount = $('input[name="discount"]').val();
         this.details.products.forEach(function (value, index, array) {
             value.index = index;
@@ -34,14 +34,11 @@ var sale = {
             }
         });
 
-        console.log("subtotal_exento: ", subtotal_exempt)
-        console.log("subtotal_iva: ", subtotal_iva)
-
         this.details.subtotal_exempt = subtotal_exempt;
         this.details.subtotal = subtotal_iva;
         this.details.discount = discount;
 
-        this.details.iva = (this.details.subtotal - this.details.discount) * iva;
+        this.details.iva = (this.details.subtotal - this.details.discount) * 0.15;
         this.details.total = ((this.details.subtotal + this.details.subtotal_exempt) - this.details.discount) + this.details.iva;
 
         $('input[name="subtotal"]').val(this.details.subtotal.toFixed(2));
@@ -70,8 +67,25 @@ var sale = {
             ],
             columnDefs: [
                 {
+                    targets: [0],
+                    class: 'text-center',
+                    visible: false,
+                    // render: function (data, type, row) {
+                    //     return '<a rel="remove" class="btn btn-danger btn-xs btn-flat" style="color: white;"><i class="fas fa-trash-alt"></i></a>';
+                    // }
+                },
+                {
+                    targets: [1],
+                    orderable: false,
+                    class: 'text-center',
+                    render: function (data, type, row) {
+                        return '<a rel="remove" style="color: blue; cursor: pointer">' + data + '</a>';
+                    }
+                },
+                {
                     targets: [-4],
                     class: 'text-center',
+                    orderable: false,
                     render: function (data, type, row) {
                         if (!row.is_inventoried) {
                             return '<span class="badge badge-secondary">Sin stock</span>';
@@ -80,19 +94,11 @@ var sale = {
                     }
                 },
                 {
-                    targets: [0],
-                    class: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        return '<a rel="remove" class="btn btn-danger btn-xs btn-flat" style="color: white;"><i class="fas fa-trash-alt"></i></a>';
-                    }
-                },
-                {
                     targets: [-3],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
+                        return 'C$' + parseFloat(data).toFixed(2);
                     }
                 },
                 {
@@ -108,7 +114,7 @@ var sale = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
+                        return 'C$' + parseFloat(data).toFixed(2);
                     }
                 },
             ],
@@ -116,7 +122,7 @@ var sale = {
 
                 $(row).find('input[name="cant"]').TouchSpin({
                     min: 1,
-                    max: data.stock,
+                    max: data.stock === 0 ?  data.cant : data.stock + data.cant,
                     step: 1
                 });
 
@@ -230,37 +236,6 @@ $(function () {
             });
     });
 
-    // Products
-    /*select_search_product.autocomplete({
-        source: function (request, response) {
-            $.ajax({
-                url: pathname,
-                type: 'POST',
-                data: {
-                    'action': 'search_products',
-                    'term': request.term
-                },
-                dataType: 'json',
-            }).done(function (data) {
-                response(data);
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                //alert(textStatus + ': ' + errorThrown);
-            }).always(function (data) {
-
-            });
-        },
-        delay: 500,
-        minLength: 1,
-        select: function (event, ui) {
-            event.preventDefault();
-            console.clear();
-            ui.item.cant = 1;
-            ui.item.subtotal = 0.00;
-            sale.addProduct(ui.item);
-            $(this).val('');
-        }
-    });*/
-
     select_search_product.select2({
         theme: "bootstrap4",
         language: 'es',
@@ -324,7 +299,7 @@ $(function () {
                 '</div>');
         },
     })
-        .on('select2:select', function (e) {
+        .on('select2:select', function (e) {    
             var data = e.params.data;
             if (!Number.isInteger(data.id)) {
                 return false;
@@ -462,17 +437,17 @@ $(function () {
         keepOpen: false
     });
 
-    $("input[name='iva']").TouchSpin({
-        min: 0,
-        max: 1,
-        step: 0.01,
-        decimals: 2,
-        boostat: 5,
-        maxboostedstep: 10,
-        postfix: '%'
-    }).on('change', function () {
-        sale.calculateInvoice();
-    }).val(0.15);
+    // $("input[name='iva']").TouchSpin({
+    //     min: 0,
+    //     max: 1,
+    //     step: 0.01,
+    //     decimals: 2,
+    //     boostat: 5,
+    //     maxboostedstep: 10,
+    //     postfix: '%'
+    // }).on('change', function () {
+    //     sale.calculateInvoice();
+    // }).val(0.15);
 
     $("input[name='discount']").TouchSpin({
         min: 0,
