@@ -157,6 +157,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             else:
                 data['error'] = 'No se ha encontrado el action'
         except Exception as e:
+            print(str(e))
             data['error'] = str(e)
         return JsonResponse(data, safe=False)
 
