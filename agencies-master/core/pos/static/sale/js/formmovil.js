@@ -57,7 +57,7 @@ var sale = {
             destroy: true,
             paging: false,
             dom: 't',
-            scrollY: '65vh',
+            scrollY: '62vh',
             scrollCollapse: true,
             data: this.details.products,
             columns: [

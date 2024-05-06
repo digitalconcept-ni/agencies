@@ -220,7 +220,7 @@ class SaleForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['client'].queryset = Client.objects.none()
-        # self.fields['user_com'].required = False
+        self.fields['user_com'].required = False
 
     user_com = forms.ModelChoiceField(queryset=User.objects.all(), to_field_name='username', widget=forms.Select(attrs={
         'class': 'form-control select2'}))
@@ -279,13 +279,22 @@ class SaleForm(ModelForm):
 
 class SaleMovilForm(ModelForm):
     def __init__(self, *args, **kwargs):
+        # print(self.user)
         super().__init__(*args, **kwargs)
         self.fields['client'].queryset = Client.objects.none()
+        self.fields['user_com'].required = False
+
+    user_com = forms.ModelChoiceField(queryset=User.objects.all(), to_field_name='username', widget=forms.Select(attrs={
+        'class': 'form-control select2', 'required': False}))
 
     class Meta:
         model = Sale
         fields = '__all__'
         widgets = {
+            'user_commissions': forms.TextInput(attrs={
+                'class': 'form-control',
+                'readonly': True
+            }),
             'client': forms.Select(attrs={
                 'class': 'custom-select select2',
                 # 'style': 'width: 100%'

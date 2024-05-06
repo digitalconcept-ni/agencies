@@ -103,6 +103,17 @@
                              aria-labelledby="custom-tabs-four-payment-tab">
 
                             <div class="form-group">
+                                <label for="{{ form.user_com.id_for_label }}">{{ form.user_commissions.label }}: </label>
+                                {{ form.user_com }}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.user_commissions.id_for_label }}">Aplicado anteriormente
+                                    a: </label>
+                                {{ form.user_commissions }}
+                            </div>
+
+                            <div class="form-group">
                                 <label>{{ form.purchase_order.label }}</label>
                                 {{ form.purchase_order|add_class:'form-control'|attr:'autocomplete:off' }}
                             </div>
