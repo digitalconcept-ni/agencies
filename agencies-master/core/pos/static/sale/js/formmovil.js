@@ -57,7 +57,7 @@ var sale = {
             destroy: true,
             paging: false,
             dom: 't',
-            scrollY: '58vh',
+            scrollY: '65vh',
             scrollCollapse: true,
             data: this.details.products,
             columns: [
@@ -233,7 +233,7 @@ $(function () {
             }
             var tax = '';
 
-            if (repo.tax === 'e' || repo.tax === 'exonerado') {
+            if (repo.tax === 'e' || repo.tax === 'exento') {
                 tax = 'Exento';
             } else if (repo.tax === 'g' || repo.tax === 'grabado') {
                 tax = 'Grabado'

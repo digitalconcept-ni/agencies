@@ -21,7 +21,7 @@ var sale = {
                 if (data === 'cash') {
                     return '<a class="badge badge-success badge-pill" rel="number">' + data + '</a>'
                 } else if (data === 'credit') {
-                    if (row[10][2] === true) {
+                    if (row[12][2] === true) {
                         return '<a class="badge badge-success badge-pill">' + data + '</a>';
                     } else {
                         return '<a class="badge badge-danger badge-pill pointer" rel="credit">' + data + '</a>'

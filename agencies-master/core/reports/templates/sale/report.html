@@ -4,6 +4,7 @@
     <script src="{% static 'js/dcTables.js' %}"></script>
     <script src="{% static 'sale/js/report.js' %}"></script>
     <script src="{% static 'sale/js/follow.js' %}"></script>
+    <script src="{% static 'sale/js/salexpresale.js' %}"></script>
 
 {% endblock %}
 
@@ -24,6 +25,12 @@
                                href="#custom-tabs-one-follow" role="tab" aria-controls="custom-tabs-one-follow"
                                aria-selected="false">Seguimiento</a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-one-profile-tab" data-toggle="pill"
+                               href="#custom-tabs-one-products" role="tab" aria-controls="custom-tabs-one-follow"
+                               aria-selected="false">Productos</a>
+                        </li>
                     </ul>
                 </div>
                 <div class="card-body">
@@ -33,9 +40,14 @@
                             <h2>Reporte de Ventas</h2>
 
                             <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Rango de fechas:</label>
+                                <label>Rango de fechas:</label>
+                                <div class="input-group">
                                     {{ form.date_range }}
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success" type="button" id="btnSearchSaleInfo">
+                                            <i class="fas fa-search"></i> Buscar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -43,7 +55,7 @@
                              aria-labelledby="custom-tabs-one-follow-tab">
                             <div class="row">
                                 <div class="col-md-6 col">
-                                <h2>Reporte preventa</h2>
+                                    <h2>Reporte preventa</h2>
                                     <div class="input-group mb-3">
                                         <select name="idPreSeles" id="selectPreSales" class="form-control">
                                             <option value="">Selecciona el preventa</option>
@@ -61,12 +73,45 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="tab-pane fade" id="custom-tabs-one-products" role="tabpanel"
+                             aria-labelledby="custom-tabs-one-follow-tab">
+                            <h2>Reporte de productos más vendidos</h2>
+                            <div class="row">
+
+                                <div class="col-md-6 col">
+                                    <div class="input-group mb-3">
+                                        {{ form.date_range_2 }}
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-6 col">
+                                    <div class="input-group mb-3">
+                                        <select name="idPreSeles2" id="selectPreSales2" class="form-control">
+                                            <option value="">Selecciona el preventa</option>
+                                            <option value="all">Todos</option>
+                                            {% for u in pre_sales %}
+                                                <option value="{{ u.id }}">{{ u.username }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-success" type="button" id="btnSearchSalesxPresaleInfo">
+                                                <i class="fas fa-search"></i> Buscar
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
             </div>
         </div>
     </div>
+
+
     <table class="table table-bordered" id="data">
         <thead>
         <tr id="trow" rel="rowData">

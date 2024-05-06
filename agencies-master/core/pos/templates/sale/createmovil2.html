@@ -140,42 +140,56 @@
 
 
             {# PART OF DETAIL OF INVOICE #}
-            <div class="fixed-bottom border-top bg-gradient-gray-dark" style="padding: 0.2rem 0 0 0">
+            <div class="fixed-bottom border-top bg-success"
+                 style="padding: 0.5rem 1rem 0rem 1rem; border-radius: 1rem 1rem 0rem 0rem">
                 {#SE DEJA AFUERA PORQUE NO SE REQUIERE VISUALIZAR#}
                 <input type="hidden" name="action" value="{{ action }}">
                 {{ form.date_joined }}
                 {# FIN AFUERA#}
 
                 {# FILA DEL SUB TOTAL Y CUANTO DEL IVA#}
-                <div class="row  ">
-                    <div class="col-3  text-center">
-                        <div class="form-group  text-center">
-                            <label>Subtotal Exento:</label>
-                            {{ form.subtotal_exempt }}
+                <div class="row ">
+                    <div class="col-6">
+                        <div class="  row ">
+                            <label>Sub exento:</label>
+                            <div class="col-6">
+                                {{ form.subtotal_exempt }}
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-3">
-                        <div class="form-group">
-                            <label>Subtotal IVA:</label>
-                            {{ form.subtotal }}
+                    <div class="col-6">
+                        <div class=" row">
+                            <label>Sub total IVA:</label>
+                            <div class="col-6">
+                                {{ form.subtotal }}
+                            </div>
                         </div>
+
                     </div>
 
-                    <div class="col-3">
-                        <div class="form-group">
+                </div>
+
+                <div class="row">
+
+                    <div class="col-6">
+                        <div class=" row">
                             <label>IVA:</label>
-                            <input readonly type="text"
-                                   style="color: white; border: none; width: 100%; background-color: transparent;"
-                                   name="ivacalc"
-                                   value="0.00">
+                            <div class="col-6">
+                                <input readonly type="text"
+                                       style="color: white; border: none; width: 100%; background-color: transparent;"
+                                       name="ivacalc"
+                                       value="0.00">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-3">
-                        <div class="form-group">
+                    <div class="col-6">
+                        <div class=" row">
                             <label>Total:</label>
-                            {{ form.total }}
+                            <div class="col-6">
+                                {{ form.total }}
+                            </div>
                         </div>
                     </div>
                 </div>

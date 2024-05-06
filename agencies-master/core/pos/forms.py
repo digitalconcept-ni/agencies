@@ -309,7 +309,6 @@ class SaleMovilForm(ModelForm):
             'subtotal_exempt': forms.TextInput(attrs={
                 'readonly': True,
                 'style': 'border: none; width: 100%; background: transparent; color: white;',
-                'class': 'form-control',
             }),
             'subtotal': forms.TextInput(attrs={
                 'readonly': True,

@@ -1,17 +1,14 @@
-import csv
 import json
 from datetime import datetime
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Q, Sum, F
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse
 from django.http import JsonResponse, HttpResponseRedirect
 from django.template.loader import get_template
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
-from django.views.generic import CreateView, FormView, DeleteView, UpdateView, View
+from django.views.generic import CreateView, FormView, UpdateView, View
 import os
 
 from core.pos.choices import personalized_invoice
@@ -468,8 +465,8 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         try:
-            tenantName = 'disam'
-            # tenantName = request.tenant.name
+            # tenantName = 'disam'
+            tenantName = request.tenant.name
             templateName = tenantName + '.html'
 
             sale = Sale.objects.get(pk=self.kwargs['pk'])

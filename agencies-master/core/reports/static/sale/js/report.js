@@ -126,31 +126,61 @@ $(function () {
                 cancelLabel: '<i class="fas fa-times"></i> Cancelar',
             },
         })
-        .on('hide.daterangepicker', function (ev, picker) {
-            var parameters = {
-                'action': 'search_sale',
-                'start_date': input_daterange.data('daterangepicker').startDate.format('YYYY-MM-DD'),
-                'end_date': input_daterange.data('daterangepicker').endDate.format('YYYY-MM-DD'),
-            };
+    // .on('hide.daterangepicker', function (ev, picker) {
+    //     var parameters = {
+    //         'action': 'search_sale',
+    //         'start_date': input_daterange.data('daterangepicker').startDate.format('YYYY-MM-DD'),
+    //         'end_date': input_daterange.data('daterangepicker').endDate.format('YYYY-MM-DD'),
+    //     };
+    //
+    //     let config = [{
+    //         targets: [-1, -2, -3],
+    //         class: 'text-center',
+    //         orderable: false,
+    //         render: function (data, type, row) {
+    //             return 'C$' + parseFloat(data).toFixed(2);
+    //         }
+    //     },]
+    //     let data = {
+    //         'data': parameters,
+    //         'inserInto': 'rowData',
+    //         'th': ['Nro', 'Cliente', 'Fecha registro', 'Sub Total', 'Iva', 'Total'],
+    //         'table': 'data',
+    //         'config': config,
+    //         'modal': false,
+    //     }
+    //     drawTables(data);
+    // });
 
-            let config = [{
-                targets: [-1, -2, -3],
-                class: 'text-center',
-                orderable: false,
-                render: function (data, type, row) {
-                    return 'C$' + parseFloat(data).toFixed(2);
-                }
-            },]
-            let data = {
-                'data': parameters,
-                'inserInto': 'rowData',
-                'th': ['Nro', 'Cliente', 'Fecha registro', 'Sub Total', 'Iva', 'Total'],
-                'table': 'data',
-                'config': config,
-                'modal': false,
+
+    $('#btnSearchSaleInfo').on('click', function () {
+        var parameters = {
+            'action': 'search_sale',
+            'start_date': input_daterange.data('daterangepicker').startDate.format('YYYY-MM-DD'),
+            'end_date': input_daterange.data('daterangepicker').endDate.format('YYYY-MM-DD'),
+        };
+
+        console.log(parameters)
+
+
+        let config = [{
+            targets: [-1, -2, -3],
+            class: 'text-center',
+            orderable: false,
+            render: function (data, type, row) {
+                return 'C$' + parseFloat(data).toFixed(2);
             }
-            drawTables(data);
-        });
+        },]
+        let data = {
+            'data': parameters,
+            'inserInto': 'rowData',
+            'th': ['Nro', 'Cliente', 'Fecha registro', 'Sub Total', 'Iva', 'Total'],
+            'table': 'data',
+            'config': config,
+            'modal': false,
+        }
+        drawTables(data);
+    })
 
     $('.drp-buttons').hide();
 });

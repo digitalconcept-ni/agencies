@@ -275,7 +275,7 @@ $(function () {
 
             var tax = '';
 
-            if (repo.tax === 'e' || repo.tax === 'exonerado') {
+            if (repo.tax === 'e' || repo.tax === 'exento') {
                 tax = 'Exento';
             } else if (repo.tax === 'g' || repo.tax === 'grabado') {
                 tax = 'Grabado'

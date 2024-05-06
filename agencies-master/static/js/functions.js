@@ -188,7 +188,11 @@ function validate_decimals(el, evt) {
 window.addEventListener('load', () => {
     let loader = document.querySelector('.preloader-container');
     loader.style.opacity = 0
-    loader.style.visibility = 'hidden'
+    loader.style.visibility = 'hidden';
+
+    var year = new Date;
+    let spanYear = document.getElementById('year-system');
+    spanYear.innerHTML = `${year.getFullYear()}`;
 });
 
 // function toggleFullScreen() {
