@@ -11,7 +11,7 @@ class UserForm(ModelForm):
 
     class Meta:
         model = User
-        fields = 'first_name', 'last_name', 'phone_number', 'email', 'username', 'password', 'image', 'groups', 'presale', 'is_staff', 'is_superuser', 'is_active'
+        fields = 'first_name', 'last_name', 'phone_number', 'email', 'username', 'password', 'image', 'groups', 'presale', 'is_superuser', 'is_active'
         widgets = {
             'first_name': forms.TextInput(
                 attrs={
