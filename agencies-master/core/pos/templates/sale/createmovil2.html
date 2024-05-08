@@ -63,7 +63,7 @@
                 </div>
             </div>
 
-            <div class="card-outline card-outline-tabs" style="height: auto;">
+            <div class="card-outline card-outline-tabs">
                 <div class="card-header p-0 border-bottom-0">
                     <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
                         <li class="nav-item">
@@ -102,25 +102,30 @@
                         <div class="tab-pane fade" id="custom-tabs-four-payment" role="tabpanel"
                              aria-labelledby="custom-tabs-four-payment-tab">
 
-                            <div class="form-group">
-                                <label for="{{ form.user_com.id_for_label }}">{{ form.user_commissions.label }}: </label>
-                                {{ form.user_com }}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="{{ form.user_com.id_for_label }}">{{ form.user_commissions.label }}: </label>
+                                    {{ form.user_com }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.user_commissions.id_for_label }}">Aplicado anteriormente
+                                        a: </label>
+                                    {{ form.user_commissions }}
+                                </div>
+
                             </div>
 
-                            <div class="form-group">
-                                <label for="{{ form.user_commissions.id_for_label }}">Aplicado anteriormente
-                                    a: </label>
-                                {{ form.user_commissions }}
+                            <div class="row">
+                                <div class="col-6">
+                                    <label>{{ form.purchase_order.label }}: </label>
+                                    {{ form.purchase_order|add_class:'form-control'|attr:'autocomplete:off' }}
+                                </div>
+                                <div class="col-6">
+                                    <label>Descuento:</label>
+                                    {{ form.discount }}
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label>{{ form.purchase_order.label }}</label>
-                                {{ form.purchase_order|add_class:'form-control'|attr:'autocomplete:off' }}
-                            </div>
-                            <div class="form-group">
-                                <label>Descuento:</label>
-                                {{ form.discount }}
-                            </div>
 
                             <div class="form-group">
                                 <label>{{ form.payment.label }}</label>
@@ -171,7 +176,7 @@
 
                     <div class="col-6">
                         <div class=" row">
-                            <label>Sub total IVA:</label>
+                            <label>Sub IVA:</label>
                             <div class="col-6">
                                 {{ form.subtotal }}
                             </div>
