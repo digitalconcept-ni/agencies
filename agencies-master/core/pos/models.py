@@ -388,10 +388,11 @@ class Sale(models.Model):
     def __str__(self):
         return self.client.names
 
-    def end_day(self):
-        if self.user.is_active:
-            self.user.is_active = False
-            self.user.save()
+    def end_day(self, session):
+        if not session:
+            if self.user.is_active:
+                self.user.is_active = False
+                self.user.save()
         self.endofday = True
         self.save()
 
@@ -410,9 +411,10 @@ class Sale(models.Model):
             modify = True
         opt = [modify, self.endofday, self.applied]
         data = [
-            self.get_number(), self.purchase_order, self.user.username, self.user_commissions,self.client.get_full_name(),
+            self.get_number(), self.client.get_full_name(), self.payment, self.purchase_order, self.user.username,
+            self.user_commissions,
             f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}',
-            self.payment, f'{self.subtotal_exempt:.2f}', f'{self.subtotal:.2f}', f'{self.discount:.2f}',
+            f'{self.subtotal_exempt:.2f}', f'{self.subtotal:.2f}', f'{self.discount:.2f}',
             f'{self.total_iva:.2f}', f'{self.total:.2f}',
             opt
         ]

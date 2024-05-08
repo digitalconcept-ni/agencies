@@ -76,16 +76,18 @@
                         <div class="tab-pane fade" id="custom-tabs-one-products" role="tabpanel"
                              aria-labelledby="custom-tabs-one-follow-tab">
                             <h2>Reporte de productos más vendidos</h2>
+                            <hr>
                             <div class="row">
 
-                                <div class="col-md-6 col">
+                                <div class="col-md-12 col-lg-6">
+                                    <label for="">Seleccione rango de fechas: </label>
                                     <div class="input-group mb-3">
                                         {{ form.date_range_2 }}
                                     </div>
 
                                 </div>
 
-                                <div class="col-md-6 col">
+                                <div class="col-md-12 col-lg-6">
                                     <div class="input-group mb-3">
                                         <select name="idPreSeles2" id="selectPreSales2" class="form-control">
                                             <option value="">Selecciona el preventa</option>
@@ -95,7 +97,8 @@
                                             {% endfor %}
                                         </select>
                                         <div class="input-group-append">
-                                            <button class="btn btn-success" type="button" id="btnSearchSalesxPresaleInfo">
+                                            <button class="btn btn-success" type="button"
+                                                    id="btnSearchSalesxPresaleInfo">
                                                 <i class="fas fa-search"></i> Buscar
                                             </button>
                                         </div>

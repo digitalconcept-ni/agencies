@@ -69,27 +69,21 @@ class ReportSaleView(ValidatePermissionRequiredMixin, FormView):
                 sold = []
 
                 if presale == 'all':
-                    subQuery = query.values('product__name', 'product__brand__name').annotate(
+                    subQuery = query.values('product__category__name', 'product__name',
+                                            'product__brand__name').annotate(
                         total=Sum(F('cant'))).order_by('-total')
                 else:
                     subQuery = query.filter(sale__user_id=presale).values(
-                        'sale__user__username', 'product__name', 'product__brand__name').annotate(
-                        total=Sum(F('cant'))).order_by('-total')
-                    presaleNmae = subQuery.values('sale__user__username')[1]
-                    sold.append([0, '------', '------', presaleNmae.get('sale__user__username')])
+                        'product__category__name', 'sale__user__username', 'product__name',
+                        'product__brand__name').annotate(total=Sum(F('cant'))).order_by('-total')
+
+                    presaleName = subQuery.values('sale__user__username')[0]
+                    sold.append([0, '------', '------', '------', presaleName.get('sale__user__username')])
+
                 for x, subQuery in enumerate(subQuery):
-                    sold.append([x + 1, subQuery['product__brand__name'], subQuery['product__name'], subQuery['total']])
+                    sold.append([x + 1, subQuery['product__category__name'], subQuery['product__brand__name'],
+                                 subQuery['product__name'], subQuery['total']])
                 data = sold
-                # now = datetime.now()
-                # if query.count() != 0:
-                #     totalMoney = query.aggregate(result=Sum(F('total'))).get('result')
-                #     totalSales = query.count()
-                #     u = query.order_by('time_joined').last()
-                #     data = [[request.POST['id'], f'{totalSales}', f'{totalMoney:.2f}', f'{u.client.names}',
-                #              f'{u.time_joined.strftime("%H:%M:%S")}']]
-                #     print(data)
-                # else:
-                #     data['info'] = 'No se encontraron ventas de hoy'
             else:
                 data['error'] = 'Ha ocurrido un error'
         except Exception as e:

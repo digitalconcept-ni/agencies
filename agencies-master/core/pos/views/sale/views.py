@@ -1,4 +1,5 @@
 import json
+import shutil
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -34,8 +35,12 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
         try:
             dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
             directorySchema = os.path.join(dirname, param['tenant'])
-            if not os.path.isdir(directorySchema):
+            if not os.path.isdir(dirname):
+                os.mkdir(dirname)
+
+            if not os.path.exists(directorySchema):
                 os.mkdir(directorySchema)
+
             now = datetime.now()
             user = param['user']
             today = str(now.date())
@@ -84,7 +89,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
 
                 # CREATE A PDFS FOR ALL SALES TODAY
                 for q in querySales:
-                    q.end_day()
+                    q.end_day(param['session'])
 
                 template = get_template('sale/invoice2.html')
                 context = {
@@ -124,7 +129,8 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     'id': request.POST['id'],
                     'tenant': request.tenant.schema_name,
                     'user': request.user,
-                    'uri': request.build_absolute_uri()
+                    'uri': request.build_absolute_uri(),
+                    'session': request.session,
                 }
                 path = self.guide(param)
                 data = path

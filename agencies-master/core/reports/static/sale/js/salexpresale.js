@@ -19,7 +19,7 @@ $(function () {
         var selector = $('#selectPreSales2').val();
 
         if (selector.length === 0) {
-            message_info({'Error de selección': 'Favor de seleccionar el preventa'})
+            message_info({'Error de seleccion': 'Favor de seleccionar el preventa'})
         } else {
             var parameters = {
                 'action': 'search_sale_presale',
@@ -39,7 +39,7 @@ $(function () {
             let data = {
                 'data': parameters,
                 'inserInto': 'rowData',
-                'th': ['Nro', 'Marca', 'Producto', 'Cantidad'],
+                'th': ['Nro', 'Categoria','Marca', 'Producto', 'Cantidad'],
                 'table': 'data',
                 'config': config,
                 'modal': false,

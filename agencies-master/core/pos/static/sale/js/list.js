@@ -1,4 +1,3 @@
-var tblSale;
 var input_daterange;
 
 var sale = {
@@ -15,7 +14,7 @@ var sale = {
             }
         },
         {
-            targets: [6],
+            targets: [2],
             class: 'text-center',
             render: function (data, type, row) {
                 if (data === 'cash') {
@@ -34,7 +33,7 @@ var sale = {
             }
         },
         {
-            targets: [7, 8,9],
+            targets: [7, 8, 9],
             class: 'text-center',
             render: function (data) {
                 return 'C$' + parseFloat(data).toFixed(2);
@@ -69,7 +68,7 @@ var sale = {
         let data = {
             'data': parameters,
             'inserInto': 'rowList',
-            'th': ['Nro', 'Orden de compra', 'Creado por', 'Venta de','Cliente', 'Registro', 'Pago', 'Sub Total Exento', 'Sub total IVA', 'Descuento', 'Iva', 'Total', 'Opciones'],
+            'th': ['Nro', 'Cliente', 'Pago', 'Orden de compra', 'Creado por', 'Venta de', 'Registro', 'Sub Total Exento', 'Sub total IVA', 'Descuento', 'Iva', 'Total', 'Opciones'],
             'table': 'tableList',
             'config': sale.config,
             'modal': false,
@@ -118,7 +117,6 @@ $(function () {
             $('#btnDonwloadGuide').removeClass('disabled');
         } else {
             $('#btnDonwloadGuide').addClass('disabled');
-            $('#iconDonwload').addClass('d-hidden-mini')
         }
     })
 
@@ -126,8 +124,9 @@ $(function () {
         id = $('#selectPreSales').val()
         if (id !== '') {
             var param = new FormData();
-            param.append('action', 'download_guides')
-            param.append('id', id)
+            param.append('action', 'download_guides');
+            param.append('session', $('#idSession').prop('checked'));
+            param.append('id', id);
 
             submit_with_ajax(pathname, 'Descargar Guia', '¿Estas seguro de esta accion?', param, function (request) {
                 if (request.hasOwnProperty('info')) {
@@ -135,8 +134,9 @@ $(function () {
                 } else {
                     document.getElementById('iconDonwload').href = request.path
                     $('#iconDonwload').removeClass('disabled')
-                        .removeClass('d-hidden-mini');
-                    tblSale.ajax.reload();
+                        .removeClass('d-none')
+                        .css('display', 'inline-block');
+                    tableData.ajax.reload();
                     Swal.fire({
                         title: 'Alerta',
                         text: 'Guia realizada correctamente',
@@ -145,7 +145,7 @@ $(function () {
                     })
                 }
 
-            })
+            });
         }
     })
 

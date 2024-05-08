@@ -11,26 +11,25 @@
 {% block content_list_before %}
     <div class="row">
         {% if request.user.is_superuser == True %}
-            <div class="col-md-12 col-lg-6">
-                <div class="form-group">
-                    <label for="search_client">Busqueda de cliente: </label>
+            <div class="col-lg-6">
+                <label for="search_client">Busqueda de cliente: </label>
+                <div class="input-group ">
                     <select class="form-control select2" id="search_client" name="client">
                         {#                            <option value="">Busqueda de clientes</option>#}
                         {#                            {% for u in frmClient %}#}
                         {#                                <option value="{{ u.id }}">{{ u.names }} - {{ u.dni }}</option>#}
                         {#                            {% endfor %}#}
                     </select>
-                    <div class="input-group ">
-                        <div class="input-group-append col-md-12">
-                            <button class="btn btn-success" id="btnSearch" type="button">
-                                <i class="fas fa-search"></i> Buscar
-                            </button>
-                            <button class="btn btn-warning" id="btnSearchAll" type="button">
-                                <i class="fas fa-users"></i> Ver todos
-                            </button>
-                        </div>
+                    <div class="input-group-append col-md-12 col-lg-6">
+                        <button class="btn btn-success" id="btnSearch" type="button">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                        <button class="btn btn-warning" id="btnSearchAll" type="button">
+                            <i class="fas fa-users"></i> todos
+                        </button>
                     </div>
                 </div>
+
             </div>
         {% endif %}
 
