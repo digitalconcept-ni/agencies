@@ -46,7 +46,7 @@
                         </div>
                     {% endif %}
 
-                    {% for fields in  form|split_form_field:3 %}
+                    {% for fields in  form|split_form_field:request.user_agent %}
 
                         <div class="row">
                             {% for field  in fields %}
@@ -65,7 +65,7 @@
 
                     {# FIELD CHECBOX #}
 
-                    {% for fields in  form|split_form_field:3 %}
+                    {% for fields in  form|split_form_field:request.user_agent %}
 
                         <div class="row">
                             {% for field  in fields %}

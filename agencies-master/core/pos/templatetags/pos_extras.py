@@ -9,7 +9,11 @@ def is_checkbox(field):
     return field.field.widget.__class__.__name__ == CheckboxInput().__class__.__name__
 
 @register.filter()
-def split_form_field(form, quantity):
+def split_form_field(form, request):
+    if request.is_mobile:
+        quantity = 1
+    elif request.is_pc:
+        quantity = 3
     list_of_fields = form.visible_fields()
     splitted_list = []
 
