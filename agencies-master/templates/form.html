@@ -45,37 +45,43 @@
                             </ul>
                         </div>
                     {% endif %}
-                    {#                    {% for field in form.visible_fields %}#}
-                    {#                        <div class="form-group">#}
-                    {#                            <label>{{ field.label }}:</label>#}
-                    {#                            {% if field|is_checkbox %}#}
-                    {#                               <br>{{ field }}#}
-                    {#                            {% else %}#}
-                    {#                                {{ field|add_class:'form-control'|attr:'autocomplete:off' }}#}
-                    {#                            {% endif %}#}
-                    {#                        </div>#}
-                    {#                    {% endfor %}#}
 
-                    {% for field in form.visible_fields %}
-                        {% if not field|is_checkbox %}
-                            <div class="form-group">
-                                <label>{{ field.label }}:</label>
-                                {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                    <div class="row">
-                        {% for field in form.visible_fields %}
-                            {% if field|is_checkbox %}
-                                <div class="col">
-                                    <div class="form-group">
-                                        <label>{{ field.label }}: </label>
-                                        {{ field }}
+                    {% for fields in  form|split_form_field:3 %}
+
+                        <div class="row">
+                            {% for field  in fields %}
+
+                                {% if not field|is_checkbox %}
+                                    <div class="col">
+                                        <div class="mb-3 form-input">
+                                            <label>{{ field.label }}:</label>
+                                            {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+                                        </div>
                                     </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    {# FIELD CHECBOX #}
+
+                    {% for fields in  form|split_form_field:3 %}
+
+                        <div class="row">
+                            {% for field  in fields %}
+
+                                {% if field|is_checkbox %}
+                                    <div class="col-2">
+                                        <div class="mb-3 form-group">
+                                            <label>{{ field.label }}: </label>
+                                            {{ field }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
                 </div>
             </div>
             <div class="card-footer">

@@ -41,6 +41,7 @@ SHARED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core.user',
 ]
 
 TENANT_APPS = [
@@ -83,6 +84,8 @@ LOCAL_APPS = [
 
 THIRD_PARTY_APPS = [
     'widget_tweaks',
+    'django_cleanup.apps.CleanupConfig',
+    'django_user_agents',
     # 'rest_framework',
     # 'rest_framework.authtoken',
 ]
@@ -101,6 +104,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'crum.CurrentRequestUserMiddleware',
+    'django_user_agents.middleware.UserAgentMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -223,3 +227,9 @@ DOMAIN = ''
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
+
+# VARIABLE PARA CONTROLAR EL TIEMPO DE SESSION ACTIVA DIARIO EM SEGUNDOS
+SESSION_COOKIE_AGE = 28800
+
+# VARIABLE PARA INDICAR QUE CUANDO SE CIERRE EL NAVEGADOR SE CIERRE LA SESSION
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
