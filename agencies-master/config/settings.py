@@ -133,9 +133,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Databasex
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-# DATABASES = db.SQLITE
-
-DATABASES = db.TENANT
+DATABASES = db.TENANT_SERVER
 
 DATABASE_ROUTERS = (
     'django_tenants.routers.TenantSyncRouter',
