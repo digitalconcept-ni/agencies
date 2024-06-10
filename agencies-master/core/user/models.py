@@ -12,6 +12,7 @@ class User(AbstractUser):
     image = models.ImageField(upload_to='users/%Y/%m/%d', null=True, blank=True)
     token = models.UUIDField(primary_key=False, editable=False, null=True, blank=True)
     presale = models.BooleanField(default=False)
+    map = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.username}'

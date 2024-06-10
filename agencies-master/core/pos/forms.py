@@ -110,7 +110,7 @@ class ClientForm(ModelForm):
 
     class Meta:
         model = Client
-        fields = 'user', 'names', 'dni', 'birthdate', 'address', 'municipality', 'gender', 'is_active', 'frequent', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'
+        fields = 'user', 'names', 'dni', 'birthdate', 'address', 'municipality', 'gender', 'lat','lng','is_active', 'frequent', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'
         widgets = {
             # 'user': forms.Select(attrs={
             #     'class': 'custom-select select2',

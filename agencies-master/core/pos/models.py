@@ -260,6 +260,8 @@ class Client(models.Model):
     fri = models.BooleanField(verbose_name='Viernes', null=True, blank=True)
     sat = models.BooleanField(verbose_name='Sabados', null=True, blank=True)
     is_active = models.BooleanField(verbose_name='activo', default=True)
+    lat = models.CharField(max_length=20, null=True, blank=True)
+    lng = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
         return self.get_full_name()

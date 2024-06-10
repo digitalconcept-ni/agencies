@@ -1,6 +1,7 @@
 var tblProducts;
 var select_client, select_search_product;
 var tblSearchProducts;
+let coordClient = false;
 
 var sale = {
     details: {
@@ -158,6 +159,17 @@ $(function () {
         },
         placeholder: 'Ingrese un nombre',
         minimumInputLength: 1,
+    }).on('select2:select', function (e) {
+        var lat = e.params.data.lat;
+        if (lat != null || lat != undefined) {
+            coordClient = true
+            $("input[name='latitud']").val(' ')
+            $("input[name='longitud']").val(' ')
+        }else {
+            coordClient = false;
+        }
+
+        // select_search_product.val('').trigger('change.select2');
     });
 
     $('.btnAddClient').on('click', function () {
@@ -413,10 +425,17 @@ $(function () {
             return false;
         }
 
+        if (!coordClient) {
+            message_error('Favor de Geo localizar al cliente');
+            return false;
+        };
+
         var success_url = this.getAttribute('data-url');
         var parameters = new FormData(this);
         parameters.append('products', JSON.stringify(sale.details.products));
         parameters.append('products_review', JSON.stringify(sale.details.products_review));
+        parameters.append('lat', $('input[name="latitud"]').val());
+        parameters.append('lng', $('input[name="longitud"]').val());
         submit_with_ajax(pathname, 'Notificación',
             '¿Estas seguro de realizar la siguiente acción?', parameters, function (response) {
                 alert_action('Notificación', '¿Desea imprimir la factura de venta?', function () {

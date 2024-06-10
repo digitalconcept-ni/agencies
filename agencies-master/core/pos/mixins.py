@@ -73,7 +73,10 @@ class deviceVerificationMixin(object):
     def dispatch(self, request, *args, **kwargs):
         if request.user_agent.is_mobile:
             self.form_class = SaleMovilForm
-            self.template_name = 'sale/createmovil2.html'
+            # self.template_name = 'sale/createmovil2.html'
+            # se esta trabajando de esta manera mientras se
+            # agregan todos las georeferencias de lso clientes
+            self.template_name = 'map/load.html'
         else:
             self.form_class = SaleForm
             self.template_name = 'sale/create.html'

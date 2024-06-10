@@ -57,6 +57,7 @@ TENANT_APPS = [
     'core.reports',
     'core.homepage',
     'core.pos',
+    'core.gmaps',
     'core.security',
 ]
 

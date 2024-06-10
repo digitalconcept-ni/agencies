@@ -17,6 +17,12 @@
     <link href="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/css/tempusdominus-bootstrap.css' %}" rel="stylesheet"/>
 
     <script src="{% static 'sale/js/formmovil.js' %}"></script>
+
+    {# BLOQUE PARA CARGAR LOS ARCHIVOS DE LOS MAPAS #}
+
+    {% block map_library %}
+    {% endblock %}
+
 {% endblock %}
 
 {% block body_2 %}
@@ -76,10 +82,18 @@
                                href="#custom-tabs-four-payment" role="tab" aria-controls="custom-tabs-four-payment"
                                aria-selected="false">Forma de pago</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link " id="custom-tabs-four-profile-tab" data-toggle="pill"
+                               href="#custom-tabs-four-map" role="tab" aria-controls="custom-tabs-four-map"
+                               aria-selected="false">Mapa</a>
+                        </li>
                     </ul>
                 </div>
                 <div class="">
                     <div class="tab-content" id="custom-tabs-four-tabContent">
+
+                        {# TABLA DE FACTURACION #}
+
                         <div class="tab-pane fade active show" id="custom-tabs-four-detalle" role="tabpanel"
                              aria-labelledby="custom-tabs-four-detalle-tab">
                             {# ROW FOR THE TABLE INSERT PRODUCT #}
@@ -99,6 +113,9 @@
 
                             {# PARTE DEL DETALLE #}
                         </div>
+
+                        {# FORMA DE PAGO #}
+
                         <div class="tab-pane fade" id="custom-tabs-four-payment" role="tabpanel"
                              aria-labelledby="custom-tabs-four-payment-tab">
 
@@ -146,6 +163,19 @@
                                     </div>
                                 </div>
                             </div>
+
+
+                        </div>
+
+                        {# MAPS #}
+
+                        <div class="tab-pane fade" id="custom-tabs-four-map" role="tabpanel"
+                             aria-labelledby="custom-tabs-four-map-tab">
+
+
+                            {% block map_content %}
+
+                            {% endblock %}
 
 
                         </div>
