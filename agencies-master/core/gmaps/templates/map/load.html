@@ -2,7 +2,7 @@
 {% load static %}
 
 
-{% block map_library %}
+{% block map_library_not %}
     <!-- Script to load google maps dynamic mode -->
 
     <script>
@@ -46,22 +46,22 @@
         <div class="col-6">
             <div class="form-group">
                 <label for="latitud">Latitud:</label>
-                <input type="text" readonly id="latitud" name='latitud' class="form-control">
+                <input type="text" autocomplete="off" id="latitud" name='latitud' class="form-control">
             </div>
         </div>
         <div class="col-6">
             <div class="form-group">
                 <label for="longitud">Longitud:</label>
-                <input type="text" readonly id="longitud" name='longitud' class="form-control">
+                <input type="text" autocomplete="off" id="longitud" name='longitud' class="form-control">
             </div>
         </div>
     </div>
 
-    <div class="row" style="height: 35rem">
-        <div class="col-12">
-            <div id="map"></div>
-        </div>
-    </div>
+{#    <div class="row" style="height: 35rem">#}
+{#        <div class="col-12">#}
+{#            <div id="map"></div>#}
+{#        </div>#}
+{#    </div>#}
 
 
 {% endblock %}

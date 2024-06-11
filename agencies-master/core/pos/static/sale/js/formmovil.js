@@ -123,7 +123,7 @@ var sale = {
 };
 
 $(function () {
-    initMap();
+
 
     select_client = $('select[name="client"]');
     select_search_product = $('select[name="search_product"]');
@@ -418,6 +418,13 @@ $(function () {
         sale.calculateInvoice();
     })
 
+    $('input[name="latitud"]').on('change', function () {
+        coordClient = true;
+    })
+    $('input[name="longitud"]').on('change', function () {
+        coordClient = true;
+    })
+
     $('#frmSale').on('submit', function (e) {
         e.preventDefault();
 
@@ -427,6 +434,7 @@ $(function () {
         }
 
         if (!coordClient) {
+            console.log()
             message_error('Favor de Geo localizar al cliente');
             return false;
         };
