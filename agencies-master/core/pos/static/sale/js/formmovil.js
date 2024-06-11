@@ -123,6 +123,7 @@ var sale = {
 };
 
 $(function () {
+    initMap();
 
     select_client = $('select[name="client"]');
     select_search_product = $('select[name="search_product"]');

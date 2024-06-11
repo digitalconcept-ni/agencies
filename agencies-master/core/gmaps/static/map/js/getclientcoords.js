@@ -49,5 +49,5 @@ async function initMap() {
 
 }
 
-initMap();
+// initMap();
 // window.initMap = initMap;
