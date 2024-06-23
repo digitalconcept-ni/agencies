@@ -14,6 +14,15 @@ async function initMap() {
         center: {lat: userLat, lng: userLng},
         zoom: 18,
         mapId: 'e60eef08aec988f8',
+        mapTypeId:google.maps.MapTypeId.TERRAIN,
+        panControl: false,
+        zoomControl: true,
+        scaleControl: true,
+        mapTypeControl: false,
+        streetViewControl: false,
+        overviewMapControl: false,
+        rotateControl: true
+
     });
 
     // Create a marker to get customer's coordinate
@@ -49,5 +58,5 @@ async function initMap() {
 
 }
 
-// initMap();
+initMap();
 // window.initMap = initMap;

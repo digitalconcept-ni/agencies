@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>iPortfolio Bootstrap Template - Index</title>
+    <title>BISB - Invoice System</title>
     <meta content="" name="descriptison">
     <meta content="" name="keywords">
 
@@ -29,15 +29,14 @@
     <!-- Template Main CSS File -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
-    <!-- =======================================================
-    * Template Name: iPortfolio - v1.2.0
-    * Template URL: https://bootstrapmade.com/iportfolio-bootstrap-portfolio-websites-template/
-    * Author: BootstrapMade.com
-    * License: https://bootstrapmade.com/license/
-    ======================================================== -->
-</head>
+
+    {% block map_library %}
+
+    {% endblock %}
+
 
 <body>
+
 
 <!-- ======= Header ======= -->
 <header id="header">
@@ -83,6 +82,7 @@
     </div>
 </header><!-- End Header -->
 
+
 <!-- ======= Hero Section ======= -->
 <section id="hero" class="d-flex flex-column justify-content-center align-items-center">
     <div class="hero-container" data-aos="fade-in">
@@ -92,6 +92,10 @@
 </section><!-- End Hero -->
 
 <main id="main">
+
+    {% block map_content %}
+
+    {% endblock %}
 
     <!-- ======= About Section ======= -->
     <section id="about" class="about">

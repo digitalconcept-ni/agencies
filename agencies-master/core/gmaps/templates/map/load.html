@@ -1,8 +1,8 @@
-{% extends 'sale/createmovil2.html' %}
+{% extends 'index.html' %}
 {% load static %}
 
 
-{% block map_library_not %}
+{% block map_library %}
     <!-- Script to load google maps dynamic mode -->
 
     <script>
@@ -57,11 +57,11 @@
         </div>
     </div>
 
-{#    <div class="row" style="height: 35rem">#}
-{#        <div class="col-12">#}
-{#            <div id="map"></div>#}
-{#        </div>#}
-{#    </div>#}
+    <div class="row" style="height: 35rem">
+        <div class="col-12">
+            <div id="map"></div>
+        </div>
+    </div>
 
 
 {% endblock %}
