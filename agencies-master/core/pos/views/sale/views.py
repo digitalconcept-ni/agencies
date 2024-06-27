@@ -50,13 +50,13 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
 
             if param['startHour'] != '' and param['endHour'] != '':
                 endDay = True
-                query = Sale.objects.select_related().filter(Q(date_joined='2024-06-26') &
+                query = Sale.objects.select_related().filter(Q(date_joined=today) &
                                                              Q(time_joined__range=(
                                                              param['startHour'], param['endHour']))
                                                              & Q(user__presale=True))
             else:
                 endDay = False
-                query = Sale.objects.select_related().filter(Q(date_joined='2024-06-26') & Q(user__presale=True))
+                query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
 
             # query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
             querySales = query.filter(Q(user_id=id) & Q(endofday__exact=endDay))
@@ -138,7 +138,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 hours = [[[
                     f'{t.time_joined.hour}:{t.time_joined.minute}:{t.time_joined.second}.{t.time_joined.microsecond}'],
                     t.time_joined.strftime("%I:%M:%S %p")] for t
-                    in Sale.objects.filter(user__id=userId, date_joined='2024-06-26').order_by(
+                    in Sale.objects.filter(user__id=userId, date_joined=datetime.now().date()).order_by(
                         'time_joined')]
                 data = hours
             elif action == 'apply_credit':
