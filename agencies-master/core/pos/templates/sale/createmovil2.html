@@ -173,10 +173,22 @@
                              aria-labelledby="custom-tabs-four-map-tab">
 
 
-                            {% block map_content %}
-
-                            {% endblock %}
-
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="latitud">Latitud:</label>
+                                        <input type="text" autocomplete="off" id="latitud" name='latitud'
+                                               class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="longitud">Longitud:</label>
+                                        <input type="text" autocomplete="off" id="longitud" name='longitud'
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
 
                         </div>
                     </div>

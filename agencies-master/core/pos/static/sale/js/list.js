@@ -112,18 +112,65 @@ $(function () {
             }
         });
 
+
+    // variables que seleccionar los select donde pondremos las horas del preventa
+    let startHour = $('#selectRangeHourStart');
+    let endHour = $('#selectRangeHourEnd');
+
     $('#selectPreSales').on('change', function (e) {
-        if ($(this).val() !== '') {
-            $('#btnDonwloadGuide').removeClass('disabled');
+        let _this = $(this);
+
+        if (_this.val() !== '') {
+            var param = new FormData();
+            param.append('action', 'search_time');
+            param.append('id', _this.val());
+
+            $.ajax({
+                url: pathname,
+                data: param,
+                type: 'POST',
+                dataType: 'json',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                processData: false,
+                contentType: false,
+                success: function (request) {
+                    if (!request.hasOwnProperty('error')) {
+                        startHour.empty()
+                        endHour.empty()
+                        var opt = '';
+
+                        $.each(request, function (key, value) {
+                            opt += `<option value="${value[0]}">${value[1]}</option>`;
+                        });
+                        startHour.append(opt);
+                        endHour.append(opt);
+                        $('#btnDonwloadGuide').removeClass('disabled');
+                        return false;
+                    } else {
+                        message_error(request.error);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    message_error(errorThrown + ' ' + textStatus);
+                }
+            });
         } else {
             $('#btnDonwloadGuide').addClass('disabled');
         }
     })
 
     $('#btnDonwloadGuide').on('click', function (e) {
-        id = $('#selectPreSales').val()
+        id = $('#selectPreSales').val();
+        var param = new FormData();
+
+        if (startHour.val() !== endHour.val()) {
+            param.append('startHour', startHour.val());
+            param.append('endHour', endHour.val());
+        }
+
         if (id !== '') {
-            var param = new FormData();
             param.append('action', 'download_guides');
             param.append('session', $('#idSession').prop('checked'));
             param.append('id', id);
@@ -147,6 +194,7 @@ $(function () {
 
             });
         }
+
     })
 
     $('.drp-buttons').hide();

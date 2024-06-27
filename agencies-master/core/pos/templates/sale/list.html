@@ -60,9 +60,10 @@
         </div>
 
         {% if request.user.is_superuser == True %}
-            <div class="col-lg-6 col-md-12">
+            <div class="col-lg-4 col-md-12">
                 <label>Descarga de guía: </label>
 
+                {# checbox for maintence the session user active #}
                 <input type="checkbox" checked id="idSession" style="margin-left: 1.2rem">
                 <label>Mantener sesion: </label>
 
@@ -84,6 +85,30 @@
 
                     </div>
 
+                </div>
+
+            </div>
+
+            {# select for indicate donwload rangue per hours guide #}
+            <div class="col-lg-2 col-md-12">
+
+                <label for="selectRangeHourStart">Hora Inicial</label>
+                <div class="input-group">
+                    <select class="form-control" name="selectRangeHourStart" id="selectRangeHourStart">
+                        <option> --: --</option>
+
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="col-lg-2 col-md-12">
+
+                <label for="selectRangeHourEnd">Hora Final</label>
+                <div class="input-group">
+                    <select class="form-control" name="selectRangeHourEnd" id="selectRangeHourEnd">
+                        <option> --: --</option>
+                    </select>
                 </div>
 
             </div>

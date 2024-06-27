@@ -132,7 +132,6 @@ $(function () {
         theme: "bootstrap4",
         language: 'es'
     });
-
     // Supplier
 
     select_client.select2({
@@ -434,7 +433,6 @@ $(function () {
         }
 
         if (!coordClient) {
-            console.log()
             message_error('Favor de Geo localizar al cliente');
             return false;
         };
@@ -445,6 +443,7 @@ $(function () {
         parameters.append('products_review', JSON.stringify(sale.details.products_review));
         parameters.append('lat', $('input[name="latitud"]').val());
         parameters.append('lng', $('input[name="longitud"]').val());
+        parameters.append('coords', true);
         submit_with_ajax(pathname, 'Notificación',
             '¿Estas seguro de realizar la siguiente acción?', parameters, function (response) {
                 alert_action('Notificación', '¿Desea imprimir la factura de venta?', function () {

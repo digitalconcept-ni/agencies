@@ -48,8 +48,18 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             # today = '2023-09-08'
             id = int(param['id'])
 
-            query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
-            querySales = query.filter(Q(user_id=id) & Q(endofday__exact=False))
+            if param['startHour'] != '' and param['endHour'] != '':
+                endDay = True
+                query = Sale.objects.select_related().filter(Q(date_joined='2024-06-26') &
+                                                             Q(time_joined__range=(
+                                                             param['startHour'], param['endHour']))
+                                                             & Q(user__presale=True))
+            else:
+                endDay = False
+                query = Sale.objects.select_related().filter(Q(date_joined='2024-06-26') & Q(user__presale=True))
+
+            # query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
+            querySales = query.filter(Q(user_id=id) & Q(endofday__exact=endDay))
             # COLLECT ALL THE SALES FOR ESPESIFIC USER
             detailProducts = querySales.order_by('-saleproduct__product__category_id').values(
                 'saleproduct__product__category__name', 'saleproduct__product__code', 'saleproduct__product__name',
@@ -119,18 +129,47 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
         data = {}
         try:
             action = request.POST['action']
-            if action == 'apply_credit':
+
+            if action == 'search_time':
+                # Accion para saber las horas de la primer y ultima venta
+                # para la respectiva descarga de la guia
+                userId = request.POST['id']
+
+                hours = [[[
+                    f'{t.time_joined.hour}:{t.time_joined.minute}:{t.time_joined.second}.{t.time_joined.microsecond}'],
+                    t.time_joined.strftime("%I:%M:%S %p")] for t
+                    in Sale.objects.filter(user__id=userId, date_joined='2024-06-26').order_by(
+                        'time_joined')]
+                data = hours
+            elif action == 'apply_credit':
                 s = Sale.objects.get(id=request.POST['id'])
                 s.applied = True
                 s.save()
             elif action == 'download_guides':
                 data = []
+                print(request.POST)
+                if 'startHour' in request.POST and 'endHour' in request.POST:
+                    startHour = datetime.strptime(request.POST['startHour'], '%H:%M:%S.%f').time()
+                    endHour = datetime.strptime(request.POST['endHour'], '%H:%M:%S.%f').time()
+
+                    print('hay fehca')
+
+                    # q = Sale.objects.select_related().filter(
+                    #     Q(date_joined='2024-06-26') & Q(user_id=request.POST['id']) &
+                    #     Q(time_joined__range=(tStart, tEnd)))
+
+                else:
+                    print('No hay fehca')
+                    startHour = ''
+                    endHour = ''
                 param = {
                     'id': request.POST['id'],
                     'tenant': request.tenant.schema_name,
                     'user': request.user,
                     'uri': request.build_absolute_uri(),
                     'session': request.session,
+                    'startHour': startHour,
+                    'endHour': endHour,
                 }
                 path = self.guide(param)
                 data = path
@@ -252,11 +291,12 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
 
                         sale.calculate_invoice()
 
-                        # PARTE PARA GUARDAR LA GEOLOCALIZACION DEL CLIENTE
-                        if request.POST['lat'] != ' ' and request.POST['lng'] != ' ':
-                            sale.client.lat = request.POST['lat']
-                            sale.client.lng = request.POST['lng']
-                            sale.client.save()
+                        if request.POST['coords'] != 'false':
+                            # PARTE PARA GUARDAR LA GEOLOCALIZACION DEL CLIENTE
+                            if request.POST['lat'] != ' ' and request.POST['lng'] != ' ':
+                                sale.client.lat = request.POST['lat']
+                                sale.client.lng = request.POST['lng']
+                                sale.client.save()
                         data = {'id': sale.id}
             elif action == 'search_if_exits_client':
                 now = datetime.now()

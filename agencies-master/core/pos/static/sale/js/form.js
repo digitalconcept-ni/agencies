@@ -1,6 +1,8 @@
 var tblProducts;
 var select_client, select_search_product;
 var tblSearchProducts;
+let coordClient = false;
+
 
 var sale = {
     details: {
@@ -122,7 +124,7 @@ var sale = {
 
                 $(row).find('input[name="cant"]').TouchSpin({
                     min: 1,
-                    max: data.stock === 0 ?  data.cant : data.stock + data.cant,
+                    max: data.stock === 0 ? data.cant : data.stock + data.cant,
                     step: 1
                 });
 
@@ -174,7 +176,7 @@ $(function () {
     })
         .on('select2:select', function (e) {
             var data = e.params.data;
-            console.log(data.id)
+
             $.ajax({
                 url: window.location.pathname,
                 type: 'POST',
@@ -196,7 +198,16 @@ $(function () {
                             location.href = data.success_url;
                         }
                     });
+                } else {
+                    var lat = e.params.data.lat;
+                    console.log(lat)
+                    if (lat != null || lat != undefined) {
+                        coordClient = true;
+                    } else {
+                        coordClient = false;
+                    }
                 }
+
             })
         });
 
@@ -299,7 +310,7 @@ $(function () {
                 '</div>');
         },
     })
-        .on('select2:select', function (e) {    
+        .on('select2:select', function (e) {
             var data = e.params.data;
             if (!Number.isInteger(data.id)) {
                 return false;
@@ -469,10 +480,17 @@ $(function () {
             return false;
         }
 
+        if (!coordClient) {
+            message_error('Favor de Geo localizar al cliente');
+            return false;
+        }
+        ;
+
         var success_url = this.getAttribute('data-url');
         var parameters = new FormData(this);
         parameters.append('products', JSON.stringify(sale.details.products));
         parameters.append('products_review', JSON.stringify(sale.details.products_review));
+        parameters.append('coords', false);
         submit_with_ajax(pathname, 'Notificación',
             '¿Estas seguro de realizar la siguiente acción?', parameters, function (response) {
                 alert_action('Notificación', '¿Desea imprimir la factura de venta?', function () {
