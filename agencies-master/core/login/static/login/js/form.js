@@ -2,8 +2,8 @@ $(function () {
 
     const options = {
         enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
+        timeout: 30000,
+        maximumAge: 27000
     };
 
     const success = (pos) => {
