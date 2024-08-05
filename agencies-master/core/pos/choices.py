@@ -5,6 +5,12 @@ personalized_invoice = {
     'di': 1
 }
 
+printer = (
+    ('standard', 'Standard'),
+    ('80', '80mm'),
+    ('58', '58mm'),
+)
+
 genders = (
     ('male', 'Masculino'),
     ('female', 'Femenino'),
