@@ -1,0 +1,85 @@
+@page {
+    size: 80mm 1122pt;
+    margin: 0;
+    padding: 0;
+
+}
+
+.page {
+    background: grey;
+    width: 100%;
+    height: auto;
+    position: relative;
+}
+
+.content {
+    width: 80mm;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0.3cm;
+    page-break-inside: avoid !important;
+}
+
+
+.name-company {
+    font-size: 18px;
+    padding: 0;
+    margin: auto;
+    width: 90%;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center !important;
+}
+
+/*.img-logo {
+    margin-top: 10px;
+    width: 75px;
+    height: 75px;
+    margin-bottom: 10px;
+{*/
+
+body {
+    width: 80mm;
+    max-width: 100%;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.no-page-break {
+    page-break-inside: avoid !important;
+}
+
+.comprobante {
+    width: 95%;
+    margin: auto;
+
+}
+
+.comprobante table {
+    width: 90%;
+    margin: 0 auto;
+    height: auto;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 2px;
+    text-align: center;
+    border-bottom: 1px solid black;
+}
+
+.txt-info {
+    padding: 0 1rem;
+    margin: 0.5rem 0;
+}
+
+.txt-info-invoice {
+    padding: 0 1rem;
+    margin: 0.5rem 0;
+    text-align: right;
+}
+

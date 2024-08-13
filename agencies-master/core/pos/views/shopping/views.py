@@ -107,39 +107,39 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
             elif action == 'add':
                 with transaction.atomic():
                     products = json.loads(request.POST['products'])
-                    print(products)
-                    # shopping = Shopping()
-                    # shopping.supplier_id = int(request.POST['supplier'])
-                    # shopping.user_id = request.POST['user_id']
-                    # shopping.invoice_number = request.POST['invoice_number']
-                    # shopping.date_joined = request.POST['date_joined']
-                    # shopping.iva = float(request.POST['iva'])
-                    # shopping.save()
-                    #
-                    # cantItemsShopping = 0
+                    shopping = Shopping()
+                    shopping.supplier_id = int(request.POST['supplier'])
+                    shopping.user_id = request.POST['user_id']
+                    shopping.invoice_number = request.POST['invoice_number']
+                    shopping.date_joined = request.POST['date_joined']
+                    shopping.iva = float(request.POST['iva'])
+                    shopping.save()
+
+                    cantItemsShopping = 0
                     for i in products:
-                        print(i)
-                        print(i['expiration'])
-                    #     detail = ShoppingDetail()
-                    #     detail.shopping_id = shopping.id
-                    #     detail.product_id = int(i['id'])
-                    #     detail.cant = int(i['cant'])
-                    #     detail.price = float(i['pvp'])
-                    #     detail.subtotal = detail.cant * detail.price
-                    #     detail.save()
-                    #     if not detail.product.is_inventoried:
-                    #         detail.product.is_inventoried = True
-                    #     if detail.product.is_inventoried:
-                    #         detail.product.stock += detail.cant
-                    #         detail.product.cost = float(i['cost'])
-                    #         detail.product.pvp = float(i['pvp'])
-                    #         detail.product.save()
-                    #     cantItemsShopping += 1
-                    #
-                    # shopping.cant = + int(cantItemsShopping)
-                    # shopping.save()
-                    # shopping.calculate_invoice()
-                    # data = {'id': shopping.id}
+                        # print(i)
+                        # print(i['expiration'])
+                        detail = ShoppingDetail()
+                        detail.shopping_id = shopping.id
+                        detail.product_id = int(i['id'])
+                        detail.cant = int(i['cant'])
+                        detail.price = float(i['cost'])
+                        detail.subtotal = detail.cant * detail.price
+                        detail.save()
+                        if not detail.product.is_inventoried:
+                            detail.product.is_inventoried = True
+                        if detail.product.is_inventoried:
+                            detail.product.stock += detail.cant
+                            detail.product.cost = float(i['cost'])
+                            detail.product.pvp = float(i['pvp'])
+                            detail.product.expiration = i['expiration']
+                            detail.product.save()
+                        cantItemsShopping += 1
+
+                    shopping.cant = + int(cantItemsShopping)
+                    shopping.save()
+                    shopping.calculate_invoice()
+                    data = {'id': shopping.id}
             elif action == 'search_supplier':
                 data = []
                 term = request.POST['term']
@@ -250,7 +250,7 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
                         detail.shopping_id = shopping.id
                         detail.product_id = int(p['id'])
                         detail.cant = int(p['cant'])
-                        detail.price = float(p['pvp'])
+                        detail.price = float(p['cost'])
                         detail.subtotal = detail.cant * detail.price
                         detail.save()
                         if detail.product.is_inventoried:
@@ -260,11 +260,13 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
                                                        p['cant']
                                 detail.product.cost = float(p['cost'])
                                 detail.product.pvp = float(p['pvp'])
+                                detail.product.expiration = p['expiration']
                                 detail.product.save()
                             else:
                                 detail.product.stock += p['cant']
                                 detail.product.cost = float(p['cost'])
                                 detail.product.pvp = float(p['pvp'])
+                                detail.product.expiration = p['expiration']
                                 detail.product.save()
                         listProductId.append(p['id'])
                         cantItemsShopping += 1

@@ -88,9 +88,10 @@
                                 </div>
 
                                 <div class="col-md-12 col-lg-6">
+                                    <label for="selectPreSales2">Selecciona el preventa: </label>
                                     <div class="input-group mb-3">
                                         <select name="idPreSeles2" id="selectPreSales2" class="form-control">
-                                            <option value="">Selecciona el preventa</option>
+                                            <option value="">Selecciona el usuario</option>
                                             <option value="all">Todos</option>
                                             {% for u in pre_sales %}
                                                 <option value="{{ u.id }}">{{ u.username }}</option>

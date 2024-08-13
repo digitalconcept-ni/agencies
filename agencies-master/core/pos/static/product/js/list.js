@@ -57,7 +57,7 @@ var product = {
         let data = {
             'data': {'action': 'search'},
             'inserInto': 'rowList',
-            'th': ['Nro', 'Marca', 'Nombre', 'Vencimiento', 'Impuesto', '¿Es inventariado?', 'Stock', 'Costo', 'Precio venta', 'Opciones'],
+            'th': ['Nro', 'Categoría', 'Nombre', 'Vencimiento', 'Impuesto', '¿Es inventariado?', 'Stock', 'Costo', 'Precio venta', 'Opciones'],
             'table': 'tableList',
             'config': product.config,
             'modal': false,

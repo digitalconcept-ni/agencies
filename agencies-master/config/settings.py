@@ -57,8 +57,9 @@ TENANT_APPS = [
     'core.reports',
     'core.homepage',
     'core.pos',
-    'core.gmaps',
+    'core.maps',
     'core.security',
+    'core.processes',
 ]
 
 TENANT_MODEL = "client.Client"  # app.Model
@@ -81,6 +82,7 @@ LOCAL_APPS = [
     'core.homepage',
     'core.pos',
     'core.security',
+    'client',
 ]
 
 THIRD_PARTY_APPS = [
@@ -227,8 +229,12 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
 
+# NOMBRE DE LA SESSION DEL SISTEMA
+SESSION_COOKIE_NAME = 'bisb'
+
 # VARIABLE PARA CONTROLAR EL TIEMPO DE SESSION ACTIVA DIARIO EM SEGUNDOS
 SESSION_COOKIE_AGE = 28800
+
 
 # VARIABLE PARA INDICAR QUE CUANDO SE CIERRE EL NAVEGADOR SE CIERRE LA SESSION
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True

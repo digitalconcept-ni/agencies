@@ -21,6 +21,8 @@ from config import settings
 from core.homepage.views import IndexView
 from django.conf.urls import handler404
 from core.pos.views.dashboard.views import page_not_found404
+from core.processes.views.specifications.views import QRcodeView
+
 # from rest_framework.authtoken import views
 
 urlpatterns = [
@@ -31,6 +33,11 @@ urlpatterns = [
     path('reports/', include('core.reports.urls')),
     path('user/', include('core.user.urls')),
     path('security/', include('core.security.urls')),
+    path('map/', include('core.maps.urls')),
+    path('processes/', include('core.processes.urls')),
+
+    # QRcode
+    path('qrspecifications/<int:pk>/', QRcodeView.as_view(), name='qrcode_view'),
     # path('api/', include('core.api.urls')),
     # path('api-token-auth/', views.obtain_auth_token)
 ]

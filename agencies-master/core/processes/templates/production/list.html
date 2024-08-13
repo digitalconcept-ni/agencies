@@ -1,0 +1,107 @@
+{% extends 'list.html' %}
+{% load static %}
+{% block head_list %}
+    <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/spanish.js' %}"></script>
+    <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/daterangepicker.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'lib/bootstrap-daterangepicker-3.1/css/daterangepicker.css' %}"/>
+    <script src="{% static 'production/js/list.js' %}"></script>
+
+    {#    LIbreria para agregar el touchspin a los inpust al cambiar el status  #}
+    <link href="{% static 'lib/bootstrap-touchspin-4.2.5/css/jquery.bootstrap-touchspin.css' %}" rel="stylesheet"/>
+    <script src="{% static 'lib/bootstrap-touchspin-4.2.5/js/jquery.bootstrap-touchspin.js' %}"></script>
+{% endblock %}
+
+{% block content_list_before %}
+    <div class="row">
+        <div class="col-lg-4 col-md-12">
+
+            <div class="form-group">
+                <label>Rangos de fechas:</label>
+                <div class="input-group mb-3">
+                    {{ form.date_range }}
+                    <div class="input-group-append ">
+                        <button class="btn btn-success btnSearch" type="button">
+                            <i class="fas fa-calendar-check"></i> Buscar
+                        </button>
+                        <button class="btn btn-warning btnSearchAll" type="button">
+                            <i class="fas fa-calendar-check"></i> todas
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <hr>
+{% endblock %}
+
+{% block javascript %}
+    {#    modal para ver el detalle de la porduccion y tambien modificar el status #}
+    <div class="modal fade" id="myModalProducts" tabindex="-1" role="dialog" aria-hidden="true">
+        {#        <form id="frmProductStatus" enctype="multipart/form-data" method="post">#}
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <b><i class="fas fa-search"></i> Detalle de producción</b>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-sm" id="tblProducts">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Categoria</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnFinallyProduction" style="display: none" class="btn btn-dark">Finalizar proceso
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Modal para presentar la lista de facturas de matenia prima #}
+    <div class="modal fade" id="modalRawMaterials" tabindex="-1" role="dialog" aria-hidden="true">
+        {#        <form id="frmProductStatus" enctype="multipart/form-data" method="post">#}
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <b><i class="fas fa-search"></i> Detalle de materia prima</b>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-sm" id="tblRowMaterials">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Numero de Factura</th>
+                            <th>Proveedor</th>
+                            <th>total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

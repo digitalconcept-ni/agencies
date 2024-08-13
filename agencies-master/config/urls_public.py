@@ -31,6 +31,7 @@ urlpatterns = [
     path('reports/', include('core.reports.urls')),
     path('user/', include('core.user.urls')),
     path('security/', include('core.security.urls')),
+    path('map/', include('core.maps.urls')),
     # path('api/', include('core.api.urls')),
     # path('api-token-auth/', views.obtain_auth_token)
 ]

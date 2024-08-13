@@ -69,6 +69,30 @@
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-city"></i>
+                        <p>
+                            Operaciones
+                        </p>
+                        <i class="fas fa-angle-left right"></i>
+
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'production_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Producción</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'specifications_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Especificaciones</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
                         <p>
                             Clientes
@@ -91,6 +115,7 @@
                         </li>
                     </ul>
                 </li>
+
                 <li class="nav-item">
                     <a href="{% url 'sale_list' %}" class="nav-link">
                         <i class="nav-icon fas fa-money-bill-alt"></i>

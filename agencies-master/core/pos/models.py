@@ -6,8 +6,41 @@ from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 
 from config import settings
-from core.pos.choices import genders, payment, municipality, tax_type, random_code
+from core.pos.choices import genders, payment, municipality, tax_type, random_code, printer
 from core.user.models import User
+
+
+class Company(models.Model):
+    name = models.CharField(max_length=150, verbose_name='Razón Social')
+    ruc = models.CharField(max_length=14, verbose_name='Ruc')
+    address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')
+    mobile = models.CharField(max_length=8, verbose_name='Teléfono Celular')
+    phone = models.CharField(max_length=8, verbose_name='Teléfono Convencional')
+    website = models.CharField(max_length=60, verbose_name='Website')
+    image = models.ImageField(upload_to='company/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
+    printer = models.CharField(choices=printer, max_length=10, null=True, blank=True, verbose_name='Tipo de impresora')
+
+    def __str__(self):
+        return self.name
+
+    def get_image(self):
+        if self.image:
+            return f'{settings.MEDIA_URL}{self.image}'
+        return f'{settings.STATIC_URL}img/empty.png'
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['image'] = self.get_image()
+        return item
+
+    class Meta:
+        verbose_name = 'Compañia'
+        verbose_name_plural = 'Compañias'
+        default_permissions = ()
+        permissions = (
+            ('change_company', 'Can change Company'),
+        )
+        ordering = ['id']
 
 
 class Category(models.Model):
@@ -113,7 +146,7 @@ class Product(models.Model):
         # return sum([payment.amount for payment in self.objects.all()])
         s = self.objects.all().aggregate(
             result=Sum(F('cost'), 0.00, output_field=FloatField())).get('result')
-        return
+        return s
 
     def toLIST(self):
         if self.brand is None:
@@ -125,12 +158,13 @@ class Product(models.Model):
         else:
             ex = self.expiration.strftime('%Y-%m-%d')
         data = [
-            self.id, brand, self.__str__(), ex, self.tax,
+            self.id, self.category.name, self.__str__(), ex, self.tax,
             self.is_inventoried, self.stock, f'{self.cost:.2f}', f'{self.pvp:.2f}', self.id
         ]
         return data
 
     def toJSON(self):
+
         if self.brand is None:
             brand = 1
         else:
@@ -140,6 +174,8 @@ class Product(models.Model):
         else:
             ex = self.expiration.strftime('%Y-%m-%d')
         item = model_to_dict(self)
+        if self.category:
+            item['category'] = self.category.toJSON()
         item['full_name'] = self.__str__()
         item['expiration'] = ex
         item['brand'] = brand
@@ -174,6 +210,10 @@ class Shopping(models.Model):
     iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total_iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.invoice_number} - {self.supplier.name}'
 
     def get_number(self):
         return f'{self.id:06d}'
@@ -333,38 +373,6 @@ class Assets(models.Model):
         verbose_name = 'Activos'
         verbose_name_plural = 'Activos'
         ordering = ['-date_joined']
-
-
-class Company(models.Model):
-    name = models.CharField(max_length=150, verbose_name='Razón Social')
-    ruc = models.CharField(max_length=14, verbose_name='Ruc')
-    address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')
-    mobile = models.CharField(max_length=8, verbose_name='Teléfono Celular')
-    phone = models.CharField(max_length=8, verbose_name='Teléfono Convencional')
-    website = models.CharField(max_length=60, verbose_name='Website')
-    image = models.ImageField(upload_to='company/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
-
-    def __str__(self):
-        return self.name
-
-    def get_image(self):
-        if self.image:
-            return f'{settings.MEDIA_URL}{self.image}'
-        return f'{settings.STATIC_URL}img/empty.png'
-
-    def toJSON(self):
-        item = model_to_dict(self)
-        item['image'] = self.get_image()
-        return item
-
-    class Meta:
-        verbose_name = 'Compañia'
-        verbose_name_plural = 'Compañias'
-        default_permissions = ()
-        permissions = (
-            ('change_company', 'Can change Company'),
-        )
-        ordering = ['id']
 
 
 class Sale(models.Model):

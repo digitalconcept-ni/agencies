@@ -52,7 +52,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 endDay = True
                 query = Sale.objects.select_related().filter(Q(date_joined=today) &
                                                              Q(time_joined__range=(
-                                                             param['startHour'], param['endHour']))
+                                                                 param['startHour'], param['endHour']))
                                                              & Q(user__presale=True))
             else:
                 endDay = False
@@ -523,6 +523,8 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
             templateName = tenantName + '.html'
 
             sale = Sale.objects.get(pk=self.kwargs['pk'])
+            countSales = sale.saleproduct_set.all().count()
+            printer = sale.company.printer
 
             if tenantName in personalized_invoice:
                 template = get_template('sale/' + templateName)
@@ -531,18 +533,30 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
                 jump = (lines - saleLines) + 1
                 listJump = [i for i in range(jump)]
             else:
-                template = get_template('sale/invoice.html')
                 listJump = []
+                if printer == '80':
+                    template = get_template(f'sale/invoice{printer}mm.html')
+                elif printer == '58':
+                    template = get_template(f'sale/invoice{printer}mm.html')
+                else:
+                    template = get_template('sale/invoice.html')
             context = {
                 'sale': sale,
                 'icon': f'{settings.MEDIA_URL}logo.png',
                 'jump': listJump,
+                'h': 150 + (countSales * 14)
             }
 
             html = template.render(context)
             css_url = os.path.join(settings.BASE_DIR, 'static/lib/bootstrap-4.6.0/css/bootstrap.min.css')
-            pdf = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[CSS(css_url)])
-            return HttpResponse(pdf, content_type='application/pdf')
+
+            if printer == '80' or printer == '58':
+                # Linea de codigo para imprimir en 80mm y 58mm
+                pdf = HTML(string=html, base_url=request.build_absolute_uri())
+                result = pdf.write_pdf(encoding='utf-8')
+            else:
+                result = HTML(string=html, base_url=request.build_absolute_uri()).write_pdf(stylesheets=[CSS(css_url)])
+            return HttpResponse(result, content_type='application/pdf')
         except Exception as e:
             print(e)
         return HttpResponseRedirect(reverse_lazy('sale_list'))
