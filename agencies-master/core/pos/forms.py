@@ -110,7 +110,7 @@ class ClientForm(ModelForm):
 
     class Meta:
         model = Client
-        fields = 'user', 'names', 'dni', 'birthdate', 'address', 'municipality', 'gender', 'lat','lng','is_active', 'frequent', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'
+        fields = 'user', 'names', 'dni', 'birthdate', 'address', 'municipality', 'gender', 'lat', 'lng', 'is_active', 'frequent', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'
         widgets = {
             # 'user': forms.Select(attrs={
             #     'class': 'custom-select select2',
@@ -254,8 +254,7 @@ class SaleForm(ModelForm):
                 'id': 'date_joined',
                 'data-target': '#date_joined',
                 'data-toggle': 'datetimepicker',
-            }
-            ),
+            }),
             # 'iva': forms.TextInput(attrs={
             #     'class': 'form-control',
             # }),
@@ -390,6 +389,7 @@ class CompanyForm(ModelForm):
             'mobile': forms.TextInput(attrs={'placeholder': 'Ingrese un teléfono celular'}),
             'phone': forms.TextInput(attrs={'placeholder': 'Ingrese un teléfono convencional'}),
             'website': forms.TextInput(attrs={'placeholder': 'Ingrese una dirección web'}),
+            'printer': forms.Select(attrs={'class': 'custom-select select2', }),
         }
 
     def save(self, commit=True):
