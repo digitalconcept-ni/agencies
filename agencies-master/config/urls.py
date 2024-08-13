@@ -33,7 +33,7 @@ urlpatterns = [
     path('reports/', include('core.reports.urls')),
     path('user/', include('core.user.urls')),
     path('security/', include('core.security.urls')),
-    path('map/', include('core.maps.urls')),
+    # path('map/', include('core.maps.urls')),
     path('processes/', include('core.processes.urls')),
 
     # QRcode
