@@ -1,4 +1,4 @@
-var category = {
+var specifications = {
     config: [
         {
             targets: [1, 2, 3, 4, 5, 6],
@@ -14,8 +14,8 @@ var category = {
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                var button = '<a href="' + row[2] + '" target="_blank" type="button" class="btn btn-danger" ><i class="fas fa-file-pdf"></i></a>';
-                if (row.archivo === 'No insertado') {
+                var button = '<a href="' + row[3] + '" target="_blank" type="button" class="btn btn-danger" ><i class="fas fa-file-pdf"></i></a>';
+                if (row[3] === 'No insertado') {
                     var button = '<a href="#" type="button" class="btn btn-danger disabled"><i class="far fa-file-pdf"></i></a>'
                     return button
                 }
@@ -27,9 +27,9 @@ var category = {
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                var buttons = '<a rel="QRcode" type="button" class="btn btn-dark btn-xs btn-flat mr-1"><i class="fas fa-qrcode"></i></a>';
-                buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
-                buttons += '<a rel="delete" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                var buttons = `<a rel="QRcode" type="button" class="btn btn-dark btn-xs btn-flat mr-1"><i class="fas fa-qrcode"></i></a>`
+                buttons += `<a href="${pathname}update/${row[0]}/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a>`
+                buttons += `<a rel="delete" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>`
                 return buttons;
             }
         },
@@ -49,7 +49,7 @@ var category = {
 };
 
 $(function () {
-    category.list();
+    specifications.list();
 
     // Optenemos el contenedor del QR
     // que se encuentra en el modal
@@ -58,12 +58,9 @@ $(function () {
     const QR = new QRCode(contenedorQR);
 
     $('#tableList tbody')
-        .off()
         .on('click', 'a[rel="QRcode"]', function () {
             var tr = tableData.cell($(this).closest('td, li')).index();
             var data = tableData.row(tr.row).data();
-
-            alert(data)
 
             // makeCode utilizafa para generar un nueov qr con los valores que requerimos
             QR.makeCode(`${window.origin}/qrspecifications/${data[1]}`);

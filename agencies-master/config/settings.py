@@ -13,16 +13,23 @@ import os.path
 
 from pathlib import Path
 
+import environ
+
 from config import db
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# initialize enviroment variables
+env = environ.Env()
+# Read the document environ
+environ.Env.read_env(os.path.join(BASE_DIR, '.env.prod'))
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '+-q801b67uu&j)5jt*tc)7d#58^(r2pvacn=mxm12khm^)1p2u'
+SECRET_KEY = env.str('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -135,7 +142,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Databasex
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = db.TENANT_SERVER
+DATABASES = {
+    'default': env.db(engine='django_tenants.postgresql_backend'),
+}
 
 DATABASE_ROUTERS = (
     'django_tenants.routers.TenantSyncRouter',
@@ -163,7 +172,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'America/Managua'
+TIME_ZONE = env.str('TIME_ZONE')
 
 USE_I18N = True
 
@@ -196,9 +205,9 @@ LOGIN_URL = '/login/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # TENANT MEDIA
-MULTITENANT_RELATIVE_MEDIA_ROOT = "%s/other_dir"
+# MULTITENANT_RELATIVE_MEDIA_ROOT = "%s/other_dir"
 
-MEDIA_URL = '/media/'
+# MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'user.User'
 
@@ -206,10 +215,10 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # Email configuration
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'desarrollo.digitalconcept@gmail.com'
-EMAIL_HOST_PASSWORD = 'yvozkwpvhfeltgph'
+EMAIL_HOST = env.str('EMAIL_HOST')
+EMAIL_PORT = env.int('EMAIL_PORT')
+EMAIL_HOST_USER = env.str('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD')
 
 # django rest framework
 
@@ -235,11 +244,37 @@ SESSION_COOKIE_NAME = 'bisb'
 # VARIABLE PARA CONTROLAR EL TIEMPO DE SESSION ACTIVA DIARIO EM SEGUNDOS
 SESSION_COOKIE_AGE = 28800
 
-# VARIABLE PARA CONTROLAR LA CARGA DE LOS ARCHIVOS
-DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880 # 5 MB
+# CONFIGURE STORAGE OBJECTS
 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880 # 5 MB
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# MEDIA_URL = f'https://bisb.s3.amazonaws.com/media/'
 
+AWS_ACCESS_KEY_ID = env.str('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env.str('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = env.str('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = env.str('AWS_S3_REGION_NAME')
+AWS_QUERYSTRING_AUTH = env('AWS_QUERYSTRING_AUTH')
+AWS_S3_SIGNATURE_NAME = env.str('AWS_S3_SIGNATURE_NAME')
+AWS_S3_FILE_OVERWRITE = env('AWS_S3_FILE_OVERWRITE')
+AWS_DEFAULT_ACL = env('AWS_DEFAULT_ACL')
+AWS_S3_VERITY = env('AWS_S3_VERITY')
+
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_LOCATION = 'media'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # VARIABLE PARA INDICAR QUE CUANDO SE CIERRE EL NAVEGADOR SE CIERRE LA SESSION
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True

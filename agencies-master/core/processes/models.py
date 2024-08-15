@@ -95,7 +95,7 @@ class detail_production(models.Model):
 
 class specifications(models.Model):
     production = models.ForeignKey(production, on_delete=models.CASCADE)
-    health_certificate = models.FileField(upload_to='pdf/healthCertificate/%Y/%m/%d', null=True, blank=True,
+    health_certificate = models.FileField(upload_to='healthCertificate', null=True, blank=True,
                                           verbose_name='Certificado sanitario')
     characteristics = models.CharField(max_length=30, verbose_name='Características')
     chemical_analysis = models.CharField(max_length=30, verbose_name='Análisis químico')

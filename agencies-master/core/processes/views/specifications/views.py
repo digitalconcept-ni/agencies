@@ -19,11 +19,12 @@ class SpecificationsListView(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'search':
                 data = [i.toLIST() for i in specifications.objects.select_related()]
+                print(data)
                 # for i in Category.objects.all():
                 #     data.append(i.toJSON())
-            # elif action == 'delete':
-            #     cat = Category.objects.get(id=request.POST['id'])
-            #     cat.delete()
+            elif action == 'delete':
+                cat = specifications.objects.get(id=request.POST['id'])
+                cat.delete()
             else:
                 data['error'] = 'Ha ocurrido un error con el action'
         except Exception as e:
@@ -53,7 +54,11 @@ class SpecificationsCreateView(ValidatePermissionRequiredMixin, CreateView):
             action = request.POST['action']
             if action == 'add':
                 form = self.get_form()
-                data = form.save()
+                if form.is_valid():
+                    form.save()
+                    data['message'] = 'Especificación creada con éxito'
+                else:
+                    data['error'] = form.errors
             else:
                 data['error'] = 'No ha ingresado a ninguna opción'
         except Exception as e:
