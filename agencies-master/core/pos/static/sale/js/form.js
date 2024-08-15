@@ -137,6 +137,7 @@ var sale = {
 };
 
 $(function () {
+    var action = $('input[name="action"]').val();
 
     select_client = $('select[name="client"]');
     select_search_product = $('select[name="search_product"]');
@@ -480,11 +481,13 @@ $(function () {
             return false;
         }
 
-        if (!coordClient) {
-            message_error('Favor de Geo localizar al cliente');
-            return false;
+        if (action == 'add') {
+            if (!coordClient) {
+                message_error('Favor de Geo localizar al cliente');
+                return false;
+            }
         }
-        ;
+
 
         var success_url = this.getAttribute('data-url');
         var parameters = new FormData(this);
