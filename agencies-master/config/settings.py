@@ -143,6 +143,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Databasex
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+
+# DATABASES = db.TENANT
 DATABASES = {
     'default': env.db(engine='django_tenants.postgresql_backend'),
 }
