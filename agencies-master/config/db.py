@@ -30,7 +30,8 @@ TENANT = {
         'PASSWORD': '00Dascher',
         'HOST': 'localhost',
         'PORT': '5432',
-    }}
+    }
+}
 
 # mysqlclient
 
