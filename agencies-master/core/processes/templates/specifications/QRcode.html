@@ -4,6 +4,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <link rel="icon" href="{% static 'img/BISB-LOGO.png' %}" type="image/png"/>
     <title>{{ title }}</title>
 
     <!-- Font Awesome Icons -->
@@ -19,57 +22,47 @@
     <script src="{% static 'lib/bootstrap-4.6.0/js/bootstrap.min.js' %}"></script>
     <!-- AdminLTE App -->
     <script src="{% static 'lib/adminlte-3.2.0/js/adminlte.min.js' %}"></script>
-    <!-- Sweetalert2 -->
-    <script src="{% static 'lib/sweetalert2-11.0.16/sweetalert2.all.min.js' %}"></script>
-    <!-- Jquery Confirm -->
-    <link rel="stylesheet" href="{% static 'lib/jquery-confirm-3.3.4/jquery-confirm.min.css' %}">
-    <script src="{% static 'lib/jquery-confirm-3.3.4/jquery-confirm.min.js' %}"></script>
-    <!-- Moment -->
-    <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/moment.min.js' %}"></script>
-    <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/moment-with-locales.js' %}"></script>
 
 </head>
 <body>
 
 <div class="container mt-5">
-    <div class="col">
-        <div class="card card-default">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-bullhorn"></i>
-                    {{ title }}
-                </h3>
-            </div>
+    <div class="card card-default">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-bullhorn"></i>
+                {{ title }}
+            </h3>
+        </div>
 
-            <div class="card-body">
-                <div class="row">
-                    {% for k, v in query.items %}
-                        <div class="col-3">
+        <div class="card-body">
+            <div class="row">
+                {% for k, v in query.items %}
+                    <div class="col-md-6">
 
-                            <div class="callout callout-info">
-                                <h5>{{ k }}</h5>
-                                {% if k == 'Health certificate' %}
-                                    <a href="{{ v }}" target="_blank" type="button"
-                                       class="btn btn-info btn-sm btn-flat" style="color: white">
-                                        <i class="fas fa-file-pdf"></i></a>
-                                {% elif k == 'Product' %}
-                                    {% for foo in v %}
-                                        {{ foo.product.name }}
+                        <div class="callout callout-info">
+                            <h5>{{ k }}</h5>
+                            {% if k == 'Health certificate' %}
+                                <a href="{{ v }}" target="_blank" type="button"
+                                   class="btn btn-info btn-sm btn-flat" style="color: white">
+                                    <i class="fas fa-file-pdf"></i></a>
+                            {% elif k == 'Product' %}
+                                {% for foo in v %}
+                                    {{ foo.product.name }}
 
-                                    {% endfor %}
+                                {% endfor %}
 
-                                {% else %}
-                                    <p>{{ v }}</p>
-                                {% endif %}
-                            </div>
+                            {% else %}
+                                <p>{{ v }}</p>
+                            {% endif %}
                         </div>
-                    {% endfor %}
-                </div>
-
-
+                    </div>
+                {% endfor %}
             </div>
+
 
         </div>
+
     </div>
 
 </div>
