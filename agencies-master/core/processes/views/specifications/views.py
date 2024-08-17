@@ -274,12 +274,13 @@ class QRcodeView(TemplateView):
                 'Production Date': i.production.date_joined.strftime('%d %b %Y'),
                 'Characteristics': i.characteristics,
                 'Chemical analysis': i.chemical_analysis,
-                'Health certificate': i.health_certificate,
+                'Health certificate': i.get_file()
             }
         return data
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Specification Viewer'
+        context['pk'] = self.kwargs['pk']
         context['query'] = self.get_information_view(self.kwargs['pk'])
         return context

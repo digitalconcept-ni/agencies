@@ -99,6 +99,7 @@ class specifications(models.Model):
                                           verbose_name='Certificado sanitario')
     characteristics = models.CharField(max_length=30, verbose_name='Características')
     chemical_analysis = models.CharField(max_length=30, verbose_name='Análisis químico')
+
     # Quitar esta parte y se agregra en caracteristicas
     # purity = models.CharField(max_length=15, verbose_name='% de pureza')
     # humidity = models.DecimalField(default=0.00, max_digits=5, decimal_places=2, verbose_name='% humedad')
@@ -111,8 +112,19 @@ class specifications(models.Model):
             return '{}{}'.format(settings.MEDIA_URL, self.health_certificate)
         return 'No insertado'
 
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['Lot number'] = self.production.id
+        item['Product'] = self.production.detail_production_set.filter(product__category__name='PF')
+        item['Production Date'] = self.production.date_joined.strftime('%d %b %Y')
+        item['Characteristics'] = self.characteristics
+        item['Chemical analysis'] = self.chemical_analysis
+        item['Health certificate'] = self.get_file()
+        return item
+
     def toLIST(self):
-        data = [self.id, self.production.id, self.production.date_joined, self.get_file(), self.characteristics, self.chemical_analysis, self.id]
+        data = [self.id, self.production.id, self.production.date_joined, self.get_file(), self.characteristics,
+                self.chemical_analysis, self.id]
         return data
 
     class Meta:
