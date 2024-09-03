@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.views.generic import FormView, CreateView, UpdateView
 
 from core.pos.mixins import ExistsCompanyMixin, ValidatePermissionRequiredMixin
-from core.pos.models import Product, Shopping
+from core.pos.models import Product, Shopping, ShoppingDetail
 from core.processes.forms import ProductionForm
 from core.processes.models import production, detail_production, ProductionShopping
 from core.reports.forms import ReportForm
@@ -32,7 +32,6 @@ class ProductionListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Fo
             else:
                 # Si no existe el valor en el diccionario
                 valores_por_clave[i['category']] = i['cant']
-        print(valores_por_clave)
 
         SP = valores_por_clave['SP']
         PF = valores_por_clave['PF']
@@ -53,17 +52,11 @@ class ProductionListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Fo
                 start_date = request.POST['start_date']
                 end_date = request.POST['end_date']
                 queryset = production.objects.select_related()
-                # Separamos la fecha inicial y la fecha final
-                sds = start_date.split('-')
-                eds = end_date.split('-')
-                # Creamos la fecha con hora para no tener inconvenientes en la busqueda de las ordenes
-                sd = datetime(int(sds[0]), int(sds[1]), int(sds[2]), 00, 00, 00)
-                ed = datetime(int(eds[0]), int(eds[1]), int(eds[2]), 23, 59, 00)
                 if len(start_date) and len(end_date) and request.user.is_superuser:
-                    queryset = queryset.filter(date_joined__range=[sd, ed])
+                    queryset = queryset.filter(date_joined__range=[start_date, end_date])
                 elif len(start_date) and len(end_date) and not request.user.is_superuser:
                     queryset = queryset.filter(
-                        Q(user_id=request.user.id) & Q(date_joined__range=[sd, ed]))
+                        Q(user_id=request.user.id) & Q(date_joined__range=[start_date, end_date]))
                 elif not len(start_date) and not len(end_date) and not request.user.is_superuser:
                     queryset = queryset.filter(user_id=request.user.id)
 
@@ -120,16 +113,19 @@ class ProductionListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Fo
                     detail.product.save()
                     detail.save()
             elif action == 'search_raw_materials':
-                p = production.objects.get(id=request.POST['id']).productionshopping_set.all()
+                p = ProductionShopping.objects.select_related().filter(production_id=request.POST['id'])
                 shopping = []
                 total = 0.00
 
                 for ps in p:
-                    total += float(ps.shopping_cart.total)
-                    shopping.append({'id': ps.id, 'invoice': ps.shopping_cart.invoice_number,
-                                     'supplier': ps.shopping_cart.supplier.name, 'total': ps.shopping_cart.total})
+                    total += float(ps.subtotal)
+                    product = f'{ps.product.code} {ps.product.name} {ps.product.brand.name} {ps.product.um}'
+                    supplier = f'{ps.shopping_cart.invoice_number} - {ps.shopping_cart.supplier.name}'
+                    shopping.append({'id': ps.id, 'supplier': supplier, 'product': product,
+                                     'price': ps.price, 'cant': ps.cant, 'subtotal': ps.subtotal})
                 shopping.append(
-                    {'id': '---------', 'invoice': '---------', 'supplier': '---------', 'total': total})
+                    {'id': '---------', 'supplier': '---------', 'product': '---------', 'price': '',
+                     'cant': '---------', 'subtotal': total})
 
                 data = shopping
             elif action == 'delete':
@@ -170,6 +166,7 @@ class ProductionCreateView(ValidatePermissionRequiredMixin, CreateView):
                 with transaction.atomic():
 
                     products = json.loads(request.POST['products'])
+                    shop = json.loads(request.POST['shopping'])
 
                     prod = production()
                     prod.user_id = request.user.id
@@ -178,24 +175,24 @@ class ProductionCreateView(ValidatePermissionRequiredMixin, CreateView):
                         prod.date_process = request.POST['date_process']
                     prod.save()
 
-                    # Recolectamos los id de las compras para poder saar los costoss de cada saco producido
-                    idShopping = request.POST.getlist('shopping_cart')
-                    psList = []
+                    # Guardamos la informacion de las compras de materia prima y otros
+                    # con la orden de produccciona actual
+                    for s in shop:
+                        ps = ProductionShopping()
+                        ps.production_id = prod.id
+                        ps.shopping_cart_id = int(s['id_shopping'])
+                        ps.product_id = int(s['id_product'])
+                        ps.price = float(s['price'])
+                        ps.cant = int(s['cant'])
+                        ps.subtotal = float(s['subtotal'])
+                        ps.save()
+                        # if ps.shopping_cart.status:
+                        # ps.shopping_cart.status = True
+                        p = ps.shopping_cart.shoppingdetail_set.get(product_id=ps.product_id)
+                        p.available -= ps.cant
+                        p.save()
 
-                    # Guardamos las facturas relacionadas para la produccion creada
-
-                    for s in idShopping:
-                        changeStatus = Shopping.objects.get(id=s)
-                        changeStatus.status = True
-                        changeStatus.save()
-                        ps = ProductionShopping(
-                            production_id=prod.id,
-                            shopping_cart_id=int(s)
-                        )
-                        psList.append(ps)
-                    # Guardamos de manera masiva los id relacionados de la produccion con las compras
-                    ProductionShopping.objects.bulk_create(psList)
-
+                    # Guardamos el detalle de los porductos que se van a producir
                     for i in products:
                         detail = detail_production()
                         detail.production_id = prod.id
@@ -203,6 +200,18 @@ class ProductionCreateView(ValidatePermissionRequiredMixin, CreateView):
                         detail.cant = 0
                         detail.save()
                     data = {'id': prod.id}
+
+            if action == 'search_shoppings':
+                data = []
+                ids_exclude = json.loads(request.POST['ids'])
+                term = request.POST['term'].strip()
+                shop = Shopping.objects.filter(status=True)
+                if len(term):
+                    shop = shop.filter(Q(invoice_number__icontains=term) | Q(supplier__name__icontains=term))
+                for i in shop.exclude(id__in=ids_exclude)[0:10]:
+                    item = i.toJSONPROCESS()
+                    item['value'] = i.__str__()
+                    data.append(item)
 
             if action == 'search_products_select2':
                 data = []
@@ -229,10 +238,6 @@ class ProductionCreateView(ValidatePermissionRequiredMixin, CreateView):
         context['list_url'] = self.success_url
         context['action'] = 'add'
         context['products'] = []
-        id = self.request.user.id
-        # form = ClientForm(initial={'user': User.objects.get(id=id)})
-        # form.fields['user'].widget.attrs['hidden'] = True
-        # context['frmClient'] = form
         return context
 
 
@@ -244,6 +249,14 @@ class ProductionUpdateView(ValidatePermissionRequiredMixin, UpdateView):
     url_redirect = success_url
     permission_required = 'change_production'
 
+    def get_detail_shopping(self):
+        data = []
+        shop = self.get_object()
+        for s in shop.productionshopping_set.all():
+            item = s.toJSONPROCESS()
+            data.append(item)
+        return json.dumps(data)
+
     def get_details_product(self):
         data = []
         prod = self.get_object()
@@ -251,14 +264,24 @@ class ProductionUpdateView(ValidatePermissionRequiredMixin, UpdateView):
             item = i.product.toJSON()
             item['cant'] = i.cant
             data.append(item)
-        print(data)
         return json.dumps(data)
 
     def post(self, request, *args, **kwargs):
         data = {}
         try:
             action = request.POST['action']
-            if action == 'search_products_select2':
+            if action == 'search_shoppings':
+                data = []
+                ids_exclude = json.loads(request.POST['ids'])
+                term = request.POST['term'].strip()
+                shop = Shopping.objects.filter(status=False)
+                if len(term):
+                    shop = shop.filter(Q(invoice_number__icontains=term) | Q(supplier__name__icontains=term))
+                for i in shop.exclude(id__in=ids_exclude)[0:10]:
+                    item = i.toJSONPROCESS()
+                    item['value'] = i.__str__()
+                    data.append(item)
+            elif action == 'search_products_select2':
                 data = []
                 ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
@@ -273,50 +296,58 @@ class ProductionUpdateView(ValidatePermissionRequiredMixin, UpdateView):
             elif action == 'edit':
                 with transaction.atomic():
                     products = json.loads(request.POST['products'])
-                    # now = datetime.now()
-                    # today = str(now.date())
+                    shop = json.loads(request.POST['shopping'])
+                    shopping_delete = json.loads(request.POST['shopping_delete'])
 
                     prod = self.get_object()
                     prod.user_id = request.user.id
-                    prod.shopping_cart_id = request.POST['shopping_cart']
                     prod.date_joined = request.POST['date_joined']
                     if request.POST['date_process'] != '':
                         prod.date_process = request.POST['date_process']
                     prod.save()
 
-                    # Recolectamos los id de las compras para cambiar el status
-                    idShopping = request.POST.getlist('shopping_cart')
-                    psList = []
+                    # Eliminamos los datos anteriormente insertados
+                    # en las tablas relacionadas
+                    prod.detail_production_set.all().delete()  # Eliminamos detalle de produccion
+                    prod.productionshopping_set.all().delete()  # Eliminamos compras relacionadas
 
-                    psSet = prod.productionshopping_set.all()
-
-                    # Le quitamos el status a las facturas ingresadas para luego aliminarlas
-
-                    for s in psSet:
-                        s.shopping_cart.status = False
-                        s.save()
-
-                    psSet.delete()
-
-                    # Guardamos las facturas relacionadas para la produccion creada
-
-                    for s in idShopping:
-                        ps = ProductionShopping(
-                            production_id=prod.id,
-                            shopping_cart_id=int(s)
-                        )
-                        ps.shopping_cart.status = True
+                    # Guardamos la informacion de las compras de materia prima y otros
+                    for s in shop:
+                        ps = ProductionShopping()
+                        ps.production_id = prod.id
+                        ps.shopping_cart_id = int(s['id_shopping'])
+                        ps.product_id = int(s['id_product'])
+                        ps.price = float(s['price'])
+                        ps.cant = int(s['cant'])
+                        ps.subtotal = float(s['subtotal'])
                         ps.save()
-                        psList.append(ps)
+                        # Agregamos la disponibilidad de los elementos eliminados
+                        # Aun no tomaremos en cuenta el status de la factura
+                        # Se cambiara cuando no tenga ningun insumo disponible
+                        # ps.shopping_cart.status = True
+                        p = ps.shopping_cart.shoppingdetail_set.get(product_id=ps.product_id)
+                        # Validamos si encontramos la variable a validar en el diccionario
+                        # de esa manera validamos el disponible de manera correcta y solamente a los items que sufrieron
+                        # cambios vamos a modificar los otros no
+                        if 'before_cant' in s:
+                            p.available = (p.available + int(s['before_cant'])) - ps.cant
+                            p.save()
+                    # Revertimos las disponibilidad de los productos comprados
+                    # que se eliminaron al momento de actualizar la orden de produccion
+                    for sd in shopping_delete:
+                        p = ShoppingDetail.objects.get(
+                            Q(shopping=sd['shopping_cart']) & Q(product_id=sd['id_product']))
+                        p.available += sd['cant']
+                        p.save()
 
-                    prod.detail_production_set.all().delete()
-
-                    for p in products:
+                    # Guardamos el detalle de los porductos que se van a producir
+                    for i in products:
                         detail = detail_production()
                         detail.production_id = prod.id
-                        detail.product_id = int(p['id'])
+                        detail.product_id = int(i['id'])
                         detail.cant = 0
                         detail.save()
+
             else:
                 data['error'] = 'No ha ingresado a ninguna opción'
         except Exception as e:
@@ -330,4 +361,5 @@ class ProductionUpdateView(ValidatePermissionRequiredMixin, UpdateView):
         context['list_url'] = self.success_url
         context['action'] = 'edit'
         context['products'] = self.get_details_product()
+        context['shoppings'] = self.get_detail_shopping()
         return context

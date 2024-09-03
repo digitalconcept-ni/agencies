@@ -20,6 +20,7 @@
 
 {% block content %}
     <form id="frmproduction" method="post" data-url="{{ list_url }}">
+        <input type="hidden" name="action" value="{{ action }}">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
@@ -43,9 +44,15 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="container-fluid">
+
                                         <div class="form-group">
                                             <label>Buscador de productos:</label>
                                             <div class="input-group">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-success btnSearchShoppings" type="button">
+                                                        <i class="fas fa-shopping-cart"></i>
+                                                    </button>
+                                                </div>
                                                 <select class="form-control select2" name="search_product"></select>
                                                 {#                                        <input type="text" class="form-control" autocomplete="off"#}
                                                 {#                                               placeholder="Ingrese una descripción" maxlength="50" name="search">#}
@@ -91,15 +98,11 @@
                                     <div class="container-fluid">
                                         <input type="hidden" name="action" value="{{ action }}">
 
-                                        {{ form.date_joined}}
+                                        {{ form.date_joined }}
 
                                         <div class="form-group">
-                                            <label for="{{ form.shopping_cart.id_for_label }}">Materia Prima: </label>
-                                            {{ form.shopping_cart|add_class:'form-comtrol select2' }}
-                                        </div>
-                                        <div class="form-group">
                                             <label for="{{ form.date_process.id_for_label }}">{{ form.date_process.label }}: </label>
-                                            {{ form.date_process}}
+                                            {{ form.date_process }}
                                         </div>
                                     </div>
                                 </div>
@@ -119,9 +122,64 @@
         </div>
     </form>
 
-    <script>
-        production.details.products = {{ products|safe }};
-        production.details.products_review = {{ products|safe }};
-        // Se removio el vents.list(); para calcular bien el iva en el editar. Revisar al final del archivo form.js se lo puso.
-    </script>
+    {# Modal que nos ayudara a buscar las facturas que queremos utilizar  #}
+
+    <div class="modal fade" id="myModalSearchShoppings" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        <b><i class="fas fa-search"></i> Búsqueda de facturas</b>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <select class="form-control select2" name="search_shopping"></select>
+                    </div>
+
+                    <table class="table table-bordered table-sm" id="tblSearchShoppings">
+                        <thead>
+                        <tr>
+                            <th>id_shopping</th>
+                            <th>Proveedor</th>
+                            <th>id_producto</th>
+                            <th>Producto</th>
+                            <th>Costo</th>
+                            <th>Disponible</th>
+                            <th>Cantidad a utilizar</th>
+                            <th>Subtotal</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <input type="text" name="totalShopping" disabled class="form-control is-valid"
+                                       id="input-total-cost-production" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# unicamente se mostrara la informacion de los productos a producir y compras al editar #}
+    {% if action == 'edit' %}
+        <script>
+            production.details.products = {{ products|safe }};
+            production.details.shopping = {{ shoppings|safe }};
+        </script>
+    {% endif %}
+
+
 {% endblock %}
