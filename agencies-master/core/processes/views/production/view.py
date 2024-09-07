@@ -33,7 +33,13 @@ class ProductionListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Fo
                 # Si no existe el valor en el diccionario
                 valores_por_clave[i['category']] = i['cant']
 
-        SP = valores_por_clave['SP']
+        # Verificamos si existe un sub producto
+        if not 'SP' in valores_por_clave:
+            # Si no existe se valida en 0
+            SP = 0
+        else:
+            SP = valores_por_clave['SP']
+
         PF = valores_por_clave['PF']
 
         # Calculo de la eficiencia
@@ -75,8 +81,6 @@ class ProductionListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Fo
 
                 # Mandamos a calcular la eficiencia y la cantidad de PRODUCTO FINAL
                 calc = self.calc_efficiency(products)
-
-                print(calc)
 
                 # Seleccionamos el objeto de la produccion
                 prod = production.objects.get(id=products[0]['production'])

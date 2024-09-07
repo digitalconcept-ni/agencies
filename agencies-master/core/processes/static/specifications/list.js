@@ -10,13 +10,13 @@ var specifications = {
         },
 
         {
-            targets: [3],
+            targets: [3, 4, 5],
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                var button = '<a href="' + row[3] + '" target="_blank" type="button" class="btn btn-danger" ><i class="fas fa-file-pdf"></i></a>';
-                if (row[3] === 'No insertado') {
-                    var button = '<a href="#" type="button" class="btn btn-danger disabled"><i class="far fa-file-pdf"></i></a>'
+                var button = `<a href="${data}" target="_blank" type="button" class="btn btn-danger" ><i class="fas fa-file-pdf"></i></a>`;
+                if (data === 'No insertado') {
+                    var button = `<a href="#" type="button" class="btn btn-danger disabled"><i class="far fa-file-pdf"></i></a>`
                     return button
                 }
                 return button;
@@ -39,7 +39,7 @@ var specifications = {
         let data = {
             'data': {'action': 'search'},
             'inserInto': 'rowList',
-            'th': ['Nro','Nro Lote' ,'Fecha produccion', 'Certificado sanitario', 'Características', 'Análisis químico', 'Opciones'],
+            'th': ['Nro', 'Nro Lote', 'Fecha produccion', 'Certificado sanitario', 'Características', 'Análisis químico', 'Opciones'],
             'table': 'tableList',
             'config': this.config,
             'modal': false,

@@ -19,6 +19,7 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <li class="nav-header">Mantenimientos</li>
+                {# company #}
                 <li class="nav-item">
                     <a href="{% url 'company_update' %}" class="nav-link">
                         <i class="nav-icon fas fa-building"></i>
@@ -27,56 +28,89 @@
                         </p>
                     </a>
                 </li>
+                {# Products #}
                 <li class="nav-item">
-                    <a href="{% url 'category_list' %}" class="nav-link">
-                        <i class="nav-icon fas fa-truck-loading"></i>
-                        <p>
-                            Categorías
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'brand_list' %}" class="nav-link">
-                        <i class="nav-icon fas fa-award"></i>
-                        <p>
-                            Marcas
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'product_list' %}" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-barcode"></i>
                         <p>
                             Productos
+                            <i class="fas fa-angle-left right"></i>
                         </p>
+
                     </a>
+
+                    <ul class="nav nav-treeview">
+                        {# Category #}
+                        <li class="nav-item">
+                            <a href="{% url 'category_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Categorias</p>
+                            </a>
+                        </li>
+                        {# Brands #}
+                        <li class="nav-item">
+                            <a href="{% url 'brand_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Marcas</p>
+                            </a>
+                        </li>
+                        {# Products Listo / stock #}
+                        <li class="nav-item">
+                            <a href="{% url 'product_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Stock</p>
+                            </a>
+                        </li>
+
+                    </ul>
+
                 </li>
+                {#  Shoppings  #}
                 <li class="nav-item">
-                    <a href="{% url 'supplier_list' %}" class="nav-link">
-                        <i class="nav-icon fas fa-list"></i>
-                        <p>
-                            Proveedores
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'shopping_list' %}" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-shopping-cart"></i>
                         <p>
                             Compras
+                            <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
+
+                    <ul class="nav nav-treeview">
+                        {# Supplier #}
+                        <li class="nav-item">
+                            <a href="{% url 'supplier_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Proveedores</p>
+                            </a>
+                        </li>
+
+                        {# Invoices #}
+                        <li class="nav-item">
+                            <a href="{% url 'shopping_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Facturas</p>
+                            </a>
+                        </li>
+
+                    </ul>
                 </li>
+                {#  Operaciones #}
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-city"></i>
                         <p>
                             Operaciones
+                            <i class="fas fa-angle-left right"></i>
                         </p>
-                        <i class="fas fa-angle-left right"></i>
 
                     </a>
                     <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'loss_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Pérdidas</p>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a href="{% url 'production_list' %}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
@@ -91,13 +125,14 @@
                         </li>
                     </ul>
                 </li>
+                {#  Clientes #}
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
                         <p>
                             Clientes
+                            <i class="fas fa-angle-left right"></i>
                         </p>
-                        <i class="fas fa-angle-left right"></i>
 
                     </a>
                     <ul class="nav nav-treeview">
@@ -115,7 +150,7 @@
                         </li>
                     </ul>
                 </li>
-
+                {#  Sales #}
                 <li class="nav-item">
                     <a href="{% url 'sale_list' %}" class="nav-link">
                         <i class="nav-icon fas fa-money-bill-alt"></i>
@@ -124,6 +159,34 @@
                         </p>
                     </a>
                 </li>
+                {#  Shippings  #}
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-truck-moving"></i>
+                        <p>
+                            Envios
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'vehicles_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Vehiculos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'deliveries_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Delivery</p>
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </li>
+                {#  Reports #}
                 <li class="nav-item">
                     <a href="{% url 'sale_report' %}" class="nav-link">
                         <i class="nav-icon fas fa-chart-bar"></i>
@@ -132,6 +195,7 @@
                         </p>
                     </a>
                 </li>
+                {# Users #}
                 <li class="nav-item">
                     <a href="{% url 'user_list' %}" class="nav-link">
                         <i class="nav-icon fas fa-user-friends"></i>
@@ -140,6 +204,7 @@
                         </p>
                     </a>
                 </li>
+                {#  Control access #}
                 <li class="nav-item">
                     <a href="{% url 'access_users_list' %}" class="nav-link">
                         <i class="fas fa-user-clock"></i>

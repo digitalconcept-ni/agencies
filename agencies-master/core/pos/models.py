@@ -179,6 +179,7 @@ class Product(models.Model):
         item['full_name'] = self.__str__()
         item['expiration'] = ex
         item['brand'] = brand
+        item['restore'] = False
         item['image'] = self.get_image()
         item['pvp'] = f'{self.pvp:.2f}'
         if item['cost']:
@@ -210,7 +211,8 @@ class Shopping(models.Model):
     iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total_iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
-    status = models.BooleanField(default=False)
+    # Estaod para validad si la factura tiene disponibilidad de items para prroduccion
+    status = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.invoice_number} - {self.supplier.name}'
@@ -219,16 +221,38 @@ class Shopping(models.Model):
         return f'{self.id:06d}'
 
     def toLIST(self):
-        modify = False
+        print(self.status)
+        # Verificamos si la factura de compra tiene productos disponibles
+        # para produccion
+        available = self.shoppingdetail_set.all().aggregate(
+            result=Coalesce(Sum(F('available')), 0.00, output_field=FloatField())).get('result')
+        if available <= 0:
+            self.status = False
+            self.save()
+        print('status: ', self.status)
+
+        # Verificamos si las la fecha de registro es menos a hoy
         if self.date_joined.strftime("%Y-%m-%d") < str(datetime.now().date()):
             modify = True
+        else:
+            modify = False
+
+        # Variable de opciones adicionales
+        opt = [modify, self.status]
+
         date_joined = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}'
         data = [
             self.get_number(), self.user.username, self.supplier.name, self.invoice_number,
             self.cant, date_joined, f'{self.subtotal:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}',
-            modify
+            opt
         ]
         return data
+
+    def toJSONPROCESS(self):
+        item = model_to_dict(self)
+        item['username'] = self.user.username
+        item['shopping_details'] = [i.toJSON() for i in self.shoppingdetail_set.all()]
+        return item
 
     def toJSON(self):
         item = model_to_dict(self)
@@ -242,7 +266,7 @@ class Shopping(models.Model):
         item['total_iva'] = f'{self.total_iva:.2f}'
         item['total'] = f'{self.total:.2f}'
         item['date_joined'] = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}'
-        item['saleproduct'] = [i.toJSON() for i in self.shoppingdetail_set.all()]
+        item['shopping_details'] = [i.toJSON() for i in self.shoppingdetail_set.all()]
         return item
 
     def calculate_invoice(self):
@@ -256,7 +280,7 @@ class Shopping(models.Model):
     class Meta:
         verbose_name = 'Compra'
         verbose_name_plural = 'Compras'
-        ordering = ['date_joined']
+        ordering = ['-date_joined']
 
 
 class ShoppingDetail(models.Model):
@@ -264,13 +288,16 @@ class ShoppingDetail(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     cant = models.IntegerField(default=0)
+    # Este campo lo utilizaremos para saber cuanto hay disponible
+    # para las proximas producciones
+    available = models.IntegerField(default=0, verbose_name='Disponible')
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
 
     def __str__(self):
         return self.product.name
 
     def toJSON(self):
-        item = model_to_dict(self, exclude=['sale'])
+        item = model_to_dict(self)
         item['product'] = self.product.toJSON()
         item['price'] = f'{self.price:.2f}'
         item['subtotal'] = f'{self.subtotal:.2f}'
@@ -473,6 +500,8 @@ class SaleProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
     cant = models.IntegerField(default=0)
+    # Con este campo vamos a validar que productos de la factura los devolucionaron
+    restore = models.BooleanField(default=False, verbose_name='Devolucion')
     subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
 
     def __str__(self):
@@ -481,6 +510,7 @@ class SaleProduct(models.Model):
     def toJSON(self):
         item = model_to_dict(self, exclude=['sale'])
         item['product'] = self.product.toJSON()
+        item['restore'] = self.restore
         item['price'] = f'{self.price:.2f}'
         item['subtotal'] = f'{self.subtotal:.2f}'
         return item
@@ -488,5 +518,47 @@ class SaleProduct(models.Model):
     class Meta:
         verbose_name = 'Detalle de Venta'
         verbose_name_plural = 'Detalle de Ventas'
+        default_permissions = ()
+        ordering = ['id']
+
+
+# Modelo para control de perdidas de productos
+
+class loss(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_joined = models.DateField(default=datetime.now)
+    time_joined = models.TimeField(default=datetime.now)
+    total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+
+    def get_number(self):
+        return f'{self.id:06d}'
+
+    def toLIST(self):
+        data = [self.get_number(), self.user.username, f'{self.date_joined.strftime("%Y-%m-%d")}',
+                f'{self.time_joined.strftime("%I:%M:%S %p")}', self.total, self.id]
+        return data
+
+    class Meta:
+        verbose_name = 'Perdida'
+        verbose_name_plural = 'Perdidas'
+        ordering = ['date_joined']
+
+
+class loss_details(models.Model):
+    order_loss = models.ForeignKey(loss, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    price = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    cant = models.IntegerField(default=0)
+    subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    reason_loss = models.CharField(max_length=80)
+
+    def toJSON(self):
+        item = model_to_dict(self, exclude=['order_loss'])
+        item['product'] = self.product.name
+        return item
+
+    class Meta:
+        verbose_name = 'detalle perdida'
+        verbose_name_plural = 'detalle perdidas'
         default_permissions = ()
         ordering = ['id']

@@ -9,8 +9,9 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 
-from core.pos.models import Sale, Product, SaleProduct, Client
+from core.pos.models import Sale, Product, SaleProduct, Client, Company
 from core.pos.query import visitFrequency
+from core.processes.models import production
 from core.user.models import User
 
 
@@ -72,6 +73,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 else:
                     data['error'] = 'No tiene acceso a esta informacion'
             elif action == 'search_data':
+
+                prod = production.objects.select_related()
+                prod_detail = {
+                    'process-lot': prod.filter(status=False).count(),
+                    'finaly-lot': prod.filter(status=True).count(),
+                    'total-lot': prod.count()
+                }
+
                 maximumProductSold = SaleProduct.objects.select_related().filter(sale__date_joined=now).values(
                     'product__name').annotate(
                     total=Sum(F('cant'))).order_by('-total')[:5]
@@ -101,7 +110,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'lower-inventory': lowInventory,
                     'maximumsold': sold,
                     'programing-clients': visitFrequency(request).count(),
-                    'applied-credit': appliedCredit
+                    'applied-credit': appliedCredit,
+                    'prod': prod_detail,
                 }
             elif action == 'search_presale_info':
                 today = str(now.date())

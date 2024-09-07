@@ -123,6 +123,7 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                         detail.shopping_id = shopping.id
                         detail.product_id = int(i['id'])
                         detail.cant = int(i['cant'])
+                        detail.available = int(i['cant'])
                         detail.price = float(i['cost'])
                         detail.subtotal = detail.cant * detail.price
                         detail.save()

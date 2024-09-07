@@ -7,14 +7,18 @@ var sale = {
             targets: [0],
             class: 'text-center',
             render: function (data, type, row) {
-                return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
+                if (row[9][1] === true) {
+                    return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
+                } else {
+                    return '<a class="badge badge-danger badge-pill pointer" rel="number">' + data + '</a>'
+                }
             }
         },
         {
             targets: [6, 7, 8],
             class: 'text-center',
             render: function (data, type, row) {
-                return 'C$' + parseFloat(data).toFixed(2);
+                return parseFloat(data).toFixed(2);
             }
         },
         {
@@ -23,8 +27,8 @@ var sale = {
             orderable: false,
             render: function (data, type, row) {
                 var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
-                if (data === false) {
                     buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
+                if (data[0] === false) {
                     buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
                 }
                 return buttons;
@@ -263,19 +267,22 @@ $(function () {
                     {"data": "product.category.name"},
                     {"data": "price"},
                     {"data": "cant"},
+                    {"data": "available"},
                     {"data": "subtotal"},
                 ],
                 columnDefs: [
                     {
-                        targets: [-1, -3],
+                        targets: [0, 1, 2, 3, 4, 5],
                         class: 'text-center',
+                    },
+                    {
+                        targets: [-1, -4],
                         render: function (data, type, row) {
-                            return '$' + parseFloat(data).toFixed(2);
+                            return parseFloat(data).toFixed(2);
                         }
                     },
                     {
                         targets: [-2],
-                        class: 'text-center',
                         render: function (data, type, row) {
                             return data;
                         }

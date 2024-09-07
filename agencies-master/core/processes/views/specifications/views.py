@@ -19,7 +19,6 @@ class SpecificationsListView(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'search':
                 data = [i.toLIST() for i in specifications.objects.select_related()]
-                print(data)
                 # for i in Category.objects.all():
                 #     data.append(i.toJSON())
             elif action == 'delete':

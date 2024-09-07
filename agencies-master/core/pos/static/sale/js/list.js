@@ -230,9 +230,10 @@ $(function () {
                         'X-CSRFToken': csrftoken
                     },
                 },
-                columns: [{
-                    "data": "product.name"
-                },
+                columns: [
+                    {
+                        "data": "product.name"
+                    },
                     {
                         "data": "product.brand.name"
                     },
@@ -246,13 +247,29 @@ $(function () {
                         "data": "subtotal"
                     },
                 ],
-                columnDefs: [{
-                    targets: [-1, -3],
-                    class: 'text-center',
-                    render: function (data) {
-                        return '$' + parseFloat(data).toFixed(2);
-                    }
-                },
+                columnDefs: [
+                    {
+                        targets: [0, 1, 2, 3],
+                        class: 'text-center',
+                    },
+                    {
+                        targets: [0],
+                       render: function (data, type, row){
+                            if(row.restore){
+                                return `<span style="color: red">${data}</span>`
+                            }else{
+                                return data
+                            }
+
+                       }
+                    },
+                    {
+                        targets: [-1, -3],
+                        class: 'text-center',
+                        render: function (data) {
+                            return parseFloat(data).toFixed(2);
+                        }
+                    },
                     {
                         targets: [-2],
                         class: 'text-center',

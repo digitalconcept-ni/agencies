@@ -392,7 +392,12 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
         sale = self.get_object()
         for i in sale.saleproduct_set.all():
             item = i.product.toJSON()
-            item['cant'] = i.cant
+            if i.restore:
+                item['cant'] = 1
+                item['subtotal'] = f'{i.product.pvp:.2f}'
+            else:
+                item['cant'] = i.cant
+            item['restore'] = i.restore
             data.append(item)
         return json.dumps(data)
 
@@ -441,6 +446,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     sale.discount = float(request.POST['discount'])
                     sale.save()
 
+                    # Eliminamos de la tabla los productos anteriormente agregados
                     sale.saleproduct_set.all().delete()
                     listProductId = []  # Lista que obtendra los id de los productos ingresados
                     pr = [pr.get('id') for pr in products_review]
@@ -449,23 +455,32 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                         detail = SaleProduct()
                         detail.sale_id = sale.id
                         detail.product_id = int(p['id'])
-                        detail.cant = int(p['cant'])
+                        detail.restore = bool(p['restore'])
+                        # Si es True se toma como devolucion y se agrega a cantidad en 0 para que no se tome encuenta
+                        # al calcular la factura
+                        if detail.restore:
+                            detail.cant = 0
+                        else:
+                            detail.cant = int(p['cant'])
                         detail.price = float(p['pvp'])
                         detail.subtotal = detail.cant * detail.price
                         detail.save()
                         if detail.product.is_inventoried:
                             if p['id'] in pr:
-                                indice = pr.index(p['id'])
                                 # print('indice existe: ', indice)
-                                detail.product.stock = (detail.product.stock + products_review[indice]['cant']) - \
-                                                       p['cant']
-                                detail.product.cost = float(p['cost'])
-                                detail.product.pvp = float(p['pvp'])
+                                indice = pr.index(p['id'])
+                                # Validamos si antetiormente fue devolucion
+                                if detail.restore:
+                                    detail.product.stock += products_review[indice]['cant']
+                                else:
+                                    if bool(products_review[indice]['restore']):
+                                        detail.product.stock -= p['cant']
+                                    else:
+                                        detail.product.stock = (detail.product.stock + products_review[indice][
+                                            'cant']) - p['cant']
                                 detail.product.save()
                             else:
                                 detail.product.stock -= p['cant']
-                                detail.product.cost = float(p['cost'])
-                                detail.product.pvp = float(p['pvp'])
                                 detail.product.save()
                         listProductId.append(p['id'])
 
@@ -475,11 +490,10 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                                 indice = pr.index(i)
                                 # print('indice no existe: ', indice)
                                 # print('No existe: ', i)
-                                detail.product_id = int(i)
-                                detail.product.stock = detail.product.stock + products_review[indice]['cant']
-                                detail.product.cost = float(products_review[indice]['cost'])
-                                detail.product.pvp = float(products_review[indice]['pvp'])
-                                detail.product.save()
+                                if bool(products_review[indice]['restore']) == False:
+                                    detail.product_id = int(i)
+                                    detail.product.stock = detail.product.stock + products_review[indice]['cant']
+                                    detail.product.save()
 
                     sale.calculate_invoice()
                     data = {'id': sale.id}

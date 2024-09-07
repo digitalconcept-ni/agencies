@@ -7,6 +7,7 @@ from core.pos.views.client.views import *
 from core.pos.views.company.views import CompanyUpdateView
 from core.pos.views.dashboard.views import *
 from core.pos.views.load.views import loadCsvView
+from core.pos.views.loss.view import *
 from core.pos.views.product.views import *
 from core.pos.views.sale.views import *
 from core.pos.views.shopping.views import *
@@ -56,6 +57,10 @@ urlpatterns = [
     path('sale/update/<int:pk>/', SaleUpdateView.as_view(), name='sale_update'),
     # path('sale/guides/', SaleInvoiceGuidesPdfView.as_view(), name='sale_guides_pdf'),
     path('sale/invoice/pdf/<int:pk>/', SaleInvoicePdfView.as_view(), name='sale_invoice_pdf'),
+
+    # loss
+    path('loss/', LossListView.as_view(), name='loss_list'),
+    path('loss/add', LossCreateView.as_view(), name='loss_create'),
 
     # company
     path('company/update/', CompanyUpdateView.as_view(), name='company_update'),

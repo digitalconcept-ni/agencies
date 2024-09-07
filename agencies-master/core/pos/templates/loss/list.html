@@ -4,7 +4,7 @@
     <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/spanish.js' %}"></script>
     <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/daterangepicker.js' %}"></script>
     <link rel="stylesheet" href="{% static 'lib/bootstrap-daterangepicker-3.1/css/daterangepicker.css' %}"/>
-    <script src="{% static 'shopping/js/list.js' %}"></script>
+    <script src="{% static 'loss/js/list.js' %}"></script>
 {% endblock %}
 
 {% block javascript %}
@@ -13,7 +13,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        <b><i class="fas fa-search"></i> Detalle de Compra</b>
+                        <b><i class="fas fa-search"></i> Detalle de perdidas</b>
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -24,11 +24,10 @@
                         <thead>
                         <tr>
                             <th>Producto</th>
-                            <th>Categoría</th>
-                            <th>PVP</th>
+                            <th>Costo</th>
                             <th>Cantidad</th>
-                            <th>Disponible</th>
                             <th>Subtotal</th>
+                            <th>Razon perdida</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -42,12 +41,13 @@
 
 {% block content_list_before %}
     <div class="row">
-        <div class="col-lg-5">
+        <div class="col-lg-4 col-md-12">
+
             <div class="form-group">
                 <label>Rangos de fechas:</label>
                 <div class="input-group mb-3">
                     {{ form.date_range }}
-                    <div class="input-group-append">
+                    <div class="input-group-append ">
                         <button class="btn btn-success btnSearch" type="button">
                             <i class="fas fa-calendar-check"></i> Buscar
                         </button>
@@ -59,21 +59,6 @@
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="form-group">
-                <label>Nro de Factura:</label>
-                <div class="input-group mb-3">
-                    <input name="invoice-number" class="form-control" type="text">
-                    <div class="input-group-append">
-                        <button class="btn btn-success btnInvoice" type="button">
-                            <i class="fas fa-calendar-check"></i> Buscar factura
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
     </div>
     <hr>
 {% endblock %}

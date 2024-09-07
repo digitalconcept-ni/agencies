@@ -35,6 +35,7 @@ urlpatterns = [
     path('security/', include('core.security.urls')),
     # path('map/', include('core.maps.urls')),
     path('processes/', include('core.processes.urls')),
+    path('shipping/', include('core.shipping.urls')),
 
     # QRcode
     path('qrspecifications/<int:pk>/', QRcodeView.as_view(), name='qrcode_view'),

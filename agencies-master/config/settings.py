@@ -68,6 +68,7 @@ TENANT_APPS = [
     # 'core.maps',
     'core.security',
     'core.processes',
+    'core.shipping',
 ]
 
 TENANT_MODEL = "client.Client"  # app.Model

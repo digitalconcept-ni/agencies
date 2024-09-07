@@ -38,7 +38,7 @@ var sale = {
         this.details.subtotal = subtotal_iva;
         this.details.discount = discount;
 
-        this.details.iva = (this.details.subtotal - this.details.discount) * 0.15;
+        this.details.iva = this.details.subtotal * 0.15;
         this.details.total = ((this.details.subtotal + this.details.subtotal_exempt) - this.details.discount) + this.details.iva;
 
         $('input[name="subtotal"]').val(this.details.subtotal.toFixed(2));
@@ -58,7 +58,7 @@ var sale = {
             destroy: true,
             paging: false,
             dom: 't',
-            scrollY: '62vh',
+            scrollY: '58vh',
             scrollCollapse: true,
             data: this.details.products,
             columns: [
@@ -107,14 +107,11 @@ var sale = {
 
                 $(row).find('input[name="cant"]').TouchSpin({
                     min: 1,
-                    max: data.stock,
+                    max: data.stock === 0 ? data.cant : data.stock + data.cant,
                     step: 1
                 });
 
             },
-            initComplete: function (settings, json) {
-
-            }
         });
     },
     calculateTotalItems: function () {

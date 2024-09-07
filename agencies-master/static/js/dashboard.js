@@ -10,7 +10,14 @@ var info = {
             },
         }).done(function (data) {
             $.each(data, v => {
-                $(`#${v}`).text(data[v])
+                // Se integra este conficonal para validad los datos de produccion
+                if (v === 'prod') {
+                    $.each(data[v], function (k, c) {
+                        $(`#${k}`).text(c)
+                    })
+                } else {
+                    $(`#${v}`).text(data[v])
+                }
             });
 
             $("#tableDashProductSold").DataTable({
@@ -43,7 +50,7 @@ $(function () {
 
     setInterval(function () {
         info.callInfo()
-    }, 15000)
+    }, 20000)
 
     $('#lower').on('click', function () {
 

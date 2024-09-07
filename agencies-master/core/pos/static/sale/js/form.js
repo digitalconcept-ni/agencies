@@ -2,6 +2,7 @@ var tblProducts;
 var select_client, select_search_product;
 var tblSearchProducts;
 let coordClient = false;
+var action = $('input[name="action"]').val();
 
 
 var sale = {
@@ -24,15 +25,16 @@ var sale = {
         var discount = $('input[name="discount"]').val();
         this.details.products.forEach(function (value, index, array) {
             value.index = index;
-
-            if (value.tax === 'e' || value.tax === 'exento') {
-                value.cant = parseInt(value.cant);
-                value.subtotal = value.cant * parseFloat(value.pvp);
-                subtotal_exempt += value.subtotal;
-            } else if (value.tax === 'grabado') {
-                value.cant = parseInt(value.cant);
-                value.subtotal = value.cant * parseFloat(value.pvp);
-                subtotal_iva += value.subtotal;
+            if (!value.restore) {
+                if (value.tax === 'e' || value.tax === 'exento') {
+                    value.cant = parseInt(value.cant);
+                    value.subtotal = value.cant * parseFloat(value.pvp);
+                    subtotal_exempt += value.subtotal;
+                } else if (value.tax === 'grabado') {
+                    value.cant = parseInt(value.cant);
+                    value.subtotal = value.cant * parseFloat(value.pvp);
+                    subtotal_iva += value.subtotal;
+                }
             }
         });
 
@@ -40,7 +42,7 @@ var sale = {
         this.details.subtotal = subtotal_iva;
         this.details.discount = discount;
 
-        this.details.iva = (this.details.subtotal - this.details.discount) * 0.15;
+        this.details.iva = this.details.subtotal * 0.15;
         this.details.total = ((this.details.subtotal + this.details.subtotal_exempt) - this.details.discount) + this.details.iva;
 
         $('input[name="subtotal"]').val(this.details.subtotal.toFixed(2));
@@ -53,6 +55,7 @@ var sale = {
         this.listProducts();
     },
     listProducts: function () {
+        var action = $('input[name="action"]').val();
         this.calculateInvoice();
         tblProducts = $('#tblProducts').DataTable({
             responsive: true,
@@ -61,6 +64,7 @@ var sale = {
             data: this.details.products,
             columns: [
                 {"data": "id"},
+                {"data": "restore"},
                 {"data": "full_name"},
                 {"data": "stock"},
                 {"data": "pvp"},
@@ -69,24 +73,36 @@ var sale = {
             ],
             columnDefs: [
                 {
-                    targets: [0],
+                    targets: [0, 1, 2, 3, 4, 5, 6],
                     class: 'text-center',
+                },
+                {
+                    targets: [0],
                     visible: false,
-                    // render: function (data, type, row) {
-                    //     return '<a rel="remove" class="btn btn-danger btn-xs btn-flat" style="color: white;"><i class="fas fa-trash-alt"></i></a>';
-                    // }
                 },
                 {
                     targets: [1],
+                    render: function (data, type, row) {
+                        if (action === 'edit') {
+                            if (data === false) {
+                                return '<input type="checkbox" rel="restore"/>';
+                            } else {
+                                return '<input type="checkbox" checked rel="restore"/>';
+                            }
+                        } else if (action === 'add') {
+                            return '<input type="checkbox" disabled/>';
+                        }
+                    }
+                },
+                {
+                    targets: [2],
                     orderable: false,
-                    class: 'text-center',
                     render: function (data, type, row) {
                         return '<a rel="remove" style="color: blue; cursor: pointer">' + data + '</a>';
                     }
                 },
                 {
                     targets: [-4],
-                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         if (!row.is_inventoried) {
@@ -97,15 +113,13 @@ var sale = {
                 },
                 {
                     targets: [-3],
-                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return 'C$' + parseFloat(data).toFixed(2);
+                        return parseFloat(data).toFixed(2);
                     }
                 },
                 {
                     targets: [-2],
-                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return '<input type="text" name="cant" class="form-control form-control-sm input-sm" autocomplete="off" value="' + row.cant + '">';
@@ -113,15 +127,13 @@ var sale = {
                 },
                 {
                     targets: [-1],
-                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return 'C$' + parseFloat(data).toFixed(2);
+                        return parseFloat(data).toFixed(2);
                     }
                 },
             ],
             rowCallback(row, data, displayNum, displayIndex, dataIndex) {
-
                 $(row).find('input[name="cant"]').TouchSpin({
                     min: 1,
                     max: data.stock === 0 ? data.cant : data.stock + data.cant,
@@ -129,15 +141,11 @@ var sale = {
                 });
 
             },
-            initComplete: function (settings, json) {
-
-            }
         });
     },
 };
 
 $(function () {
-    var action = $('input[name="action"]').val();
 
     select_client = $('select[name="client"]');
     select_search_product = $('select[name="search_product"]');
@@ -341,8 +349,26 @@ $(function () {
             var tr = tblProducts.cell($(this).closest('td, li')).index();
             sale.details.products[tr.row].cant = cant;
             sale.calculateInvoice();
-            $('td:last', tblProducts.row(tr.row).node()).html('$' + sale.details.products[tr.row].subtotal.toFixed(2));
-        });
+            $('td:last', tblProducts.row(tr.row).node()).html(sale.details.products[tr.row].subtotal.toFixed(2));
+        })
+        .on('click', 'input[rel="restore"]', function () {
+            console.clear();
+            var cant = parseInt($(this).val());
+            let tr = tblProducts.cell($(this).closest('td, li')).index();
+            const _this = $(this);
+
+            if (_this.prop('checked')) {
+                sale.details.products[tr.row].restore = true
+                let s = 0.00
+                $('td:last', tblProducts.row(tr.row).node()).html(s.toFixed(2));
+
+            } else {
+                sale.details.products[tr.row].restore = false
+                $('td:last', tblProducts.row(tr.row).node()).html(sale.details.products[tr.row].subtotal.toFixed(2));
+
+            }
+            sale.calculateInvoice();
+        })
 
     $('.btnRemoveAll').on('click', function () {
         if (sale.details.products.length === 0) return false;
@@ -468,7 +494,7 @@ $(function () {
         decimals: 2,
         boostat: 5,
         maxboostedstep: 10,
-        postfix: 'C$'
+        // postfix: 'C$'
     }).on('change', function () {
         sale.calculateInvoice();
     })
