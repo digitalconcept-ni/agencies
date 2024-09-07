@@ -1,3 +1,5 @@
+var preloader = document.querySelector('#preloader');
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -56,7 +58,6 @@ function message_info(obj) {
 }
 
 function submit_with_ajax(url, title, content, parameters, callback) {
-    let loader = document.querySelector('.preloader-container');
 
     $.confirm({
         theme: 'material',
@@ -73,8 +74,8 @@ function submit_with_ajax(url, title, content, parameters, callback) {
                 text: "Si",
                 btnClass: 'btn-primary',
                 action: function () {
-                    loader.style.opacity = 1;
-                    loader.style.visibility = 'initial';
+                    // Agregamos el preloader al bosy
+                    document.body.prepend(preloader);
                     $.ajax({
                         url: url,
                         data: parameters,
@@ -86,8 +87,11 @@ function submit_with_ajax(url, title, content, parameters, callback) {
                         processData: false,
                         contentType: false,
                         success: function (request) {
-                            loader.style.opacity = 0;
-                            loader.style.visibility = 'hidden';
+
+                            // Quitamos el preloader cuando se haya cumplido la accion
+                            if (preloader) {
+                                preloader.remove();
+                            }
                             if (!request.hasOwnProperty('error')) {
                                 callback(request);
                                 return false;
@@ -185,15 +189,21 @@ function validate_decimals(el, evt) {
     return true;
 }
 
-window.addEventListener('load', () => {
-    let loader = document.querySelector('.preloader-container');
-    loader.style.opacity = 0
-    loader.style.visibility = 'hidden';
 
-    var year = new Date;
-    let spanYear = document.getElementById('year-system');
-    spanYear.innerHTML = `${year.getFullYear()}`;
-});
+/**
+ * Preloader
+ */
+if (preloader) {
+    window.addEventListener('load', () => {
+        preloader.remove();
+    });
+}
+
+// Get ystem year
+
+var year = new Date;
+let spanYear = document.getElementById('year-system');
+spanYear.innerHTML = `${year.getFullYear()}`;
 
 // function toggleFullScreen() {
 //   if (!document.fullscreenElement &&    // alternative standard method

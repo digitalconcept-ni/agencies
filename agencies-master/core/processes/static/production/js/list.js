@@ -187,31 +187,40 @@ $(function () {
                     },
                 },
                 columns: [
-                    {
-                        "data": "id"
-                    },
-                    {
-                        "data": "invoice"
-                    },
-                    {
-                        "data": "supplier"
-                    },
-
-                    {
-                        "data": "total"
-                    },
+                    {"data": "id"},
+                    {"data": "supplier"},
+                    {"data": "product"},
+                    {"data": "price"},
+                    {"data": "cant"},
+                    {"data": "subtotal"},
                 ],
                 columnDefs: [
                     {
-                        targets: [0, 1, 2, 3],
+                        targets: [0, 1, 2, 3, 4, 5],
                         class: 'text-center',
                     },
                     {
                         targets: [0],
                         visible: false,
                     },
+                    {
+                        targets: [3],
+                        render: function (data, type, row) {
+                            if (data === '') {
+                                return '---------'
+                            } else {
+                                return parseFloat(data).toFixed(2)
+                            }
+                        }
+                    },
+                    {
+                        targets: [5],
+                        render: function (data, type, row) {
+                            return parseFloat(data).toFixed(2)
+                        }
+                    }
                 ],
-            });
+            })
             $('#modalRawMaterials').modal('show');
         })
 

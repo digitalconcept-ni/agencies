@@ -8,9 +8,9 @@ from core.processes.models import production, specifications
 
 
 class ProductionForm(ModelForm):
-    shopping_cart = forms.ModelChoiceField(queryset=Shopping.objects.filter(status=False),
-                                           to_field_name='id', widget=forms.SelectMultiple(attrs={
-            'class': 'form-control select2', 'required': True}))
+    # shopping_cart = forms.ModelChoiceField(queryset=Shopping.objects.filter(status=False),
+    #                                        to_field_name='id', widget=forms.SelectMultiple(attrs={
+    #         'class': 'form-control select2', 'required': True}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

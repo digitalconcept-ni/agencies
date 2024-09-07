@@ -403,3 +403,14 @@ class CompanyForm(ModelForm):
         except Exception as e:
             data['error'] = str(e)
         return data
+
+
+class LossForm(ModelForm):
+    class Meta:
+        model = loss
+        fields = '__all__'
+        widgets = {
+            'date_joined': forms.HiddenInput(attrs={
+                'value': datetime.now().strftime('%Y-%m-%d'),
+            }),
+        }
