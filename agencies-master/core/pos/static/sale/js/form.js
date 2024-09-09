@@ -1,7 +1,7 @@
 var tblProducts;
 var select_client, select_search_product;
 var tblSearchProducts;
-let coordClient = false;
+// let coordClient = false;
 var action = $('input[name="action"]').val();
 
 
@@ -207,15 +207,16 @@ $(function () {
                             location.href = data.success_url;
                         }
                     });
-                } else {
-                    var lat = e.params.data.lat;
-                    console.log(lat)
-                    if (lat != null || lat != undefined) {
-                        coordClient = true;
-                    } else {
-                        coordClient = false;
-                    }
                 }
+                // else {
+                //     var lat = e.params.data.lat;
+                //     console.log(lat)
+                //     if (lat != null || lat != undefined) {
+                //         coordClient = true;
+                //     } else {
+                //         coordClient = false;
+                //     }
+                // }
 
             })
         });
@@ -507,19 +508,19 @@ $(function () {
             return false;
         }
 
-        if (action == 'add') {
-            if (!coordClient) {
-                message_error('Favor de Geo localizar al cliente');
-                return false;
-            }
-        }
+        // if (action == 'add') {
+        //     if (!coordClient) {
+        //         message_error('Favor de Geo localizar al cliente');
+        //         return false;
+        //     }
+        // }
 
 
         var success_url = this.getAttribute('data-url');
         var parameters = new FormData(this);
         parameters.append('products', JSON.stringify(sale.details.products));
         parameters.append('products_review', JSON.stringify(sale.details.products_review));
-        parameters.append('coords', false);
+        // parameters.append('coords', false);
         submit_with_ajax(pathname, 'Notificación',
             '¿Estas seguro de realizar la siguiente acción?', parameters, function (response) {
                 alert_action('Notificación', '¿Desea imprimir la factura de venta?', function () {

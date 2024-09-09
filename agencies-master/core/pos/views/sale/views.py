@@ -291,12 +291,12 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
 
                         sale.calculate_invoice()
 
-                        if request.POST['coords'] != 'false':
-                            # PARTE PARA GUARDAR LA GEOLOCALIZACION DEL CLIENTE
-                            if request.POST['lat'] != ' ' and request.POST['lng'] != ' ':
-                                sale.client.lat = request.POST['lat']
-                                sale.client.lng = request.POST['lng']
-                                sale.client.save()
+                        # if request.POST['coords'] != 'false':
+                        #     # PARTE PARA GUARDAR LA GEOLOCALIZACION DEL CLIENTE
+                        #     if request.POST['lat'] != ' ' and request.POST['lng'] != ' ':
+                        #         sale.client.lat = request.POST['lat']
+                        #         sale.client.lng = request.POST['lng']
+                        #         sale.client.save()
                         data = {'id': sale.id}
             elif action == 'search_if_exits_client':
                 now = datetime.now()
