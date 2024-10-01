@@ -45,4 +45,24 @@
 
 {% endblock %}
 
+
+<script>
+    const SendEmail = () =>{
+        $.ajax(
+            $.ajax({
+            url: '/ping/',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+        }).done(function (data) {
+            console.log('Se realiazo el ping')
+        })
+        )
+    }
+
+    {#setInterval(function () {#}
+    {#    SendEmail()#}
+    {#}, 15000)#}
+</script>
+
 </html>

@@ -125,7 +125,7 @@ class Product(models.Model):
     brand = models.ForeignKey(Brands, on_delete=models.CASCADE, verbose_name='Marca', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
     name = models.CharField(max_length=150, verbose_name='Nombre')
-    code = models.CharField(max_length=6, default=random_code(), unique=True, verbose_name='Codigo de producto')
+    code = models.CharField(max_length=13, default=random_code(), unique=True, verbose_name='Codigo de producto')
     tax = models.CharField(max_length=7, default='exento', choices=tax_type, verbose_name='Impuesto')
     um = models.CharField(max_length=20, null=True, blank=True, verbose_name='Unidad de medida')
     expiration = models.DateField(verbose_name='Fecha de vencimiento', null=True, blank=True)

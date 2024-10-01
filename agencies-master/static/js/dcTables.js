@@ -108,7 +108,7 @@ const drawTables = async (data) => {
                     extend: 'excelHtml5',
                     text: 'Descargar Excel <i class="fas fa-file-excel"></i>',
                     titleAttr: 'Excel',
-                    className: 'btn btn-success btn-flat'
+                    className: 'btn btn-success'
                 }],
             columnDefs: data.config,
             initComplete: function (settings, json) {

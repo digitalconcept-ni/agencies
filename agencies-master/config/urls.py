@@ -36,6 +36,10 @@ urlpatterns = [
     # path('map/', include('core.maps.urls')),
     path('processes/', include('core.processes.urls')),
     path('shipping/', include('core.shipping.urls')),
+    path('store/', include('core.store.urls')),
+
+    # Ping to send emails
+    path('ping/', include('core.mailhandler.urls')),
 
     # QRcode
     path('qrspecifications/<int:pk>/', QRcodeView.as_view(), name='qrcode_view'),
