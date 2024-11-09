@@ -65,7 +65,7 @@
                     </ul>
 
                 </li>
-                {#  Shoppings  #}
+                {#  Shoppings #}
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-shopping-cart"></i>
@@ -150,6 +150,69 @@
                         </li>
                     </ul>
                 </li>
+                {#  Bodega #}
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-warehouse"></i>
+                        <p>
+                            Bodega
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'technicans_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Tecnicos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'exits_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Salidas</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {#  Taller #}
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-wrench"></i>
+                        <p>
+                            Taller
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'workshop_dashboard' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Panel</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'machines_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Equipos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'project_list' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Proyectos</p>
+                            </a>
+                        </li>
+
+                        {#                        <li class="nav-item">#}
+                        {#                            <a href="{% url 'exits_list' %}" class="nav-link">#}
+                        {#                                <i class="far fa-circle nav-icon"></i>#}
+                        {#                                <p>Salidas</p>#}
+                        {#                            </a>#}
+                        {#                        </li>#}
+                    </ul>
+                </li>
                 {#  Sales #}
                 <li class="nav-item">
                     <a href="{% url 'sale_list' %}" class="nav-link">
@@ -186,7 +249,7 @@
                     </ul>
 
                 </li>
-                {#  Reports #}
+                {# Reports #}
                 <li class="nav-item">
                     <a href="{% url 'sale_report' %}" class="nav-link">
                         <i class="nav-icon fas fa-chart-bar"></i>

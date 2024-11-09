@@ -69,6 +69,7 @@ TENANT_APPS = [
     'core.security',
     'core.processes',
     'core.shipping',
+    'core.mailhandler',
 ]
 
 TENANT_MODEL = "client.Client"  # app.Model
@@ -145,11 +146,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 
-# DATABASES = db.TENANT
+DATABASES = db.TENANT
 
-DATABASES = {
-    'default': env.db(engine='django_tenants.postgresql_backend'),
-}
+# DATABASES = {
+#     'default': env.db(engine='django_tenants.postgresql_backend'),
+# }
 
 DATABASE_ROUTERS = (
     'django_tenants.routers.TenantSyncRouter',
