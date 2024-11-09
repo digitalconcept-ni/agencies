@@ -69,7 +69,7 @@ TENANT_APPS = [
     'core.security',
     'core.processes',
     'core.shipping',
-    'core.mailhandler',
+    # 'core.mailhandler',
 ]
 
 TENANT_MODEL = "client.Client"  # app.Model
