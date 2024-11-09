@@ -43,9 +43,9 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
 
             now = datetime.now()
             user = param['user']
-            today = str(now.date())
+            # today = str(now.date())
             hour = f'{now.hour}:{now.minute}'
-            # today = '2023-09-08'
+            today = '2024-11-08'
             id = int(param['id'])
 
             if param['startHour'] != '' and param['endHour'] != '':
