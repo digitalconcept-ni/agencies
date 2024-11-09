@@ -38,7 +38,7 @@ urlpatterns = [
     path('shipping/', include('core.shipping.urls')),
 
     # Ping to send emails
-    path('ping/', include('core.mailhandler.urls')),
+    # path('ping/', include('core.mailhandler.urls')),
 
     # QRcode
     path('qrspecifications/<int:pk>/', QRcodeView.as_view(), name='qrcode_view'),
