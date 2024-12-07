@@ -84,9 +84,6 @@ class ProductForm(ModelForm):
                 'class': 'select2',
                 'style': 'width: 100%'
             }),
-            'code': forms.TextInput(attrs={
-                'readonly': True,
-            }),
         }
 
     def save(self, commit=True):
