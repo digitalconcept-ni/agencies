@@ -43,9 +43,9 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
 
             now = datetime.now()
             user = param['user']
-            today = str(now.date())
+            # today = str(now.date())
             hour = f'{now.hour}:{now.minute}'
-            # today = '2024-11-08'
+            today = '2024-12-06'
             id = int(param['id'])
 
             if param['startHour'] != '' and param['endHour'] != '':
@@ -59,7 +59,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
 
             # query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
-            querySales = query.filter(Q(user_id=id) & Q(endofday__exact=endDay))
+            querySales = query.filter(Q(user_id=id) & Q(endofday__exact=True))
             # COLLECT ALL THE SALES FOR ESPESIFIC USER
             detailProducts = querySales.order_by('-saleproduct__product__category_id').values(
                 'saleproduct__product__category__name', 'saleproduct__product__code', 'saleproduct__product__name',
