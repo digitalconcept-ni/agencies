@@ -138,7 +138,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 hours = [[[
                     f'{t.time_joined.hour}:{t.time_joined.minute}:{t.time_joined.second}.{t.time_joined.microsecond}'],
                     t.time_joined.strftime("%I:%M:%S %p")] for t
-                    in Sale.objects.filter(user__id=userId, date_joined='2024-06-12').order_by('time_joined')]
+                    in Sale.objects.filter(user__id=userId, date_joined='2024-12-06').order_by('time_joined')]
                     # in Sale.objects.filter(user__id=userId, date_joined=datetime.now().date()).order_by(
                     #     'time_joined')]
                 data = hours
