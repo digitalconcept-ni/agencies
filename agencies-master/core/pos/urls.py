@@ -5,7 +5,7 @@ from core.pos.views.brands.views import *
 from core.pos.views.category.views import *
 from core.pos.views.client.views import *
 from core.pos.views.company.views import CompanyUpdateView
-from core.pos.views.dashboard.views import *
+from core.dashboard.views import *
 from core.pos.views.load.views import loadCsvView
 from core.pos.views.loss.view import *
 from core.pos.views.product.views import *
@@ -14,8 +14,6 @@ from core.pos.views.shopping.views import *
 from core.pos.views.supplier.view import *
 
 urlpatterns = [
-    # dashboard
-    path('dashboard/', DashboardView.as_view(), name='dashboard'),
     # category
     path('category/', CategoryListView.as_view(), name='category_list'),
     path('category/add/', CategoryCreateView.as_view(), name='category_create'),
