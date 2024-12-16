@@ -19,8 +19,7 @@ from django.urls import path, include
 
 from config import settings
 from core.homepage.views import IndexView
-from django.conf.urls import handler404
-from core.pos.views.dashboard.views import page_not_found404
+
 # from rest_framework.authtoken import views
 
 urlpatterns = [

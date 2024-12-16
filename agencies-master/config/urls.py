@@ -19,8 +19,6 @@ from django.urls import path, include
 
 from config import settings
 from core.homepage.views import IndexView
-from django.conf.urls import handler404
-from core.pos.views.dashboard.views import page_not_found404
 from core.processes.views.specifications.views import QRcodeView
 
 # from rest_framework.authtoken import views
@@ -29,6 +27,7 @@ urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('admin/', admin.site.urls),
     path('login/', include('core.login.urls')),
+    path('dashboard/', include('core.dashboard.urls')),
     path('pos/', include('core.pos.urls')),
     path('reports/', include('core.reports.urls')),
     path('user/', include('core.user.urls')),
