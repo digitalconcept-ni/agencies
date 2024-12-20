@@ -41,16 +41,15 @@ function message_error(obj) {
 function message_info(obj) {
     var html = '';
     if (typeof (obj) === 'object') {
-        html = '<ul style="text-align: left;">';
         $.each(obj, function (key, value) {
-            html += '<li>' + key + ': ' + value + '</li>';
+            html += ` <span class='text-center'> ${value}</span>`;
         });
-        html += '</ul>';
     } else {
         html = '<p>' + obj + '</p>';
     }
     Swal.fire({
         template: 'material',
+        confirmButtonColor: "#3085d6",
         title: 'info',
         html: html,
         icon: 'info'
@@ -59,61 +58,109 @@ function message_info(obj) {
 
 function submit_with_ajax(url, title, content, parameters, callback) {
 
-    $.confirm({
-        theme: 'material',
+    Swal.fire({
         title: title,
-        icon: 'fa fa-info',
-        content: content,
-        columnClass: 'small',
-        typeAnimated: true,
-        cancelButtonClass: 'btn-primary',
-        draggable: true,
-        dragWindowBorder: false,
-        buttons: {
-            info: {
-                text: "Si",
-                btnClass: 'btn-primary',
-                action: function () {
-                    // Agregamos el preloader al bosy
-                    document.body.prepend(preloader);
-                    $.ajax({
-                        url: url,
-                        data: parameters,
-                        type: 'POST',
-                        dataType: 'json',
-                        headers: {
-                            'X-CSRFToken': csrftoken
-                        },
-                        processData: false,
-                        contentType: false,
-                        success: function (request) {
+        text: content,
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonColor: "#198754",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si",
+        cancelButtonText: "No"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: url,
+                data: parameters,
+                type: 'POST',
+                dataType: 'json',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                processData: false,
+                contentType: false,
+                success: function (request) {
 
-                            // Quitamos el preloader cuando se haya cumplido la accion
-                            if (preloader) {
-                                preloader.remove();
-                            }
-                            if (!request.hasOwnProperty('error')) {
-                                callback(request);
-                                return false;
-                            } else {
-                                message_error(request.error);
-                            }
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            message_error(errorThrown + ' ' + textStatus);
-                        }
-                    });
+                    // if (request.hasOwnProperty('info')) {
+                    //     message_info(request.info);
+                    //     callback(request);
+                    //     return false;
+                    // }
+                    if (!request.hasOwnProperty('error')) {
+                        callback(request);
+                        return false;
+                    } else {
+                        message_error(request.error);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    message_error(errorThrown + ' ' + textStatus);
                 }
-            },
-            danger: {
-                text: "No",
-                btnClass: 'btn-red',
-                action: function () {
-
-                }
-            },
+            });
         }
-    })
+    });
+
+    // $.confirm({
+    //     theme: 'material',
+    //     title: title,
+    //     icon: 'fa fa-info',
+    //     content: content,
+    //     columnClass: 'small',
+    //     typeAnimated: true,
+    //     cancelButtonClass: 'btn-primary',
+    //     draggable: true,
+    //     dragWindowBorder: false,
+    //     buttons: {
+    //         info: {
+    //             text: "Si",
+    //             btnClass: 'btn-primary',
+    //             action: function () {
+    //                 // Agregamos el preloader al bosy
+    //                 document.body.prepend(preloader);
+    //                 $.ajax({
+    //                     url: url,
+    //                     data: parameters,
+    //                     type: 'POST',
+    //                     dataType: 'json',
+    //                     headers: {
+    //                         'X-CSRFToken': csrftoken
+    //                     },
+    //                     processData: false,
+    //                     contentType: false,
+    //                     success: function (request) {
+    //
+    //                         // Quitamos el preloader cuando se haya cumplido la accion
+    //                         if (preloader) {
+    //                             preloader.remove();
+    //                         }
+    //
+    //                         if (request.hasOwnProperty('info')) {
+    //                             message_info(request.info);
+    //                             callback(request);
+    //                             return false;
+    //                         }
+    //                         if (!request.hasOwnProperty('error')) {
+    //                             callback(request);
+    //                             return false;
+    //                         } else {
+    //                             message_error(request.error);
+    //                         }
+    //                     },
+    //                     error: function (jqXHR, textStatus, errorThrown) {
+    //                         message_error(errorThrown + ' ' + textStatus);
+    //                     }
+    //                 });
+    //             }
+    //         },
+    //         danger: {
+    //             text: "No",
+    //             btnClass: 'btn-red',
+    //             action: function () {
+    //
+    //             }
+    //         },
+    //     }
+    // })
 }
 
 function alert_action(title, content, callback, cancel) {
@@ -201,9 +248,9 @@ if (preloader) {
 
 // Get ystem year
 
-var year = new Date;
-let spanYear = document.getElementById('year-system');
-spanYear.innerHTML = `${year.getFullYear()}`;
+// var year = new Date;
+// let spanYear = document.getElementById('year-system');
+// spanYear.innerHTML = `${year.getFullYear()}`;
 
 // function toggleFullScreen() {
 //   if (!document.fullscreenElement &&    // alternative standard method
