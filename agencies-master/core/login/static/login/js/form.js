@@ -15,24 +15,39 @@ $(function () {
 
     const handleError = (error) => {
         // Display error based on the error code.
-        const {
-            code
-        } = error;
+        const {code} = error;
+        let errorMessage = '';
+
         switch (code) {
             case GeolocationPositionError.TIMEOUT:
-                alert(`Tempo agotado, Para continuar, Favor, recargue la página y asegúrese de tener localización activa - ${error.message}`);
+                errorMessage = {'Tiempo agotado': ` Para continuar, Favor, recargue la página y asegúrese de tener localización activa - ${error.message}`};
                 break;
             case GeolocationPositionError.PERMISSION_DENIED:
                 // User denied the request.
-                alert(`Permiso denegado, Para continuar, favor dar permiso de Geolocalización y actualice - ${error.message}`);
+                errorMessage = {'Permiso denegado': `Para continuar, favor dar permiso de Geolocalización y actualice - ${error.message}`};
                 break;
             case GeolocationPositionError.POSITION_UNAVAILABLE:
                 // Position not available.
-                alert(`Posición no disponible, Para continuar, Favor, recargue la página y asegúrese de tener localización activa - ${error.message}`);
+                errorMessage = {'Posición no disponible': `Para continuar, Favor, recargue la página y asegúrese de tener localización activa - ${error.message}`};
                 break;
         }
+        message_error(errorMessage);
+        // Intentar obtener la ubicación nuevamente si es un error recuperable
+        retryGeolocation();
     }
 
-    navigator.geolocation.getCurrentPosition(success, handleError, options);
+    // navigator.geolocation.getCurrentPosition(success, handleError, options);
+
+    const retryGeolocation = (attempts = 3) => {
+        if (attempts > 0) {
+            setTimeout(() => {
+                navigator.geolocation.getCurrentPosition(success, handleError, options);
+            }, 2000); // Esperar 2 segundos antes de reintentar
+        } else {
+            message_error({'Error': 'No se pudo obtener la ubicación después de varios intentos.'});
+        }
+    };
+
+    retryGeolocation();
 
 });

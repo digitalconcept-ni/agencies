@@ -1,41 +1,105 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{ title }}</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <link rel="icon" href="{% static 'img/BISB-LOGO.png' %}" type="image/png"/>
+    <title>{{ title }} </title>
 
-    <!-- Tell the browser to be responsive to screen width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="{% static 'lib/fontawesome-5.15.3/css/all.min.css' %}">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="{% static 'lib/adminlte-3.2.0/css/adminlte.min.css' %}">
-    <!-- Google Font: Source Sans Pro -->
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <!-- Sweetalert2 -->
-    <script src="{% static 'lib/sweetalert2-11.0.16/sweetalert2.all.min.js' %}"></script>
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon/favicon-32x32.png' %} ">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon/favicon-16x16.png' %} ">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+          rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'lib2/bootstrap/css/bootstrap.min.css' %} " rel="stylesheet">
+    <link href="{% static 'lib2/bootstrap-icons/bootstrap-icons.css' %} " rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="{% static 'css/style.css' %} " rel="stylesheet">
+
     <!-- jQuery -->
     <script src="{% static 'lib/bootstrap-4.6.0/js/jquery.min.js' %}"></script>
-    <!-- Bootstrap 4 -->
-    <script src="{% static 'lib/bootstrap-4.6.0/js/bootstrap.min.js' %}"></script>
-    <!-- AdminLTE App -->
-    <script src="{% static 'lib/adminlte-3.2.0/js/adminlte.min.js' %}"></script>
-    <!-- Sweetalert2 -->
-    <script src="{% static 'lib/sweetalert2-11.0.16/sweetalert2.all.min.js' %}"></script>
-    <!-- Jquery Confirm -->
-    <link rel="stylesheet" href="{% static 'lib/jquery-confirm-3.3.4/jquery-confirm.min.css' %}">
-    <script src="{% static 'lib/jquery-confirm-3.3.4/jquery-confirm.min.js' %}"></script>
+
+    {# loader#}
+    <link rel="stylesheet" href="{% static 'css/loader.css' %}">
+
     <!-- Functions -->
     <script defer src="{% static 'js/functions.js' %}"></script>
+
+    <script language=JavaScript>
+
+        function inhabilitar() {
+            return false
+        }
+
+        document.oncontextmenu = inhabilitar
+
+        function checkKey(evt) {
+            onkeydown = e => {
+                let tecla = e.which || e.keyCode;
+
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (tecla === 73)
+                        console.log("Acceso Restringido");
+                }
+            }
+        }
+    </script>
+
     {% block head %}
 
     {% endblock %}
+
+    <script type="text/javascript">const tlJsHost = ((window.location.protocol == "https:") ? "https://secure.trust-provider.com/" : "http://www.trustlogo.com/");
+    document.write(unescape("<script src='" + tlJsHost + "trustlogo/javascript/trustlogo.js' type='text/javascript' %3E%3C/script%3E"));</script>
+
 </head>
-<body class="hold-transition login-page">
+{#<head>#}
+{#    <meta charset="utf-8">#}
+{#    <meta http-equiv="X-UA-Compatible" content="IE=edge">#}
+{#    <title>{{ title }}</title>#}
+{##}
+{#    <link rel="icon" href="{% static 'img/BISB-LOGO.png' %}" type="image/png"/>#}
+{##}
+{#    <!-- Tell the browser to be responsive to screen width -->#}
+{#    <meta name="viewport" content="width=device-width, initial-scale=1">#}
+{#    <!-- Font Awesome -->#}
+{#    <link rel="stylesheet" href="{% static 'lib/fontawesome-5.15.3/css/all.min.css' %}">#}
+{#    <!-- Theme style -->#}
+{#    <link rel="stylesheet" href="{% static 'lib/adminlte-3.2.0/css/adminlte.min.css' %}">#}
+{#    <!-- Google Font: Source Sans Pro -->#}
+{#    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">#}
+{#    <!-- Sweetalert2 -->#}
+{#    <script src="{% static 'lib/sweetalert2-11.0.16/sweetalert2.all.min.js' %}"></script>#}
+{#    <!-- jQuery -->#}
+{#    <script src="{% static 'lib/bootstrap-4.6.0/js/jquery.min.js' %}"></script>#}
+{#    <!-- Bootstrap 4 -->#}
+{#    <script src="{% static 'lib/bootstrap-4.6.0/js/bootstrap.min.js' %}"></script>#}
+{#    <!-- AdminLTE App -->#}
+{#    <script src="{% static 'lib/adminlte-3.2.0/js/adminlte.min.js' %}"></script>#}
+{#    <!-- Sweetalert2 -->#}
+{#    <script src="{% static 'lib/sweetalert2-11.0.16/sweetalert2.all.min.js' %}"></script>#}
+{#    <!-- Jquery Confirm -->#}
+{#    <link rel="stylesheet" href="{% static 'lib/jquery-confirm-3.3.4/jquery-confirm.min.css' %}">#}
+{#    <script src="{% static 'lib/jquery-confirm-3.3.4/jquery-confirm.min.js' %}"></script>#}
+{#    <!-- Functions -->#}
+{#    <script defer src="{% static 'js/functions.js' %}"></script>#}
+{#    {% block head %}#}
+{##}
+{#    {% endblock %}#}
+{#</head>#}
+
+<body class="hold-transition login-page" onKeyDown="checkKey(event)">
 <!-- Preloader -->
 <div id="preloader">
 
@@ -216,8 +280,28 @@
 
     </div>
 </div>
-{% block content %}
 
-{% endblock %}
+<main>
+    <div class="container">
+        {% block content %}
+
+        {% endblock %}
+
+    </div>
+</main>
+
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+        class="bi bi-arrow-up-short"></i></a>
+
+<!-- JS Files -->
+<script src="{% static 'lib2/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
+
+{# Sweet Alert 2#}
+<script src="{% static 'lib2/sweetalert2-11.0.16/sweetalert2.all.min.js' %}"></script>
+
+<!-- Template Main JS File -->
+<script src="{% static 'js/main.js' %} "></script>
+
 </body>
 </html>

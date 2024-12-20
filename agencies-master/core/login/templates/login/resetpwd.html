@@ -3,67 +3,164 @@
 {% load static %}
 
 {% block content %}
-    <div class="login-box">
-        <div class="login-logo">
-            <img src="{% static 'img/BISB-LOGO.png' %}"
-                 alt="AdminLTE Logo"
-                 class="brand-image img-circle"
-                 style="opacity: .8">
-            <a href="{% url 'index' %}">
 
-                {#                <span class="brand-text font-weight-bold"><b>B</b>is<b>B</b></span>#}
-                <b>B</b>is<b>B</b>
-            </a>
-        </div>
-        <div class="card">
-            <div class="card-body login-card-body">
-                <p class="login-box-msg">Reseteo de contraseña</p>
-                <form action=".." method="post">
-                    <input type="hidden" name="next" value="{{ next }}">
-                    {% csrf_token %}
-                    <div class="input-group mb-3">
-                        {{ form.username }}
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-envelope"></span>
+    <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+
+                    <div class="d-flex justify-content-center py-4">
+                        <a href="{% url 'index' %}" class="logo d-flex align-items-center w-auto">
+                            <img src="{% static 'img/favicon/android-chrome-512x512.png' %}" alt="">
+                            <span class="d-none d-lg-block">BisB</span>
+                        </a>
+                    </div><!-- End Logo -->
+
+                    <div class="card mb-3">
+
+                        <div class="card-body">
+
+                            <div class="pt-4 pb-2">
+                                <h5 class="card-title text-center pb-0 fs-4">Reseteo de contraseña</h5>
+                                <p class="text-center small">Ingresa tu usuario</p>
                             </div>
+
+                            <form action="." method="post" class="row g-3 needs-validation">
+                                <input type="hidden" name="next" value="{{ next }}">
+                                {% csrf_token %}
+
+                                <div class="col-12">
+                                    <label for="yourUsername" class="form-label">Usuario</label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text" id="inputGroupPrepend">@</span>
+                                        {#                                            {{ form.username|add_class:'form-control'|attr:'autofocus:off'|attr:'autocomplete:off' }}#}
+                                        <input type="text" name="username" class="form-control" id="id_username"
+                                               required>
+
+                                        <div class="invalid-feedback">Ingresa tu nombre de usuario.</div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn btn-primary w-100" type="submit">Enviar correo</button>
+                                </div>
+                                <div class="col-12">
+
+                                    <p class="small mb-0">Si deseas volver al login da un click <a
+                                            href="{% url 'login' %}">aqui </a>
+                                    </p>
+                                </div>
+                            </form>
+
                         </div>
                     </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <button type="submit" class="btn btn-primary btn-block">
-                                <i class="fas fa-envelope"></i> Enviar
-                            </button>
-                        </div>
+
+                    <div class="credits">
+                        <script language="JavaScript"
+                                type="text/javascript">TrustLogo("https://micuenta.donweb.com/img/sectigo_positive_md.png", "CL1", "none");</script>
+                        <a href="https://donweb.com/es-int/certificados-ssl" id="comodoTL"
+                           title="Certificados SSL Nicaragua">Certificados SSL
+                            Nicaragua</a>
+                        {#                                                Designed by <a href="https://digitalconcept.com/">Digital Concept</a>#}
                     </div>
-                    <p class="text-center mt-2" style="font-size: 13px;">
-                        Si deseas volver al login da un click <a
-                            href="{% url 'login' %}">aqui </a>
-                    </p>
-                </form>
+
+                </div>
             </div>
         </div>
+
         <script type="application/javascript">
+            {% if form.errors %}
+                var errors = '';
+                {% for error in form.non_field_errors %}
+                    errors += '{{ error }}\n';
+                {% endfor %}
+                Swal.fire({
+                    title: 'Error!',
+                    text: errors,
+                    icon: 'error'
+                });
+            {% endif %}
+
             $(function () {
                 $('form').on('submit', function (e) {
                     e.preventDefault();
                     var parameters = new FormData(this);
                     submit_with_ajax(pathname, 'Notificación', '¿Estas seguro de resetear tu contraseña?', parameters, function () {
-                        Swal.fire({
-                            title: 'Notificación',
-                            text: 'Se ha enviado un correo electrónico con los pasos a seguir para que pueda resetear su contraseña',
-                            icon: 'success',
-                            timer: 5000,
-                            onClose: () => {
-                                location.href = '/';
-                            }
-                        }).then((result) => {
-
-                        });
-                    });
+                         Swal.fire({
+                             title: 'Notificación',
+                             text: 'Se ha enviado un correo electrónico con los pasos a seguir para que pueda resetear su contraseña',
+                             icon: 'success',
+                             timer: 5000,
+                             willClose: () => {
+                                 location.href = '/login/';
+                             }
+                         })
+                     });
                 });
             });
         </script>
-    </div>
+    </section>
+
+    {#    <div class="login-box">#}
+    {#        <div class="login-logo">#}
+    {#            <img src="{% static 'img/BISB-LOGO.png' %}"#}
+    {#                 alt="AdminLTE Logo"#}
+    {#                 class="brand-image img-circle"#}
+    {#                 style="opacity: .8">#}
+    {#            <a href="{% url 'index' %}">#}
+    {##}
+    {#                <span class="brand-text font-weight-bold"><b>B</b>is<b>B</b></span>#}
+    {#                <b>B</b>is<b>B</b>#}
+    {#            </a>#}
+    {#        </div>#}
+    {#        <div class="card">#}
+    {#            <div class="card-body login-card-body">#}
+    {#                <p class="login-box-msg">Reseteo de contraseña</p>#}
+    {#                <form action=".." method="post">#}
+    {#                    <input type="hidden" name="next" value="{{ next }}">#}
+    {#                    {% csrf_token %}#}
+    {#                    <div class="input-group mb-3">#}
+    {#                        {{ form.username }}#}
+    {#                        <div class="input-group-append">#}
+    {#                            <div class="input-group-text">#}
+    {#                                <span class="fas fa-envelope"></span>#}
+    {#                            </div>#}
+    {#                        </div>#}
+    {#                    </div>#}
+    {#                    <hr>#}
+    {#                    <div class="row">#}
+    {#                        <div class="col-lg-12">#}
+    {#                            <button type="submit" class="btn btn-primary btn-block">#}
+    {#                                <i class="fas fa-envelope"></i> Enviar#}
+    {#                            </button>#}
+    {#                        </div>#}
+    {#                    </div>#}
+    {#                    <p class="text-center mt-2" style="font-size: 13px;">#}
+    {#                        Si deseas volver al login da un click <a#}
+    {#                            href="{% url 'login' %}">aqui </a>#}
+    {#                    </p>#}
+    {#                </form>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#        <script type="application/javascript">#}
+    {#            $(function () {#}
+    {#                $('form').on('submit', function (e) {#}
+    {#                    e.preventDefault();#}
+    {#                    var parameters = new FormData(this);#}
+    {#                    submit_with_ajax(pathname, 'Notificación', '¿Estas seguro de resetear tu contraseña?', parameters, function () {#}
+    {#                        Swal.fire({#}
+    {#                            title: 'Notificación',#}
+    {#                            text: 'Se ha enviado un correo electrónico con los pasos a seguir para que pueda resetear su contraseña',#}
+    {#                            icon: 'success',#}
+    {#                            timer: 5000,#}
+    {#                            onClose: () => {#}
+    {#                                location.href = '/';#}
+    {#                            }#}
+    {#                        }).then((result) => {#}
+    {##}
+    {#                        });#}
+    {#                    });#}
+    {#                });#}
+    {#            });#}
+    {#        </script>#}
+    {#    </div>#}
 {% endblock %}
