@@ -1,0 +1,161 @@
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar ">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+        <li class="nav-item">
+            <a class="nav-link " href="{% url 'dashboard' %}">
+                <i class="bi bi-grid"></i>
+                <span>Dashboard</span>
+            </a>
+        </li><!-- End Dashboard Nav -->
+
+         <li class="nav-item">
+            <a class="nav-link collapsed" href="{% url 'company_update' %}">
+                <i class="bi bi-building"></i>
+                <span>Compañia</span>
+            </a>
+        </li><!-- End Company Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#register-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-basket"></i><span>Productos</span><i
+                    class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="register-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{% url 'category_list' %}">
+                        <i class="bi bi-circle"></i><span>Categorias</span>
+                    </a>
+                </li>
+                <li>
+                    <a href={% url 'brand_list' %}>
+                        <i class="bi bi-circle"></i><span>Marcas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'product_list' %}">
+                        <i class="bi bi-circle"></i><span>Stock</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <!-- End Products Nav -->
+
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#incription-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-card-checklist"></i><span>Compras</span><i
+                    class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="incription-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{% url 'supplier_list' %}">
+                        <i class="bi bi-circle"></i><span>Proveedores</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'shopping_list' %}">
+                        <i class="bi bi-circle"></i><span>Facturas</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <!-- End Compras Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#operation-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-bar-chart"></i><span>Operaciones</span><i
+                    class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="operation-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{% url 'loss_list' %}">
+                        <i class="bi bi-circle"></i><span>Perdidas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'shopping_list' %}">
+                        <i class="bi bi-circle"></i><span>Producción</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'specifications_list' %}">
+                        <i class="bi bi-circle"></i><span>Especificaciones</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <!-- End Opepraciones Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#clients-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-person-circle"></i><span>Clientes</span><i
+                    class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="clients-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{% url 'loss_list' %}">
+                        <i class="bi bi-circle"></i><span>Listado de clientes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'shopping_list' %}">
+                        <i class="bi bi-circle"></i><span>Activos comerciales</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <!-- End Clients Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#">
+                <i class="bi bi-cash-coin"></i>
+                <span>Ventas</span>
+            </a>
+        </li><!-- End ventas Nav -->
+
+         <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#shipping-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-truck"></i><span>Envíos</span><i
+                    class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="shipping-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{% url 'vehicles_list' %}">
+                        <i class="bi bi-circle"></i><span>Vehículos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'deliveries_list' %}">
+                        <i class="bi bi-circle"></i><span>Delivery</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <!-- End Shipping Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="{% url 'sale_report' %}">
+                <i class="bi bi-clipboard-data"></i>
+                <span>Reportes</span>
+            </a>
+        </li><!-- End ventas Nav -->
+        
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="{% url 'user_list' %}">
+                <i class="bi bi-people"></i>
+                <span>Usuarios</span>
+            </a>
+        </li><!-- End User Page Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" href={% url 'access_users_list' %}>
+                <i class="bi bi-clock"></i>
+                <span>Control de accesos</span>
+            </a>
+        </li><!-- End User access Nav -->
+
+    </ul>
+
+</aside><!-- End Sidebar-->

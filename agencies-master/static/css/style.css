@@ -69,7 +69,7 @@ h6 {
   right: 15px;
   bottom: 15px;
   z-index: 99999;
-  background: #4154f1;
+  background: rgb(239,126,58);
   width: 40px;
   height: 40px;
   border-radius: 4px;
@@ -83,7 +83,7 @@ h6 {
 }
 
 .back-to-top:hover {
-  background: #6776f4;
+  background: rgb(245, 148, 70);
   color: #fff;
 }
 
@@ -334,13 +334,13 @@ h6 {
 
 .nav-tabs-bordered .nav-link:hover,
 .nav-tabs-bordered .nav-link:focus {
-  color: #4154f1;
+  color: rgb(239,126,58);
 }
 
 .nav-tabs-bordered .nav-link.active {
   background-color: #fff;
-  color: #4154f1;
-  border-bottom: 2px solid #4154f1;
+  color: rgb(239,126,58);
+  border-bottom: 2px solid rgb(239,126,58);
 }
 
 /*--------------------------------------------------------------
@@ -676,7 +676,7 @@ h6 {
   align-items: center;
   font-size: 15px;
   font-weight: 600;
-  color: #4154f1;
+  color: rgb(239,126,58);
   transition: 0.3;
   background: #f6f9ff;
   padding: 10px 15px;
@@ -686,7 +686,7 @@ h6 {
 .sidebar-nav .nav-link i {
   font-size: 16px;
   margin-right: 10px;
-  color: #4154f1;
+  color:rgb(239,126,58);
 }
 
 .sidebar-nav .nav-link.collapsed {
@@ -699,12 +699,12 @@ h6 {
 }
 
 .sidebar-nav .nav-link:hover {
-  color: #4154f1;
+  color: rgb(239,126,58);
   background: #f6f9ff;
 }
 
 .sidebar-nav .nav-link:hover i {
-  color: #4154f1;
+  color: rgb(239,126,58);
 }
 
 .sidebar-nav .nav-link .bi-chevron-down {
@@ -742,11 +742,11 @@ h6 {
 
 .sidebar-nav .nav-content a:hover,
 .sidebar-nav .nav-content a.active {
-  color: #4154f1;
+  color:rgb(239,126,58);
 }
 
 .sidebar-nav .nav-content a.active i {
-  background-color: #4154f1;
+  background-color: rgb(239,126,58);
 }
 
 
@@ -1024,4 +1024,9 @@ h6 {
   text-align: center;
   font-size: 13px;
   color: #012970;
+}
+
+/*Data tables*/
+th.dt-center, td.dt-center {
+    text-align: center; /* Asegura que el texto esté centrado */
 }
