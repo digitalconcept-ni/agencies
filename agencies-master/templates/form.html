@@ -84,15 +84,17 @@
                         </div>
                     {% endfor %}
 
+                    {% block extra_form %}
+
+                    {% endblock %}
+
                 </div>
             </div>
             <div class="card-footer">
-                <button type="submit" class="btn btn-primary btn-flat">
-                    <i class="fas fa-save"></i> Guardar
+                 <button type="submit" id="btn_registro" class="btn btn-success">
+                    <i class="fas fa-save"></i>
                 </button>
-                <a href="{{ list_url }}" class="btn btn-danger btn-flat">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
+                <a href="{{ list_url }}" class="btn btn-danger"><i class="fas fa-ban"></i></a>
             </div>
         </div>
     </form>
