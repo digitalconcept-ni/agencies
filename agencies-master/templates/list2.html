@@ -1,0 +1,102 @@
+{% extends 'vtc2/body.html' %}
+{% load static %}
+
+{% block head_list %}
+
+
+    {# Styles for datatables include librarys #}
+    {# Included libraries:jQuery 3 3.7.0, JSZip 3.10.1,#}
+    {# pdfmake 0.2.7, DataTables 2.0.8, Buttons 3.0.2, Column visibility 3.0.2, HTML5 #}
+    {# export 3.0.2, Print view 3.0.2, DateTime 1.5.2, FixedHeader 4.0.1, Responsive 3.0.2 #}
+    <link rel="stylesheet" href="{% static 'lib2/DataTables/datatables.css' %}">
+
+    {# Fuction data tables include librarys #}
+    {# Included libraries: jQuery 3 3.7.0, JSZip 3.10.1 #}
+    {# pdfmake 0.2.7, DataTables 2.0.8, Buttons 3.0.2, Column visibility 3.0.2,  #}
+    {# HTML5 export 3.0.2, Print view 3.0.2, DateTime 1.5.2, FixedHeader 4.0.1, Responsive 3.0.2#}
+    <script src="{% static 'lib2/DataTables/datatables.min.js' %}"></script>
+
+
+    {# script Digital Concept tables #}
+    <script src="{% static 'js/dcTables.js' %}"></script>
+
+    {% block head_list_extra %}
+
+    {% endblock %}
+
+
+{% endblock %}
+
+{% block body_content %}
+
+    <div class="card">
+        <div class="card-header">{{ title }}</div>
+        <div class="card-body pt-2">
+
+            {% block list_body %}
+
+                {% block list_controls %}
+
+                {% endblock %}
+
+                <table class="table table-striped table-valign-middle" id="tableList">
+                    <thead>
+                    <tr id="trow" rel="rowList">
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            {% endblock %}
+
+        </div>
+        <div class="card-footer">
+            {% block list_foot %}
+                {# btn to add data #}
+                <a href="{{ create_url }}" class="btn btn-success">
+                    <i class="bi bi-plus-circle-fill"></i>
+                </a>
+            {% endblock %}
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(function () {
+            
+            $('#tableList tbody').on('click', 'a[rel="delete"]', function () {
+                var table = $('#tableList').DataTable();
+                var tr = table.cell($(this).closest('td, li')).index();
+                var data = table.row(tr.row).data();
+                var param = new FormData();
+                param.append('action', 'delete')
+                param.append('id', data[0])
+                submit_with_ajax(pathname, 'Eliminar registro', '¿Estas seguro de eliminarlo?',
+                    param, function () {
+
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 1500,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            }
+                        });
+                        Toast.fire({
+                            icon: "success",
+                            title: "Registro eliminado correctamente",
+                            willClose: function () {
+                                table.ajax.reload();
+                            }
+                        });
+                    })
+            })
+        });
+    </script>
+{% endblock %}
