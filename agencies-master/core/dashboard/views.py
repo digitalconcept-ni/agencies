@@ -69,7 +69,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     pvp = Product.objects.all().aggregate(
                         result=Coalesce(Sum(F('stock') * F('pvp')), 0.00, output_field=FloatField())).get('result')
                     revenue = float(pvp) - float(investment)
-                    data = [[1, f'{investment:.2f}', f'{revenue:.2f}']]
+                    data = [[1, f'{investment:,.2f}', f'{revenue:,.2f}']]
                 else:
                     data['error'] = 'No tiene acceso a esta informacion'
             elif action == 'search_data':
@@ -103,8 +103,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 appliedCredit = querySales.filter(Q(payment='credit') & Q(applied=False)).count()
 
                 data = {
-                    'sales-today': countSalesToday,
-                    'sales': countSalesTodayMoney,
+                    'sales': countSalesToday,
+                    'amount': countSalesTodayMoney,
                     'products': totalProductsQuery,
                     'clients': totalClientsQuery,
                     'lower-inventory': lowInventory,
@@ -209,9 +209,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 data = []
                 total = 0
                 for i in appliedCredit:
-                    total += i.total
-                    data.append([i.id, i.purchase_order, i.user.username, i.client.names, i.end, i.total])
-                data.append(['--', '----', '----', '----', 'Total', total])
+                    total += f'{i.total:,.2f}'
+                    data.append([i.id, i.purchase_order, i.user.username, i.client.names, i.end, f'{i.total:,.2f}'])
+                data.append(['--', '----', '----', '----', 'Total', f'{total:,.2f}'])
         except Exception as e:
             print(str(e))
             data['error'] = str(e)

@@ -64,29 +64,18 @@ $(function () {
                 targets: [6],
                 class: 'text-center',
                 render: function (data, type, row) {
-                    if (row.stock > 6) {
-                        return '<span class="badge badge-success">' + data + '</span>';
-                    } else if (row.stock === 0) {
-                        return '<span class="badge badge-secondary">Sin stock</span>';
-                    } else {
-                        return '<span class="badge badge-danger">' + data + '</span>';
-                    }
+                    let html = `<span class="badge bg-danger">
+                                    <i class="bi bi-exclamation-octagon me-1"></i> ${data}
+                                    </span>`
+                    return html;
                 }
-            },
-            {
-                targets: [4],
-                class: 'text-center',
-                visible: false,
-                // render: function (data, type, row) {
-                //     return '$' + parseFloat(data).toFixed(2);
-                // }
             },
         ]
         let data = {
             'data': {'action': 'search_lower_inventory'},
-            'inserInto': 'rowModal',
+            'inserInto': 'rowModalInfo',
             'th': ['Nro', 'Marca', 'Nombre', 'Vencimiento', 'Imagen', '¿Es inventariado?', 'Stock', 'Costo', 'Precio venta', 'Opciones'],
-            'table': 'tableModal',
+            'table': 'tableModalInfo',
             'config': config,
             'modal': true,
         }
@@ -103,18 +92,15 @@ $(function () {
 
         let config = [
             {
-                targets: [1, 2],
+                targets: [0, 1, 2],
                 class: 'text-center',
-                render: function (data, type, row) {
-                    return 'C$ ' + parseFloat(data).toFixed(2);
-                }
             },
         ]
         let data = {
             'data': {'action': 'search_investment'},
-            'inserInto': 'rowModal',
+            'inserInto': 'rowModalInfo',
             'th': ['Nro', 'Inversión', 'Ganancia'],
-            'table': 'tableModal',
+            'table': 'tableModalInfo',
             'config': config,
             'modal': true,
         }
@@ -147,9 +133,9 @@ $(function () {
         ]
         let data = {
             'data': {'action': 'search_payment_method'},
-            'inserInto': 'rowModal',
+            'inserInto': 'rowModalInfo',
             'th': ['Nro', 'Efectivo', 'POS', 'Transferencia', 'Credito'],
-            'table': 'tableModal',
+            'table': 'tableModalInfo',
             'config': config,
             'modal': true,
         }
@@ -175,9 +161,9 @@ $(function () {
             },]
         let data = {
             'data': {'action': 'search_presale_info'},
-            'inserInto': 'rowModal',
+            'inserInto': 'rowModalInfo',
             'th': ['Nro', 'Preventa', 'Clientes Programados', 'Clientes Efectivos', 'Efectividad'],
-            'table': 'tableModal',
+            'table': 'tableModalInfo',
             'config': config,
             'modal': true,
         }
@@ -192,21 +178,16 @@ $(function () {
                 visible: false
             },
             {
-                targets: [1, 2, 3, 4],
+                targets: [1, 2, 3, 4,5],
                 class: 'text-center',
             },
-            {
-                targets: [4],
-                render: function (data, type, row) {
-                    return parseFloat(data).toFixed(2);
-                }
-            },]
+        ]
         let data = {
             'data': {'action': 'view-credit-noapplied'},
-            'inserInto': 'rowModal',
+            'inserInto': 'rowModalInfo',
             'th': ['Nro', 'Orden de compra', 'Usuario', 'Cliente', 'Cancelacion', 'Monto'],
-            'table': 'tableModal',
-            'config': [],
+            'table': 'tableModalInfo',
+            'config': config,
             'modal': true,
         }
         drawTables(data);
