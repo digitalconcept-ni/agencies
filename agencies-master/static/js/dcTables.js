@@ -48,7 +48,7 @@ const tableColumn = async (data, table, insertInto) => {
         let trow = $(`#${table} tr[rel=${insertInto}]`).empty();
         let th = '';
         $.each(data, v => {
-            th += `<th style="width: auto">${data[v]}</th>`;
+            th += `<th style="text-align: center">${data[v]}</th>`;
         })
         trow.append(th)
     }
@@ -65,22 +65,7 @@ const drawTables = async (data) => {
         tableData = $(`#${data.table}`).on('error.dt', function (e, settings, techNote, message) {
             message_error(message.split('-')[1]);
         }).DataTable({
-            // dom: 'Btip',
-            // buttons: {
-            //     dom: {
-            //         button: {
-            //             className: 'btn'
-            //         }
-            //     },
-            //     buttons: [
-            //         {
-            //             extend: "excel",
-            //             text: 'Exportar a Excel',
-            //             className: 'btn btn-outline-success'
-            //         }
-            //     ]
-            // },
-            deferRender: true,
+           deferRender: true,
             responsive: true,
             autoWidth: false,
             destroy: true,
@@ -100,13 +85,13 @@ const drawTables = async (data) => {
             order: false,
             // paging: false,
             ordering: false,
-            info: false,
+            // info: false,
             // searching: false,
             dom: 'Bfrtip',
             buttons: [
                 {
                     extend: 'excelHtml5',
-                    text: 'Descargar Excel <i class="fas fa-file-excel"></i>',
+                    text: '<i class="bi bi-file-earmark-excel-fill"></i>',
                     titleAttr: 'Excel',
                     className: 'btn btn-success'
                 }],
