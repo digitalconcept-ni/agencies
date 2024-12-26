@@ -1,10 +1,30 @@
-{% extends 'list.html' %}
+{% extends 'list2.html' %}
 {% load static %}
-{% block head_list %}
-    <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/spanish.js' %}"></script>
-    <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/daterangepicker.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'lib/bootstrap-daterangepicker-3.1/css/daterangepicker.css' %}"/>
+
+{% block head_list_extra %}
+
+    {# FUNCIONES PROPIAS DEL MODULO #}
     <script src="{% static 'access_users/js/list.js' %}"></script>
+{% endblock %}
+
+{% block list_controls %}
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="form-group">
+                <label>Rangos de fechas:</label>
+                <div class="input-group mb-3">
+                    {{ form.date_range }}
+                    <button class="btn btn-primary btnSearch" type="button">
+                        <i class="bi bi-calendar-range"></i> Rango
+                    </button>
+                    <button class="btn btn-secondary btnSearchAll" type="button">
+                        <i class="bi bi-list-columns-reverse"></i> Todas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
 {% endblock %}
 
 {% block columns %}
@@ -29,27 +49,7 @@
 
 {% endblock %}
 
-{% block content_list_before %}
-    <div class="row">
-        <div class="col-lg-5">
-            <div class="form-group">
-                <label>Rangos de fechas:</label>
-                <div class="input-group mb-3">
-                    {{ form.date_range }}
-                    <div class="input-group-append">
-                        <button class="btn btn-success btnSearch" type="button">
-                            <i class="fas fa-calendar-check"></i> Buscar por rangos
-                        </button>
-                        <button class="btn btn-warning btnSearchAll" type="button">
-                            <i class="fas fa-calendar-check"></i> Ver todas
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <hr>
-{% endblock %}
+
 
 {% block list_card_footer %}
 

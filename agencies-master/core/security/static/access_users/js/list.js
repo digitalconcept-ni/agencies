@@ -10,11 +10,11 @@ var access_users = {
             targets: [-2],
             class: 'text-center',
             render: function (data, type, row) {
-                var name = data['name'];
                 if (data['id'] === 'success') {
-                    return '<span class="badge badge-success badge-pill">' + name + '</span>';
+                    return `<button type="button" class="btn btn-success btn-sm"><i class="bi bi-check-circle"></i></button>`;
                 }
-                return '<span class="badge badge-danger badge-pill">' + name + '</span>';
+                return `<button type="button" class="btn btn-danger btn-sm"><i class="bi-exclamation-octagon me-1"></i></button`;
+
             }
         },
         {
@@ -22,7 +22,8 @@ var access_users = {
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                return '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                return `<button type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></button>`
+                // return `<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="bi bi-trash3"></i></a>`;
             }
         },
     ],
@@ -47,58 +48,6 @@ var access_users = {
         }
 
         drawTables(data);
-        // $('#data').DataTable({
-        //     responsive: true,
-        //     // scrollX: true,
-        //     // autoWidth: false,
-        //     destroy: true,
-        //     deferRender: true,
-        //     ajax: {
-        //         url: pathname,
-        //         type: 'POST',
-        //         data: parameters,
-        //         dataSrc: "",
-        //         headers: {
-        //             'X-CSRFToken': csrftoken
-        //         }
-        //     },
-        //     columns: [
-        //         {"data": "id"},
-        //         {"data": "user.username"},
-        //         {"data": "date_joined"},
-        //         {"data": "time_joined"},
-        //         {"data": "ip_address"},
-        //         {"data": "coords"},
-        //         {"data": "accuracy"},
-        //         {"data": "type.id"},
-        //         {"data": "id"},
-        //     ],
-        //     order: [[2, "desc"], [3, "desc"]],
-        //     columnDefs: [
-        //         {
-        //             targets: [-2],
-        //             class: 'text-center',
-        //             render: function (data, type, row) {
-        //                 var name = row.type.name;
-        //                 if (row.type.id === 'success') {
-        //                     return '<span class="badge badge-success badge-pill">' + name + '</span>';
-        //                 }
-        //                 return '<span class="badge badge-danger badge-pill">' + name + '</span>';
-        //             }
-        //         },
-        //         {
-        //             targets: [-1],
-        //             class: 'text-center',
-        //             orderable: false,
-        //             render: function (data, type, row) {
-        //                 return '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
-        //             }
-        //         },
-        //     ],
-        //     initComplete: function (settings, json) {
-        //
-        //     }
-        // });
     },
 };
 
