@@ -16,13 +16,24 @@
     {# HTML5 export 3.0.2, Print view 3.0.2, DateTime 1.5.2, FixedHeader 4.0.1, Responsive 3.0.2#}
     <script src="{% static 'lib2/DataTables/datatables.min.js' %}"></script>
 
+    {% block daterangepicker %}
+        <!-- Moment -->
+        <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/moment.min.js' %}"></script>
+        <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/moment-with-locales.js' %}"></script>
 
-    {# script Digital Concept tables #}
-    <script src="{% static 'js/dcTables.js' %}"></script>
+        <!-- daterangepicker -->
+        <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/spanish.js' %}"></script>
+        <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/daterangepicker.js' %}"></script>
+        <link rel="stylesheet" href="{% static 'lib/bootstrap-daterangepicker-3.1/css/daterangepicker.css' %}"/>
+    {% endblock %}
 
     {% block head_list_extra %}
 
+
     {% endblock %}
+
+    {# script Digital Concept tables #}
+    <script src="{% static 'js/dcTables.js' %}"></script>
 
 
 {% endblock %}
@@ -66,7 +77,7 @@
 {% block javascript %}
     <script>
         $(function () {
-            
+
             $('#tableList tbody').on('click', 'a[rel="delete"]', function () {
                 var table = $('#tableList').DataTable();
                 var tr = table.cell($(this).closest('td, li')).index();
