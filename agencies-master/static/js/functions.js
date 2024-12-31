@@ -69,6 +69,8 @@ function submit_with_ajax(url, title, content, parameters, callback) {
         cancelButtonText: "No"
     }).then((result) => {
         if (result.isConfirmed) {
+            // Agregamos el preloader al bosy
+            document.body.prepend(preloader);
             $.ajax({
                 url: url,
                 data: parameters,
@@ -80,6 +82,10 @@ function submit_with_ajax(url, title, content, parameters, callback) {
                 processData: false,
                 contentType: false,
                 success: function (request) {
+                    // Quitamos el preloader cuando se haya cumplido la accion
+                    if (preloader) {
+                        preloader.remove();
+                    }
 
                     // if (request.hasOwnProperty('info')) {
                     //     message_info(request.info);
@@ -98,6 +104,7 @@ function submit_with_ajax(url, title, content, parameters, callback) {
                 }
             });
         }
+
     });
 
     // $.confirm({
@@ -164,33 +171,49 @@ function submit_with_ajax(url, title, content, parameters, callback) {
 }
 
 function alert_action(title, content, callback, cancel) {
-    $.confirm({
-        theme: 'material',
+
+    Swal.fire({
         title: title,
-        icon: 'fa fa-info',
-        content: content,
-        columnClass: 'small',
-        typeAnimated: true,
-        cancelButtonClass: 'btn-primary',
-        draggable: true,
-        dragWindowBorder: false,
-        buttons: {
-            info: {
-                text: "Si",
-                btnClass: 'btn-primary',
-                action: function () {
-                    callback();
-                }
-            },
-            danger: {
-                text: "No",
-                btnClass: 'btn-red',
-                action: function () {
-                    cancel();
-                }
-            },
+        text: content,
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonColor: "#198754",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si",
+        cancelButtonText: "No"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            callback();
         }
     })
+
+    // $.confirm({
+    //     theme: 'material',
+    //     title: title,
+    //     icon: 'fa fa-info',
+    //     content: content,
+    //     columnClass: 'small',
+    //     typeAnimated: true,
+    //     cancelButtonClass: 'btn-primary',
+    //     draggable: true,
+    //     dragWindowBorder: false,
+    //     buttons: {
+    //         info: {
+    //             text: "Si",
+    //             btnClass: 'btn-primary',
+    //             action: function () {
+    //                 callback();
+    //             }
+    //         },
+    //         danger: {
+    //             text: "No",
+    //             btnClass: 'btn-red',
+    //             action: function () {
+    //                 cancel();
+    //             }
+    //         },
+    //     }
+    // })
 }
 
 function validate_form_text(type, event, regex) {
@@ -236,6 +259,12 @@ function validate_decimals(el, evt) {
     return true;
 }
 
+function formatNumber(value) {
+    return new Intl.NumberFormat('es-NI', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(value);
+}
 
 /**
  * Preloader
