@@ -4,34 +4,39 @@ var input_daterange;
 var sale = {
     config: [
         {
-            targets: [0],
-            class: 'text-center',
-            render: function (data, type, row) {
-                if (row[9][1] === true) {
-                    return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
-                } else {
-                    return '<a class="badge badge-danger badge-pill pointer" rel="number">' + data + '</a>'
-                }
-            }
+            targets: '_all',
+            class: 'text-center'
         },
         {
-            targets: [6, 7, 8],
-            class: 'text-center',
+            targets: [0],
             render: function (data, type, row) {
-                return parseFloat(data).toFixed(2);
+
+                if (row[12][1] === true) {
+                    return `<span class="badge bg-success">${data}</span>`
+                } else {
+                    return `<span class="badge bg-secondary">${data}</span>`
+                }
             }
         },
         {
             targets: [-1],
-            class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
-                    buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
+                var buttons = `<div class="btn-group" role="group" aria-label="Opciones">`
+                buttons += `<a rel="details" class="btn btn-primary btn-sm"><i class="bi bi-search"></i></a>`
                 if (data[0] === false) {
-                    buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+                    buttons += `<a class="btn btn-warning btn-sm" href="${pathname}update/${row[0]}/"><i class="bi bi-pencil-square"></i></a>`;
                 }
+                buttons += `<a rel="delete" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></a></div>`
                 return buttons;
+
+
+                // var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
+                //     buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
+                // if (data[0] === false) {
+                //     buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+                // }
+                // return buttons;
             }
         },
     ],
@@ -50,92 +55,30 @@ var sale = {
         let data = {
             'data': parameters,
             'inserInto': 'rowList',
-            'th': ['Nro', 'Usuario', 'Proveedor', 'Numero de factura', 'Items', 'Registro', 'Sub total', 'Iva', 'Total', 'Opciones'],
+            'th': ['Nro', 'Usuario', 'Proveedor', 'Numero de factura', 'Fecha', 'Items', 'Descuento', 'Sub total', 'Iva', '2%', '1%' , 'Total', 'Opciones'],
             'table': 'tableList',
             'config': sale.config,
             'modal': false,
         }
         drawTables(data);
 
-        // tblShopping = $('#data').DataTable({
-        //     responsive: true,
-        //     // scrollX: true,
-        //     autoWidth: true,
-        //     destroy: true,
-        //     deferRender: true,
-        //     ajax: {
-        //         url: pathname,
-        //         type: 'POST',
-        //         data: parameters,
-        //         dataSrc: "",
-        //         headers: {
-        //             'X-CSRFToken': csrftoken
-        //         }
-        //     },
-        //     columns: [
-        //         {"data": "number"},
-        //         {"data": "username"},
-        //         {"data": "supplier"},
-        //         {"data": "invoice_number"},
-        //         {"data": "cant"},
-        //         {"data": "date_joined"},
-        //         {"data": "subtotal"},
-        //         {"data": "iva"},
-        //         {"data": "total_iva"},
-        //         {"data": "total"},
-        //         {"data": "id"},
-        //     ],
-        //     order: [[0, "desc"], [5, "desc"]],
-        //     columnDefs: [
-        //         {
-        //             targets: [0],
-        //             class: 'text-center',
-        //             render: function (data, type, row) {
-        //                 return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
-        //             }
-        //         },
-        //         {
-        //             targets: [6, 7, 8, 9],
-        //             class: 'text-center',
-        //             render: function (data, type, row) {
-        //                 return '$' + parseFloat(data).toFixed(2);
-        //             }
-        //         },
-        //         {
-        //             targets: [-1],
-        //             class: 'text-center',
-        //             orderable: false,
-        //             render: function (data, type, row) {
-        //                 var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
-        //                 if (row.modify === false) {
-        //                     buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
-        //                     buttons += '<a href="' + pathname + 'update/' + row.id + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
-        //                 }
-        //                 return buttons;
-        //             }
-        //         },
-        //     ],
-        //     initComplete: function (settings, json) {
-        //
-        //     }
-        // });
     },
     formatRowHtml: function (d) {
         var html = '<table class="table">';
         html += '<thead class="thead-dark">';
-        html += '<tr><th scope="col">Producto</th>';
-        html += '<th scope="col">Categoría</th>';
-        html += '<th scope="col">PVP</th>';
         html += '<th scope="col">Cantidad</th>';
+        html += '<th scope="col">Categoría</th>';
+        html += '<tr><th scope="col">Producto</th>';
+        html += '<th scope="col">Costo</th>';
         html += '<th scope="col">Subtotal</th></tr>';
         html += '</thead>';
         html += '<tbody>';
         $.each(d.saleproduct, function (key, value) {
             html += '<tr>'
-            html += '<td>' + value.product.name + '</td>'
-            html += '<td>' + value.product.category.name + '</td>'
-            html += '<td>' + value.price + '</td>'
             html += '<td>' + value.cant + '</td>'
+            html += '<td>' + value.product.category.name + '</td>'
+            html += '<td>' + value.product.name + '</td>'
+            html += '<td>' + value.price + '</td>'
             html += '<td>' + value.subtotal + '</td>'
             html += '</tr>';
         });
@@ -263,30 +206,25 @@ $(function () {
                     },
                 },
                 columns: [
-                    {"data": "product.name"},
-                    {"data": "product.category.name"},
-                    {"data": "price"},
                     {"data": "cant"},
-                    {"data": "available"},
+                    {"data": "product.category.name"},
+                    {"data": "product.name"},
+                    {"data": "price"},
+                    // {"data": "available"},
                     {"data": "subtotal"},
                 ],
                 columnDefs: [
                     {
-                        targets: [0, 1, 2, 3, 4, 5],
+                        targets: '_all',
                         class: 'text-center',
                     },
                     {
-                        targets: [-1, -4],
+                        targets: [-1, -3],
                         render: function (data, type, row) {
-                            return parseFloat(data).toFixed(2);
+                            return data
                         }
                     },
-                    {
-                        targets: [-2],
-                        render: function (data, type, row) {
-                            return data;
-                        }
-                    },
+
                 ],
                 initComplete: function (settings, json) {
 

@@ -54,26 +54,26 @@ var sale = {
             columnDefs: [
                 {
                     targets: [0],
-                    class: 'text-center',
                     visible: false
                 },
                 {
-                    targets: [1],
+                    targets: '_all',
                     class: 'text-center',
+                },
+                {
+                    targets: [1],
                     render: function (data, type, row) {
                         return '<a rel="remove" class="btn-xs" style="font-size: 14px; font-weight: bold">' + data + '</a>';
                     }
                 },
                 {
                     targets: [2],
-                    class: 'text-center',
                     render: function (data, type, row) {
                         return `<input  type="text" maxlength="10" name="expiration" data-target="#expiration" data-toggle="datetimepicker" autocomplete="off" id="expiration" class="form-control form-control-sm input-sm datetimepicker-input" value="${data}"/>`;
                     }
                 },
                 {
                     targets: [3],
-                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         // return '$' + parseFloat(data).toFixed(2);
@@ -82,7 +82,6 @@ var sale = {
                 },
                 {
                     targets: [4],
-                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return '<input type="text" name="pvp" class="form-control form-control-sm input-sm" autocomplete="off" value="' + parseFloat(data).toFixed(2) + '">';
@@ -90,7 +89,6 @@ var sale = {
                 },
                 {
                     targets: [5],
-                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return '<input type="text" name="cant" class="form-control form-control-sm input-sm" autocomplete="off" value="' + row.cant + '">';
@@ -98,7 +96,6 @@ var sale = {
                 },
                 {
                     targets: [6],
-                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return '$' + parseFloat(data).toFixed(2);
@@ -181,7 +178,7 @@ $(function () {
                 };
             },
         },
-        placeholder: 'Ingrese una descripción',
+        placeholder: 'Ingrese un nombre',
         minimumInputLength: 1,
     });
 
@@ -434,17 +431,17 @@ $(function () {
 
     // Form Sale
 
-    $("input[name='iva']").TouchSpin({
-        min: 0,
-        max: 100,
-        step: 0.01,
-        decimals: 2,
-        boostat: 5,
-        maxboostedstep: 10,
-        postfix: '%'
-    }).on('change', function () {
-        sale.calculateInvoice();
-    }).val(0.15);
+    // $("input[name='iva']").TouchSpin({
+    //     min: 0,
+    //     max: 100,
+    //     step: 0.01,
+    //     decimals: 2,
+    //     boostat: 5,
+    //     maxboostedstep: 10,
+    //     postfix: '%'
+    // }).on('change', function () {
+    //     sale.calculateInvoice();
+    // }).val(0.15);
 
 
     $('#frmSale').on('submit', function (e) {

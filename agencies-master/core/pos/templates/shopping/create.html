@@ -1,87 +1,198 @@
-{% extends 'list.html' %}
+{% extends 'list2.html' %}
 {% load static %}
 {% load widget_tweaks %}
-{% block head_list %}
-    <link href="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.css' %}" rel="stylesheet"/>
-    <script src="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/js/tempusdominus-bootstrap.js' %}"></script>
-    <link href="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/css/tempusdominus-bootstrap.css' %}" rel="stylesheet"/>
-    <link href="{% static 'lib/select2-4.0.13/css/select2.min.css' %}" rel="stylesheet"/>
-    <link href="{% static 'lib/select2-4.0.13/css/select2-bootstrap4.min.css' %}" rel="stylesheet"/>
-    <script src="{% static 'lib/select2-4.0.13/js/select2.min.js' %}"></script>
-    <script src="{% static 'lib/select2-4.0.13/js/i18n/es.js' %}"></script>
-    <script src="{% static 'lib/moment-2.25.3/moment-with-locales.js' %}"></script>
-    <link href="{% static 'lib/bootstrap-touchspin-4.2.5/css/jquery.bootstrap-touchspin.css' %}" rel="stylesheet"/>
-    <script src="{% static 'lib/bootstrap-touchspin-4.2.5/js/jquery.bootstrap-touchspin.js' %}"></script>
-    <script src="{% static 'shopping/js/form.js' %}"></script>
+{% load core_app_extras %}
+
+
+{% block daterangepicker %}
 {% endblock %}
 
-{% block content %}
+{% block head_list_extra %}
+    {#    <link href="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.css' %}" rel="stylesheet"/>#}
+    {#    <script src="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>#}
+    {#    <script src="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/js/tempusdominus-bootstrap.js' %}"></script>#}
+    {#    <link href="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/css/tempusdominus-bootstrap.css' %}" rel="stylesheet"/>#}
+    {#    <link href="{% static 'lib/select2-4.0.13/css/select2.min.css' %}" rel="stylesheet"/>#}
+    {#    <link href="{% static 'lib/select2-4.0.13/css/select2-bootstrap4.min.css' %}" rel="stylesheet"/>#}
+    {#    <script src="{% static 'lib/select2-4.0.13/js/select2.min.js' %}"></script>#}
+    {#    <script src="{% static 'lib/select2-4.0.13/js/i18n/es.js' %}"></script>#}
+    {#    <script src="{% static 'lib/moment-2.25.3/moment-with-locales.js' %}"></script>#}
+    <link href="{% static 'lib/bootstrap-touchspin-4.2.5/css/jquery.bootstrap-touchspin.css' %}" rel="stylesheet"/>
+    <script src="{% static 'lib/bootstrap-touchspin-4.2.5/js/jquery.bootstrap-touchspin.js' %}"></script>
+
+    {#    SCRIPS PRINCIPAL #}
+    <script src="{% static 'shopping/js/form2.js' %}"></script>
+    {#    FORM PRODUCTS #}
+    <script src="{% static 'shopping/js/form-product.js' %}"></script>
+    {#    FORM SUPPLIER #}
+    <script src="{% static 'shopping/js/form-supplier.js' %}"></script>
+{% endblock %}
+
+{% block body_content %}
     <form id="frmSale" method="post" data-url="{{ list_url }}">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">
-                    {% if action == 'add' %}
-                        <i class="fas fa-plus"></i>
-                    {% else %}
-                        <i class="fas fa-edit"></i>
-                    {% endif %}
-                    <b>{{ title }}</b>
-                </h3>
+                <h5 class="card-title">
+                    {{ title }}
+                </h5>
             </div>
-            <div class="card-body">
-                <div class="container-fluid">
+            <div class="card-body pt-4">
+                <div class="container">
+
+                    {# FILA DE LA INFOMRACION DE LA FACTURA #}
                     <div class="row">
-                        <div class="col-lg-9">
+                        <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">
-                                        <b><i class="fas fa-boxes"></i> Detalle de productos</b>
-                                    </h3>
+                                    Datos de la factura
                                 </div>
                                 <div class="card-body">
-                                    <div class="container-fluid">
-                                        <div class="form-group">
-                                            <label>Buscador de productos:</label>
-                                            <div class="input-group">
-                                                <button class="btn btn-success btn-flat btnCreateProduct"
-                                                        type="button" alt="Crear Nuevo Producto">
-                                                    <i class="fas fa-barcode"></i>
-                                                </button>
-                                                <select class="form-control select2" name="search_product"></select>
-                                                {#                                        <input type="text" class="form-control" autocomplete="off"#}
-                                                {#                                               placeholder="Ingrese una descripción" maxlength="50" name="search">#}
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-primary dropdown-toggle" type="button"
-                                                            data-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
-                                                        Opciones
+                                    <div class="container">
+                                        <input type="hidden" name="action" value="{{ action }}">
+
+                                        <div class="row mt-3">
+                                            {# INPUT DATE #}
+                                            <div class="col-3 mb-3">
+                                                <label for="{{ form.date_joined.id_for_label }}" class="form-label">Fecha: </label>
+                                                {{ form.date_joined }}
+                                            </div>
+
+                                            {# INPUT INCOICE NUMBER #}
+                                            <div class="col-3 mb-3">
+                                                <label for="{{ form.invoice_number.id_for_label }}" class="form-label">Numero
+                                                    de Factura:</label>
+                                                {{ form.invoice_number }}
+                                            </div>
+
+                                            {# INPUT SUPPLIER #}
+                                            <div class="col-6 mb-3">
+                                                <label for="{{ form.supplier.id_for_label }}" class="form-label">Proveedor:</label>
+                                                <div class="input-group">
+                                                    {{ form.supplier }}
+                                                    <button class="btn btn-secondary btnAddSupplier"
+                                                            type="button">
+                                                        <i class="bi bi-plus"></i>
                                                     </button>
-                                                    <div class="dropdown-menu dropdown-menu-right">
-                                                        <a class="dropdown-item btnSearchProducts">
-                                                            <i class="fas fa-search"></i> Buscar productos
-                                                        </a>
-                                                        <a class="dropdown-item btnClearSearch">
-                                                            <i class="fas fa-times"></i> Limpiar búsqueda
-                                                        </a>
-                                                        <a class="dropdown-item btnRemoveAll">
-                                                            <i class="fas fa-trash"></i> Eliminar todos mis items
-                                                        </a>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div class="row">
+                                            {# INPUT DISCOUNT #}
+                                            <div class="col-2 mb-3">
+                                                <label for="{{ form.discount.id_for_label }}" class="form-label">Descuento:</label>
+                                                {{ form.discount|add_class:'form-control' }}
+                                            </div>
+
+                                            {# INPUT SUBTOTAL #}
+                                            <div class="col-2 mb-3">
+                                                <label for="{{ form.subtotal.id_for_label }}" class="form-label">Sub
+                                                    total:</label>
+                                                {{ form.subtotal }}
+                                            </div>
+
+                                            {# INPUT IVA #}
+                                            <div class="col-2 mb-3">
+                                                <label for="{{ form.iva.id_for_label }}" class="form-label">IVA:</label>
+                                                <div class="input-group">
+                                                    <button id="iva" type="button" class="btn btn-success btn-calc">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
+
+                                                    {{ form.iva|add_class:'form-control'|attr:'readonly: true' }}
+                                                </div>
+                                            </div>
+
+                                            {# INPUT IR #}
+                                            <div class="col-2 mb-3">
+
+                                                <label for="{{ form.income_tax.id_for_label }}"
+                                                       class="form-label">2%:</label>
+                                                <div class="input-group">
+                                                    <button id="income_tax" type="button"
+                                                            class="btn btn-danger btn-calc">
+                                                        <i class="bi bi-ban"></i>
+                                                    </button>
+
+                                                    {{ form.income_tax|add_class:'form-control'|attr:'readonly: true' }}
+                                                </div>
+                                            </div>
+
+                                            {# INPUT IM #}
+                                            <div class="col-2 mb-3">
+                                                <label for="{{ form.city_tax.id_for_label }}"
+                                                       class="form-label">1%:</label>
+                                                <div class="input-group">
+                                                    <button id="city_tax" type="button"
+                                                            class="btn btn-danger btn-calc">
+                                                        <i class="bi bi-ban"></i>
+                                                    </button>
+
+                                                    {{ form.city_tax|add_class:'form-control'|attr:'readonly: true' }}
+                                                </div>
+                                            </div>
+
+                                            {# INPUT TOTAL #}
+                                            <div class="col-2 mb-3">
+                                                <label for="{{ form.total.id_for_label }}"
+                                                       class="form-label">Total:</label>
+                                                {{ form.total|add_class:'form-control'|attr:'readonly: true' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    Detalle de productos
+                                </div>
+                                <div class="card-body pt-3">
+                                    <div class="container-fluid">
+                                        <div class="form-group">
+                                            <label class="form-label">Buscador de productos:</label>
+                                            <div class="input-group">
+                                                <button class="btn btn-primary btn-flat btnCreateProduct"
+                                                        type="button" alt="Crear Nuevo Producto">
+                                                    <i class="bi bi-upc"></i>
+                                                </button>
+                                                <select class="form-control select2" name="search_product"></select>
+
+                                                <button class="btn btn-secondary btnRemoveAll">Eliminar todo</button>
+
+                                                {#                                                <button class="btn btn-primary dropdown-toggle" type="button"#}
+                                                {#                                                        data-toggle="dropdown" aria-haspopup="true"#}
+                                                {#                                                        aria-expanded="false">#}
+                                                {#                                                    Opciones#}
+                                                {#                                                </button>#}
+                                                {#                                                <div class="dropdown-menu dropdown-menu-right">#}
+                                                {#                                                    <a class="dropdown-item btnSearchProducts">#}
+                                                {#                                                        <i class="fas fa-search"></i> Buscar productos#}
+                                                {#                                                    </a>#}
+                                                {#                                                    <a class="dropdown-item btnClearSearch">#}
+                                                {#                                                        <i class="fas fa-times"></i> Limpiar búsqueda#}
+                                                {#                                                    </a>#}
+                                                {#                                                    <a class="dropdown-item btnRemoveAll">#}
+                                                {#                                                        <i class="fas fa-trash"></i> Eliminar todos mis items#}
+                                                {#                                                    </a>#}
+                                                {#                                                </div>#}
+                                            </div>
+                                        </div>
                                         <hr>
-                                        <table class="table table-bordered" id="tblProducts">
+                                        <table class="table table-striped table-valign-middle" id="tblProducts">
                                             <thead>
                                             <tr>
                                                 <th>Eliminar</th>
+                                                <th>Cantidad</th>
                                                 <th>Producto</th>
-{#                                                <th>Stock</th>#}
                                                 <th>Caducidad</th>
                                                 <th>Precio Unitario</th>
                                                 <th>Precio Venta Actual</th>
-                                                <th>Cantidad</th>
                                                 <th>Subtotal</th>
                                             </tr>
                                             </thead>
@@ -92,115 +203,58 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title"><b><i class="fas fa-shopping-cart"></i> Datos de la
-                                        factura</b></h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="container-fluid">
-                                        <input type="hidden" name="action" value="{{ action }}">
-                                        <div class="form-group">
-                                            <label>Fecha de compra:</label>
-                                            {{ form.date_joined }}
-                                        </div>
-                                        <div class="form-group">
-                                            {% if action == 'add' %}
-                                                <label>Usuario: </label>
-                                                <input type="hidden" name="user_id" value="{{ request.user.id }}"
-                                                       class="form-control"
-                                                       readonly>
-                                                <input type="text" value="{{ request.user.username }}"
-                                                       class="form-control"
-                                                       readonly>
-                                            {% elif action == 'edit' %}
-                                                <input type="hidden" name="user_id" value="{{ request.user.id }}"
-                                                       class="form-control"
-                                                       readonly>
-                                            {% endif %}
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Numero de Factura:</label>
-                                            {{ form.invoice_number }}
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Proveedor:</label>
-                                            <div class="input-group">
-                                                {{ form.supplier }}
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-success btn-flat btnAddSupplier"
-                                                            type="button">
-                                                        <i class="fas fa-user-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Subtotal:</label>
-                                            {{ form.subtotal }}
-                                        </div>
-                                        <div class="form-group">
-                                            <label>IVA:</label>
-                                            {{ form.iva }}
-                                        </div>
-                                        <div class="form-group">
-                                            <label>IVA Calculado:</label>
-                                            <input type="text" class="form-control" readonly name="ivacalc"
-                                                   value="0.00">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Total a pagar:</label>
-                                            {{ form.total }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="card-footer">
-                <button type="submit" class="btn btn-primary btn-flat">
-                    <i class="fas fa-save"></i> Guardar registro
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-floppy"></i>
                 </button>
-                <a href="{{ list_url }}" class="btn btn-danger btn-flat">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
+                <a href="{{ list_url }}" class="btn btn-danger"><i class="bi bi-x-circle"></i></a>
             </div>
         </div>
     </form>
 
     <!-- Modal suppllier -->
-    <div class="modal fade" id="myModalSupplier" tabindex="-1" role="dialog" aria-hidden="true">
-        <form id="frmSupplier" enctype="multipart/form-data" method="post">
-            <div class="modal-dialog" role="document">
+    <div class="modal fade" id="myModalSupplier" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <form id="frmSupplier" enctype="multipart/form-data" method="post">
+
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">
-                            <b><i class="fas fa-user-plus"></i> Nuevo registro de un Proveedor</b>
-                        </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <h1 class="modal-title fs-5" id="modalTitle">Nuevo proveedor</h1>
+                    </div>
+                    <div class="modal-body" id="modalBody">
+                        {# FOMRULARIO PARA CREACION DE NUEVO PROVEEDOR #}
+
+                        <div class="row">
+                            {% for fields in frmSupplier|split_form_field:request.user_agent %}
+                                {% for field in fields %}
+                                    <div class="col">
+                                        <label for="{{ field.id_for_label }}"
+                                               class="form-label">{{ field.label }}:</label>
+                                        {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer" id="modalFooter">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-floppy"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        {% for field in frmSupplier.visible_fields %}
-                            <div class="form-group">
-                                <label for="email">{{ field.label }}:</label>
-                                {{ field|add_class:'form-control'|attr:'autocomplete:off' }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat">
-                            <i class="fas fa-save"></i> Guardar Proveedor
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </form>
+            </form>
+
+        </div>
+    </div>
     </div>
 
     <!-- Modal create a new products -->

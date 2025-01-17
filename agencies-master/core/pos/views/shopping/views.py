@@ -1,22 +1,15 @@
 import json
-import os
 
-from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Q
-from django.http import HttpResponse
-from django.http import JsonResponse, HttpResponseRedirect
-from django.template.loader import get_template
+from django.http import JsonResponse
 from django.urls import reverse_lazy
-from django.utils.timezone import make_aware
-from django.views.generic import CreateView, FormView, DeleteView, UpdateView, View
+from django.views.generic import CreateView, FormView, UpdateView
 # os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
-from weasyprint import HTML, CSS
 
-from core.pos.forms import ClientForm, ShoppingForm, SupplierForm, ProductForm
+from core.pos.forms import ShoppingForm, SupplierForm, ProductForm
 from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin
-from core.pos.models import Sale, Product, SaleProduct, Client, Shopping, Supplier, ShoppingDetail
+from core.pos.models import Product, Shopping, Supplier, ShoppingDetail
 from core.reports.forms import ReportForm
 
 
@@ -106,14 +99,27 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                     data.append(item)
             elif action == 'add':
                 with transaction.atomic():
+                    # Json donde recolectamos los productos insertados por el usuario
                     products = json.loads(request.POST['products'])
+
                     shopping = Shopping()
                     shopping.supplier_id = int(request.POST['supplier'])
-                    shopping.user_id = request.POST['user_id']
+                    shopping.user_id = request.user.id
                     shopping.invoice_number = request.POST['invoice_number']
                     shopping.date_joined = request.POST['date_joined']
+                    shopping.discount = float(request.POST['discount'])
                     shopping.iva = float(request.POST['iva'])
+                    shopping.income_tax = float(request.POST['income_tax'])
+                    shopping.city_tax = float(request.POST['city_tax'])
                     shopping.save()
+
+                    # shopping = Shopping()
+                    # shopping.supplier_id = int(request.POST['supplier'])
+                    # shopping.user_id = request.POST['user_id']
+                    # shopping.invoice_number = request.POST['invoice_number']
+                    # shopping.date_joined = request.POST['date_joined']
+                    # shopping.iva = float(request.POST['iva'])
+                    # shopping.save()
 
                     cantItemsShopping = 0
                     for i in products:
@@ -228,15 +234,17 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
                     data.append(item)
             elif action == 'edit':
                 with transaction.atomic():
+                    # Json donde optenemos los productos insertados por el usuario
                     products = json.loads(request.POST['products'])
                     products_review = json.loads(request.POST['products_review'])
 
                     shopping = self.get_object()
                     shopping.supplier_id = int(request.POST['supplier'])
-                    shopping.user_id = request.POST['user_id']
                     shopping.invoice_number = request.POST['invoice_number']
-                    shopping.date_joined = request.POST['date_joined']
+                    shopping.discount = float(request.POST['discount'])
                     shopping.iva = float(request.POST['iva'])
+                    shopping.income_tax = float(request.POST['income_tax'])
+                    shopping.city_tax = float(request.POST['city_tax'])
                     shopping.save()
 
                     shopping.shoppingdetail_set.all().delete()
