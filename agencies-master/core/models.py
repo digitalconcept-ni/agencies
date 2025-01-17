@@ -1,6 +1,17 @@
-from django.db import models
-from django.conf import settings
+from datetime import datetime
 
+from django.db import models
+
+from config import settings
+from core.user.models import User
+
+
+class WhoCreatedIt(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_joined = models.DateField(default=datetime.now)
+    time_joined = models.TimeField(default=datetime.now)
+    class Meta:
+        abstract = True
 
 class BaseModel(models.Model):
     user_creation = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_creation',
