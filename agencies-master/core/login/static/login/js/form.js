@@ -1,7 +1,7 @@
 $(function () {
 
     const options = {
-        enableHighAccuracy: true,
+        // enableHighAccuracy: false,
         timeout: 30000,
         maximumAge: 27000
     };
@@ -42,7 +42,7 @@ $(function () {
         if (attempts > 0) {
             setTimeout(() => {
                 navigator.geolocation.getCurrentPosition(success, handleError, options);
-            }, 2000); // Esperar 2 segundos antes de reintentar
+            }, 5000); // Esperar 2 segundos antes de reintentar
         } else {
             message_error({'Error': 'No se pudo obtener la ubicación después de varios intentos.'});
         }
