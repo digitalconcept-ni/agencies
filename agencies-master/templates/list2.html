@@ -1,6 +1,5 @@
 {% extends 'vtc2/body.html' %}
 {% load static %}
-
 {% block head_list %}
 
 
@@ -41,8 +40,12 @@
 {% block body_content %}
 
     <div class="card">
-        <div class="card-header">{{ title }}</div>
-        <div class="card-body pt-2">
+        <div class="card-header">
+            <h5 class="card-title">
+                {{ title }}
+            </h5>
+        </div>
+        <div class="card-body pt-3">
 
             {% block list_body %}
 
@@ -50,8 +53,8 @@
 
                 {% endblock %}
 
-                <table class="table table-striped table-valign-middle" id="tableList">
-                    <thead>
+                <table class="table table-striped table-valign-middle table-hover" id="tableList">
+                    <thead class="bg-secondary">
                     <tr id="trow" rel="rowList">
                     </tr>
                     </thead>
@@ -78,7 +81,7 @@
     <script>
         $(function () {
 
-            $('#tableList tbody').on('click', 'a[rel="delete"]', function () {
+            $('#tableList tbody').on('click', 'button[rel="delete"]', function () {
                 var table = $('#tableList').DataTable();
                 var tr = table.cell($(this).closest('td, li')).index();
                 var data = table.row(tr.row).data();
@@ -87,7 +90,7 @@
                 param.append('id', data[0])
                 submit_with_ajax(pathname, 'Eliminar registro', '¿Estas seguro de eliminarlo?',
                     param, function () {
-
+                        table.ajax.reload();
                         const Toast = Swal.mixin({
                             toast: true,
                             position: "top-end",
@@ -102,9 +105,6 @@
                         Toast.fire({
                             icon: "success",
                             title: "Registro eliminado correctamente",
-                            willClose: function () {
-                                table.ajax.reload();
-                            }
                         });
                     })
             })

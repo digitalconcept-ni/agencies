@@ -13,7 +13,7 @@ var access_users = {
                 if (data['id'] === 'success') {
                     return `<button type="button" class="btn btn-success btn-sm"><i class="bi bi-check-circle"></i></button>`;
                 }
-                return `<button type="button" class="btn btn-danger btn-sm"><i class="bi-exclamation-octagon me-1"></i></button`;
+                return `<button type="button" class="btn btn-danger btn-sm"><i class="bi-exclamation-octagon"></i></button`;
 
             }
         },
@@ -22,7 +22,7 @@ var access_users = {
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                return `<button type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></button>`
+                return `<button rel="delete" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></button>`
                 // return `<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="bi bi-trash3"></i></a>`;
             }
         },
