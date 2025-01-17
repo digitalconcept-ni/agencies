@@ -73,12 +73,9 @@ class ProductForm(ModelForm):
         model = Product
         fields = '__all__'
         widgets = {
-            'expiration': forms.DateInput(format='%Y-%m-%d', attrs={
-                'class': 'form-control datetimepicker-input',
-                'id': 'expiration',
+            'expiration': forms.TextInput(attrs={
                 'value': datetime.now().strftime('%Y-%m-%d'),
-                'data-toggle': 'datetimepicker',
-                'data-target': '#birthdate'
+                'type': 'date',
             }),
             'category': forms.Select(attrs={
                 'class': 'select2',
@@ -342,12 +339,10 @@ class ShoppingForm(ModelForm):
                 'class': 'custom-select select2',
                 # 'style': 'width: 100%'
             }),
-            'date_joined': forms.DateTimeInput(format='%Y-%m-%d', attrs={
-                # 'value': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'date_joined': forms.TextInput(attrs={
                 'value': datetime.now().strftime('%Y-%m-%d'),
                 'class': 'form-control',
-                'id': 'date_joined',
-                'readonly': True,
+                'type': 'date',
             }),
             'invoice_number': forms.TextInput(attrs={
                 'class': 'form-control',
