@@ -53,32 +53,41 @@
 
 {% endblock %}
 
+
+{# SECTION FOR INSERT ADITIONAL CODE LINES #}
+{% block extra_code %}
+
+{% endblock %}
+
 {# SECTION OF THE MODAL TO SHOW INFORMATION #}
 
-<div class="modal fade" id="modalInfo" tabindex="-1" aria-modal="true">
+<div class="modal fade" id="modalInfo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Información adicional</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h1 class="modal-title fs-5" id="modalTitle" >Detalle</h1>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" id="modalBody">
                 {# SECTION OF THE TABLE THE MODAL INFORMATION  #}
                 <table class="table table-striped table-valign-middle" id="tableModalInfo">
                     <thead>
-                    <tr id="trow" rel="rowModalInfo" >
+                    <tr id="trow" rel="rowModalInfo">
                     </tr>
                     </thead>
                     <tbody>
                     </tbody>
                 </table>
             </div>
-            <!-- <div class="modal-footer">
-                <button type="button" class="btn btn-orange" data-bs-dismiss="modal">Close</button>
-            </div> -->
+            <div class="modal-footer" id="modalFooter">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
         </div>
     </div>
 </div>
+
 
 {# ///// END SECTION MODAL INFORMATION #}
 

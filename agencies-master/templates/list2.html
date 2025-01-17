@@ -1,5 +1,6 @@
 {% extends 'vtc2/body.html' %}
 {% load static %}
+
 {% block head_list %}
 
 
@@ -81,7 +82,7 @@
     <script>
         $(function () {
 
-            $('#tableList tbody').on('click', 'button[rel="delete"]', function () {
+            $('#tableList tbody').on('click', 'a[rel="delete"]', function () {
                 var table = $('#tableList').DataTable();
                 var tr = table.cell($(this).closest('td, li')).index();
                 var data = table.row(tr.row).data();
