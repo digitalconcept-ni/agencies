@@ -41,7 +41,7 @@ class BrandListView(ValidatePermissionRequiredMixin, ListView):
 class BrandsCreateView(ValidatePermissionRequiredMixin, CreateView):
     model = Brands
     form_class = BrandsForm
-    template_name = 'product/create.html'
+    template_name = 'brands/create.html'
     success_url = reverse_lazy('brand_list')
     url_redirect = success_url
     permission_required = 'add_brands'

@@ -1,9 +1,10 @@
-{% extends 'list.html' %}
+{% extends 'list2.html' %}
 {% load static %}
-{% block head_list %}
+
+{% block head_list_extra %}
     <script src="{% static 'brands/js/list.js' %}"></script>
 {% endblock %}
 
-{% block javascript %}
-
+{# NO CARGMAOS LA LIBRERIA DEL RANGO DE FEHCAS #}
+{% block daterangepicker %}
 {% endblock %}

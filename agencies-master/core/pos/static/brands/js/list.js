@@ -1,16 +1,18 @@
 var brands = {
     config: [
         {
-            targets: [0],
-            visible: false,
+            targets: '_all',
+            class: 'text-center',
         },
         {
             targets: [-1],
-            class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                var buttons = '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
-                buttons += '<a rel="delete" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                var buttons = `
+                <div class="btn-group" role="group" aria-label="Opciones">
+                <a class="btn btn-warning btn-sm" href="${pathname}update/${row[0]}/"><i class="bi bi-pencil-square"></i></a>
+                <a rel="delete" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></a>
+              </div>`
                 return buttons;
             }
         },
