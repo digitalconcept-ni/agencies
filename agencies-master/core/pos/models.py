@@ -154,12 +154,12 @@ class Product(models.Model):
         else:
             brand = self.brand.get_full_name()
         if self.expiration is None:
-            ex = '2000-01-01'
+            ex = 'No registrada'
         else:
             ex = self.expiration.strftime('%Y-%m-%d')
         data = [
             self.id, self.category.name, self.__str__(), ex, self.tax,
-            self.is_inventoried, self.stock, f'{self.cost:.2f}', f'{self.pvp:.2f}', self.id
+            self.is_inventoried, self.stock, f'{self.cost:,.2f}', f'{self.pvp:,.2f}', self.id
         ]
         return data
 
@@ -170,7 +170,7 @@ class Product(models.Model):
         else:
             brand = self.brand.toJSON()
         if self.expiration is None:
-            ex = '2000-01-01'
+            ex = 'No registrada'
         else:
             ex = self.expiration.strftime('%Y-%m-%d')
         item = model_to_dict(self)
@@ -207,10 +207,13 @@ class Shopping(models.Model):
     register = models.BooleanField(default=True)
     date_joined = models.DateField(default=datetime.now)
     time_joined = models.TimeField(default=datetime.now)
-    subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
-    iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
-    total_iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
-    total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    # Calculated invoice
+    subtotal = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Subtotal')
+    discount = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Descuento')
+    iva = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='IVA')
+    income_tax = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='2%')
+    city_tax = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='1%')
+    total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='total')
     # Estaod para validad si la factura tiene disponibilidad de items para prroduccion
     status = models.BooleanField(default=True)
 
@@ -221,7 +224,6 @@ class Shopping(models.Model):
         return f'{self.id:06d}'
 
     def toLIST(self):
-        print(self.status)
         # Verificamos si la factura de compra tiene productos disponibles
         # para produccion
         available = self.shoppingdetail_set.all().aggregate(
@@ -229,7 +231,6 @@ class Shopping(models.Model):
         if available <= 0:
             self.status = False
             self.save()
-        print('status: ', self.status)
 
         # Verificamos si las la fecha de registro es menos a hoy
         if self.date_joined.strftime("%Y-%m-%d") < str(datetime.now().date()):
@@ -241,11 +242,19 @@ class Shopping(models.Model):
         opt = [modify, self.status]
 
         date_joined = f'{self.date_joined.strftime("%Y-%m-%d")} - {self.time_joined.strftime("%I:%M:%S %p")}'
+        user = f'{self.user.username} {self.time_joined.strftime("%I:%M:%S %p")}'
+
         data = [
-            self.get_number(), self.user.username, self.supplier.name, self.invoice_number,
-            self.cant, date_joined, f'{self.subtotal:.2f}', f'{self.total_iva:.2f}', f'{self.total:.2f}',
+            self.get_number(), user, self.supplier.name, self.invoice_number,
+            date_joined, self.cant, f'{self.discount:,.2f}', f'{self.subtotal:,.2f}',
+            f'{self.iva:,.2f}', f'{self.income_tax:,.2f}', f'{self.city_tax:,.2f}', f'{self.total:,.2f}',
             opt
         ]
+        # data = [
+        #     self.get_number(), self.user.username, self.supplier.name, self.invoice_number,
+        #     self.cant, date_joined, f'{self.subtotal:,.2f}', f'{self.total_iva:,.2f}', f'{self.total:,.2f}',
+        #     opt
+        # ]
         return data
 
     def toJSONPROCESS(self):
@@ -272,9 +281,8 @@ class Shopping(models.Model):
     def calculate_invoice(self):
         subtotal = self.shoppingdetail_set.all().aggregate(
             result=Coalesce(Sum(F('price') * F('cant')), 0.00, output_field=FloatField())).get('result')
-        self.subtotal = subtotal
-        self.total_iva = self.subtotal * float(self.iva)
-        self.total = float(self.subtotal) + float(self.total_iva)
+        self.subtotal = subtotal - float(self.discount)
+        self.total = float(self.subtotal) + float(self.iva) + float(self.income_tax) + float(self.city_tax)
         self.save()
 
     class Meta:
@@ -299,8 +307,8 @@ class ShoppingDetail(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         item['product'] = self.product.toJSON()
-        item['price'] = f'{self.price:.2f}'
-        item['subtotal'] = f'{self.subtotal:.2f}'
+        item['price'] = f'{self.price:,.2f}'
+        item['subtotal'] = f'{self.subtotal:,.2f}'
         return item
 
     class Meta:
