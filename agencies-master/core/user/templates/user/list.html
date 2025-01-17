@@ -1,26 +1,9 @@
-{% extends 'list.html' %}
+{% extends 'list2.html' %}
 {% load static %}
-{% block head_list %}
+
+{% block head_list_extra %}
     <script src="{% static 'user/js/list.js' %}"></script>
 {% endblock %}
 
 {% block btn_create %}
 {% endblock %}
-
-{#{% block columns %}#}
-{#    <tr>#}
-{#        <th scope="col">Tipo</th>#}
-{#        <th scope="col">Nombres</th>#}
-{#        <th scope="col">Username</th>#}
-{#        <th scope="col">Fecha de registro</th>#}
-{#        <th scope="col">Imagen</th>#}
-{#        <th scope="col">¿Es Super Usuario?</th>#}
-{#        <th scope="col">Estado</th>#}
-{#        <th scope="col">Grupos</th>#}
-{#        <th scope="col">Opciones</th>#}
-{#    </tr>#}
-{#{% endblock %}#}
-{##}
-{#{% block rows %}#}
-{##}
-{#{% endblock %}#}

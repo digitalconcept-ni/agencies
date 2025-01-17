@@ -22,7 +22,7 @@ var access_users = {
             class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                return `<button rel="delete" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></button>`
+                return `<a rel="delete" type="button" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></a>`
                 // return `<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="bi bi-trash3"></i></a>`;
             }
         },
