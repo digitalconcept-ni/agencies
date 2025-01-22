@@ -113,12 +113,9 @@ class ClientForm(ModelForm):
             'user': forms.Select(),
             'names': forms.TextInput(attrs={'placeholder': 'Ingrese un nombre'}),
             'dni': forms.TextInput(attrs={'placeholder': 'Ingrese un número de cedula'}),
-            'birthdate': forms.DateInput(format='%Y-%m-%d', attrs={
-                'class': 'form-control datetimepicker-input',
-                'id': 'birthdate',
+            'birthdate': forms.TextInput(attrs={
                 'value': datetime.now().strftime('%Y-%m-%d'),
-                'data-toggle': 'datetimepicker',
-                'data-target': '#birthdate'
+                'type': 'date',
             }),
             'address': forms.TextInput(attrs={
                 'placeholder': 'Ingrese una dirección',
@@ -154,6 +151,12 @@ class AssetsForm(ModelForm):
     class Meta:
         model = Assets
         fields = '__all__'
+        widgets = {
+            'date_joined': forms.TextInput(attrs={
+                'value': datetime.now().strftime('%Y-%m-%d'),
+                'type': 'date',
+            }),
+        }
 
     def save(self, commit=True):
         data = {}

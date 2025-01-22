@@ -1,27 +1,28 @@
 var client = {
     config: [
         {
+            targets: '_all',
+            class: 'text-center'
+        },
+        {
             targets: [0],
-            class: 'text-center',
             render: function (data, type, row) {
-                return '<a class="badge badge-secondary  badge-pill pointer" rel="number">' + data + '</a>'
+                return `<span class="badge bg-success">${data}</span>`
             }
         },
         {
             targets: [1],
-            class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
                 if (data === true) {
-                    return '<span class="badge badge-success badge-pill p-2"> </span>';
+                    return `<span class="badge bg-success p-2 rounded"> </span>`
                 } else {
-                    return '<span class="badge badge-danger badge-pill p-2"> </span>';
+                    return `<span class="badge bg-danger p-2 rounded"> </span>`
                 }
             }
         },
         {
             targets: [8],
-            class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
                 return `<span class="m-0" style="border-radius: 0.3rem;   background-color: #d2d6de;border: 1px solid #d2d6de;
@@ -33,11 +34,13 @@ var client = {
         },
         {
             targets: [9],
-            class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                var buttons = '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
-                buttons += '<a rel="delete" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                var buttons = `
+                <div class="btn-group" role="group" aria-label="Opciones">
+                <a class="btn btn-warning" href="${pathname}update/${row[0]}/"><i class="bi bi-pencil-square"></i></a>
+                <a rel="delete" class="btn btn-danger"><i class="bi bi-trash3"></i></a>
+              </div>`
                 return buttons;
             }
         },],
@@ -46,7 +49,7 @@ var client = {
         let data = {
             'data': action,
             'inserInto': 'rowList',
-            'th': ['Codigo', 'Estado', 'Vendedor', 'Nombres', 'Número de cédula', 'Fecha de nacimiento', 'Sexo', 'Dirección', 'Visita', 'Opciones'],
+            'th': ['NO', 'Estado', 'Vendedor', 'Nombres', 'Número de cédula', 'Fecha de nacimiento', 'Sexo', 'Dirección', 'Visita', 'Opciones'],
             'table': 'tableList',
             'config': client.config,
             'modal': false,
