@@ -265,7 +265,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                         sale = Sale()
                         sale.user_id = request.user.id
                         sale.user_commissions = request.POST['user_com']
-                        sale.date_joined = request.POST['date_joined']
+                        # sale.date_joined = request.POST['date_joined']
                         sale.purchase_order = request.POST['purchase_order']
                         sale.client_id = int(request.POST['client'])
                         if request.POST['payment'] == 'credit':
@@ -351,7 +351,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Creación de una Venta'
+        context['title'] = 'Crear venta'
         context['entity'] = 'Ventas'
         context['list_url'] = self.success_url
         context['action'] = 'add'
@@ -434,7 +434,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
 
                     sale = self.get_object()
                     sale.user_commissions = request.POST['user_com']
-                    sale.date_joined = request.POST['date_joined']
+                    # sale.date_joined = request.POST['date_joined']
                     sale.client_id = int(request.POST['client'])
                     if request.POST['payment'] == 'credit':
                         sale.payment = request.POST['payment']

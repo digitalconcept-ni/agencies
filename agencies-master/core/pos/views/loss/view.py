@@ -1,27 +1,17 @@
 import json
-import shutil
-from datetime import datetime
-from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Q, Sum, F
-from django.http import HttpResponse
-from django.http import JsonResponse, HttpResponseRedirect
-from django.template.loader import get_template
+from django.db.models import Q
+from django.http import JsonResponse
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, FormView, UpdateView, View
+from django.views.generic import CreateView, FormView
 import os
-
-from core.pos.choices import personalized_invoice
-from core.pos.mergerPdfFiles import mergerPdf
-from core.user.models import User
 
 # os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
 from weasyprint import HTML, CSS
 
-from core.pos.forms import SaleForm, ClientForm, SaleMovilForm, LossForm
-from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin, deviceVerificationMixin
-from core.pos.models import Sale, Product, SaleProduct, loss, loss_details
+from core.pos.forms import LossForm
+from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin
+from core.pos.models import Sale, Product, loss, loss_details
 from core.reports.forms import ReportForm
 
 
@@ -108,6 +98,8 @@ class LossCreateView(ValidatePermissionRequiredMixin, CreateView):
             elif action == 'add':
                 with transaction.atomic():
                     products = json.loads(request.POST['products'])
+
+                    print(request.POST)
 
                     l = loss()
                     l.user_id = request.user.id

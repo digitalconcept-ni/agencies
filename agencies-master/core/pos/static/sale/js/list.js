@@ -3,54 +3,55 @@ var input_daterange;
 var sale = {
     config: [
         {
+            targets: '_all',
+            class: 'text-center'
+        },
+        {
             targets: [0],
-            class: 'text-center',
             render: function (data, type, row) {
                 if (row[12][1] === true) {
-                    return '<a class="badge badge-success badge-pill pointer" rel="number">' + data + '</a>'
+                    return `<span class="badge bg-success">${data}</span>`
                 } else {
-                    return '<a class="badge badge-secondary badge-pill pointer" rel="number">' + data + '</a>'
+                    return `<span class="badge bg-secondary">${data}</span>`
                 }
             }
         },
         {
             targets: [2],
-            class: 'text-center',
             render: function (data, type, row) {
-                if (data === 'cash') {
-                    return '<a class="badge badge-success badge-pill" rel="number">' + data + '</a>'
-                } else if (data === 'credit') {
+                if (data === 'credit') {
                     if (row[12][2] === true) {
-                        return '<a class="badge badge-success badge-pill">' + data + '</a>';
+                        return `<span class="badge bg-success">${data}</span>`;
                     } else {
-                        return '<a class="badge badge-danger badge-pill pointer" rel="credit">' + data + '</a>'
+                        return `<span class="badge bg-danger pointer" rel="credit">${data}</span>`;
                     }
-                } else if (data === 'transfer') {
-                    return '<a class="badge badge-dark badge-pill" rel="number">' + data + '</a>'
-                } else if (data === 'pos') {
-                    return '<a class="badge badge-info badge-pill" rel="number">' + data + '</a>'
+                } else {
+                    return `<span class="badge bg-success">${data}</span>`;
                 }
-            }
-        },
-        {
-            targets: [7, 8, 9],
-            class: 'text-center',
-            render: function (data) {
-                return 'C$' + parseFloat(data).toFixed(2);
             }
         },
         {
             targets: [-1],
-            class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
+                var buttons = `<div class="btn-group" role="group" aria-label="Opciones">`
+                buttons += `<a rel="details" class="btn btn-primary btn-sm"><i class="bi bi-search"></i></a>`;
+                buttons += `<a class="btn btn-secondary btn-sm" href="${pathname}invoice/pdf/${row[0]}/" target="_blank"><i
+                    class="bi bi-file-earmark-pdf"></i></a>`
                 if (row[12][0] === false) {
-                    buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
-                    buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+                    buttons += `<a class="btn btn-warning btn-sm" href="${pathname}update/${row[0]}/"><i class="bi bi-pencil-square"></i></a>`;
+                    buttons += '<a rel="delete" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></a> ';
                 }
-                buttons += '<a href="' + pathname + 'invoice/pdf/' + row[0] + '/" target="_blank" class="btn btn-info btn-xs btn-flat"><i class="fas fa-file-pdf"></i></a> ';
+                buttons += `</div>`
                 return buttons;
+
+                // var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
+                // if (row[12][0] === false) {
+                //     buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
+                //     buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+                // }
+                // buttons += '<a href="' + pathname + 'invoice/pdf/' + row[0] + '/" target="_blank" class="btn btn-info btn-xs btn-flat"><i class="fas fa-file-pdf"></i></a> ';
+                // return buttons;
             }
         },
     ],
@@ -100,6 +101,11 @@ var sale = {
 };
 
 $(function () {
+
+    $('.select2').select2({
+        theme: "bootstrap4",
+        language: 'es'
+    });
 
     input_daterange = $('input[name="date_range"]');
 
@@ -254,14 +260,14 @@ $(function () {
                     },
                     {
                         targets: [0],
-                       render: function (data, type, row){
-                            if(row.restore){
+                        render: function (data, type, row) {
+                            if (row.restore) {
                                 return `<span style="color: red">${data}</span>`
-                            }else{
+                            } else {
                                 return data
                             }
 
-                       }
+                        }
                     },
                     {
                         targets: [-1, -3],

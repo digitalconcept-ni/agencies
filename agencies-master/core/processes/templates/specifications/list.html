@@ -1,14 +1,13 @@
-{% extends 'list.html' %}
+{% extends 'list2.html' %}
 {% load static %}
-{% block head_list %}
+
+{% block head_list_extra %}
     {# Libreria para quenerar codigo QR #}
     <script defer src="{% static 'js/qrcode.min.js' %}"></script>
 
     <script defer src="{% static 'specifications/list.js' %}"></script>
-{% endblock %}
 
-{% block javascript %}
-
+    {# ESTILOS PARA EL CONTENEDOR DEL CODIGO QR #}
     <style>
         .contenedorQR {
             display: flex;
@@ -16,11 +15,21 @@
             padding: 40px 0;
         }
     </style>
+{% endblock %}
+
+{# NO CARGMAOS LA LIBRERIA DEL RANGO DE FEHCAS #}
+{% block daterangepicker %}
+{% endblock %}
+
+{# NO CARGAMOS EL INPUT DE RANGO DE FEHCAS #}
+{% block list_controls %}
+{% endblock %}
+
+{% block extra_code %}
 
     {# Modal para mostrar el codigo QR #}
     <div class="modal fade" id="ModalQRcode" tabindex="-1" role="dialog" aria-hidden="true">
-        {#        <form id="frmProductStatus" enctype="multipart/form-data" method="post">#}
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">

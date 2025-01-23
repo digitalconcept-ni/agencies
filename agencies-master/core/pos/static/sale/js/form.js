@@ -73,7 +73,7 @@ var sale = {
             ],
             columnDefs: [
                 {
-                    targets: [0, 1, 2, 3, 4, 5, 6],
+                    targets: '_all',
                     class: 'text-center',
                 },
                 {
@@ -83,15 +83,19 @@ var sale = {
                 {
                     targets: [1],
                     render: function (data, type, row) {
+                        var check = ` <div class="form-check form-switch">`
                         if (action === 'edit') {
                             if (data === false) {
-                                return '<input type="checkbox" rel="restore"/>';
+                                check += '<input class="form-check-input" type="checkbox"  rel="restore">'
                             } else {
-                                return '<input type="checkbox" checked rel="restore"/>';
+                                check += '<input class="form-check-input" type="checkbox"  rel="restore" checked>'
                             }
                         } else if (action === 'add') {
-                            return '<input type="checkbox" disabled/>';
+                            check += '<input class="form-check-input" type="checkbox"  rel="restore" disabled>'
                         }
+                        check += `</div>`
+                        return check;
+
                     }
                 },
                 {
@@ -106,9 +110,9 @@ var sale = {
                     orderable: false,
                     render: function (data, type, row) {
                         if (!row.is_inventoried) {
-                            return '<span class="badge badge-secondary">Sin stock</span>';
+                            return `<span class="badge bg-secondary">Sin stock</span>`
                         }
-                        return '<span class="badge badge-secondary">' + data + '</span>';
+                        return `<span class="badge bg-secondary">${data}</span>`
                     }
                 },
                 {
@@ -122,7 +126,7 @@ var sale = {
                     targets: [-2],
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<input type="text" name="cant" class="form-control form-control-sm input-sm" autocomplete="off" value="' + row.cant + '">';
+                        return '<input type="text" name="cant" class="form-control form-control-sm" autocomplete="off" value="' + row.cant + '">';
                     }
                 },
                 {
@@ -229,20 +233,20 @@ $(function () {
         $('#frmClient').trigger('reset');
     });
 
-    $('input[name="birthdate"]').datetimepicker({
-        useCurrent: false,
-        format: 'YYYY-MM-DD',
-        locale: 'es',
-        keepOpen: false,
-        maxDate: new Date()
-    });
-
-    $('input[name="end"]').datetimepicker({
-        useCurrent: false,
-        format: 'YYYY-MM-DD',
-        locale: 'es',
-        keepOpen: false,
-    });
+    // $('input[name="birthdate"]').datetimepicker({
+    //     useCurrent: false,
+    //     format: 'YYYY-MM-DD',
+    //     locale: 'es',
+    //     keepOpen: false,
+    //     maxDate: new Date()
+    // });
+    //
+    // $('input[name="end"]').datetimepicker({
+    //     useCurrent: false,
+    //     format: 'YYYY-MM-DD',
+    //     locale: 'es',
+    //     keepOpen: false,
+    // });
 
     $('#frmClient').on('submit', function (e) {
         e.preventDefault();
@@ -468,13 +472,13 @@ $(function () {
 
     // Form Sale
 
-    $('#date_joined').datetimepicker({
-        format: 'YYYY-MM-DD',
-        useCurrent: false,
-        locale: 'es',
-        orientation: 'bottom',
-        keepOpen: false
-    });
+    // $('#date_joined').datetimepicker({
+    //     format: 'YYYY-MM-DD',
+    //     useCurrent: false,
+    //     locale: 'es',
+    //     orientation: 'bottom',
+    //     keepOpen: false
+    // });
 
     // $("input[name='iva']").TouchSpin({
     //     min: 0,

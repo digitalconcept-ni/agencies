@@ -7,38 +7,23 @@
 
 {% endblock %}
 
-{% block list_controls %}
-    <div class="row">
-        <div class="col-lg-5">
-            <div class="form-group">
-                <label>Rangos de fechas:</label>
-                <div class="input-group mb-3">
-                    {{ form.date_range }}
-                    <button class="btn btn-primary btnSearch" type="button">
-                        <i class="bi bi-calendar-range"></i> Rango
-                    </button>
-                    <button class="btn btn-secondary btnSearchAll" type="button">
-                        <i class="bi bi-list-columns-reverse"></i> Todas
-                    </button>
-                </div>
+{% block list_controls_extra %}
+
+    <div class="col-lg-4">
+
+        <div class="form-group">
+            <label class="form-label">Nro de Factura:</label>
+            <div class="input-group mb-3">
+                <input name="invoice-number" class="form-control" type="text">
+                <button class="btn btn-primary btnInvoice" type="button">
+                    <i class="bi bi-search"></i>
+                </button>
             </div>
         </div>
 
-        <div class="col-lg-4">
 
-            <div class="form-group">
-                <label>Nro de Factura:</label>
-                <div class="input-group mb-3">
-                    <input name="invoice-number" class="form-control" type="text">
-                    <button class="btn btn-primary btnInvoice" type="button">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-            </div>
-
-
-        </div>
     </div>
+
     <hr>
 {% endblock %}
 
@@ -61,7 +46,7 @@
                             <th>Categoría</th>
                             <th>Producto</th>
                             <th>Costo</th>
-{#                            <th>Disponible</th>#}
+                            {#                            <th>Disponible</th>#}
                             <th>Subtotal</th>
                         </tr>
                         </thead>

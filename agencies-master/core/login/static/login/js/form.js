@@ -3,7 +3,7 @@ $(function () {
     const options = {
         // enableHighAccuracy: false,
         timeout: 30000,
-        maximumAge: 27000
+        maximumAge: 5 * 60 * 1000 //27000
     };
 
     const success = (pos) => {

@@ -4,33 +4,32 @@ var productStatus;
 var production = {
     config: [
         {
-            targets: [0, 1, 2, 3, 4, 5, 6, 7],
+            targets: '_all',
             class: 'text-center',
         },
         {
             targets: [1],
             render: function (data, type, row) {
                 if (data === false) {
-                    return `<a class="badge badge-danger badge-pill pointer" rel="status">Proceso</a>`
+                    return `<span class="badge bg-danger">Proceso</span>`;
                 } else {
-                    return `<a class="badge badge-success badge-pill">Completo</a>`
+                    return `<span class="badge bg-success">Completo</span>`;
                 }
             },
         },
         {
             targets: [-1],
-            class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                var buttons = '<a rel="rawMaterial" class="btn btn-info btn-xs btn-flat"><i class="fas fa-hammer"></i></a> ';
-                buttons += '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
-                // if (row[12][0] === false) {
-                //     buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
-                // }
-                buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
+                var buttons = `
+                <div class="btn-group" role="group" aria-label="Opciones">
+                <a class="btn btn-success btn-sm" rel="rawMaterial" "><i class="bi bi-cart"></i></a>
+                <a class="btn btn-secondary btn-sm" rel="details" "><i class="bi bi-search"></i></a>`;
                 if (row[1] === false) {
-                    buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+                    buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></a> ';
                 }
+                buttons += `<a rel="delete" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></a>
+              </div>`
                 return buttons;
             }
         },

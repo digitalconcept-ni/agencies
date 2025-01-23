@@ -3,19 +3,18 @@ var input_daterange;
 var loss = {
     config: [
         {
-            targets: [0, 1, 2, 3, 4, 5],
+            targets: '_all',
             class: 'text-center'
         },
         {
             targets: [-1],
             orderable: false,
             render: function (data, type, row) {
-                var buttons = '<a rel="details" class="btn btn-success btn-xs btn-flat"><i class="fas fa-search"></i></a> ';
-                buttons += '<a rel="delete" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a> ';
-                // if (row[12][0] === false) {
-                //     buttons += '<a href="' + pathname + 'update/' + row[0] + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
-                // }
-                // buttons += '<a href="' + pathname + 'invoice/pdf/' + row[0] + '/" target="_blank" class="btn btn-info btn-xs btn-flat"><i class="fas fa-file-pdf"></i></a> ';
+                var buttons = `
+                <div class="btn-group" role="group" aria-label="Opciones">
+                <a rel="details" class="btn btn-primary btn-sm"><i class="bi bi-search"></i></a>
+                <a rel="delete" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></a>
+              </div>`
                 return buttons;
             }
         },
@@ -81,11 +80,11 @@ $(function () {
     $('.drp-buttons').hide();
 
     $('.btnSearch').on('click', function () {
-        sale.list(false);
+        loss.list(false);
     });
 
     $('.btnSearchAll').on('click', function () {
-        sale.list(true);
+        loss.list(true);
     });
 
     $('#tableList tbody')

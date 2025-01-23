@@ -1,7 +1,7 @@
 var specifications = {
     config: [
         {
-            targets: [1, 2, 3, 4, 5, 6],
+            targets: '_all',
             class: 'text-center',
         },
         {
@@ -11,12 +11,11 @@ var specifications = {
 
         {
             targets: [3, 4, 5],
-            class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                var button = `<a href="${data}" target="_blank" type="button" class="btn btn-danger" ><i class="fas fa-file-pdf"></i></a>`;
+                var button = `<a href="${data}" target="_blank" type="button" class="btn btn-danger btn-sm" ><i class="bi bi-file-earmark-pdf"></i></a>`;
                 if (data === 'No insertado') {
-                    var button = `<a href="#" type="button" class="btn btn-danger disabled"><i class="far fa-file-pdf"></i></a>`
+                    var button = `<a href="#" type="button" class="btn btn-danger btn-sm disabled"><i class="bi-file-earmark-pdf"></i></a>`
                     return button
                 }
                 return button;
@@ -24,12 +23,13 @@ var specifications = {
         },
         {
             targets: [-1],
-            class: 'text-center',
             orderable: false,
             render: function (data, type, row) {
-                var buttons = `<a rel="QRcode" type="button" class="btn btn-dark btn-xs btn-flat mr-1"><i class="fas fa-qrcode"></i></a>`
-                buttons += `<a href="${pathname}update/${row[0]}/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a>`
-                buttons += `<a rel="delete" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>`
+                 var buttons = `<div class="btn-group" role="group" aria-label="Opciones">`
+                    buttons += '<a rel="QRcode" class="btn btn-dark btn-sm"><i class="bi bi-qr-code"></i></a> ';
+                    buttons += `<a class="btn btn-warning btn-sm" href="${pathname}update/${row[0]}/"><i class="bi bi-pencil-square"></i></a>`;
+                    buttons += '<a rel="delete" class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i></a> ';
+                buttons += `</div>`;
                 return buttons;
             }
         },

@@ -167,11 +167,12 @@ $(function () {
     $('.btnSearchShoppings').on('click', function () {
         $('#myModalSearchShoppings').modal('show');
     });
-    // BUscardor de las facturas de compras
+    // Buscardor de las facturas de compras
     select_search_shopping.select2({
         theme: "bootstrap4",
         language: 'es',
         allowClear: true,
+        dropdownParent: $('#myModalSearchShoppings'),
         ajax: {
             delay: 250,
             type: 'POST',
@@ -366,20 +367,6 @@ $(function () {
     });
 
     // Form production
-
-    $('input[name="date_process"]').datetimepicker({
-        useCurrent: false,
-        format: 'YYYY-MM-DD',
-        locale: 'es',
-        keepOpen: false,
-    });
-    $('#date_joined').datetimepicker({
-        format: 'YYYY-MM-DD',
-        useCurrent: false,
-        locale: 'es',
-        orientation: 'bottom',
-        keepOpen: false
-    });
 
     $('#frmproduction').on('submit', function (e) {
         e.preventDefault();

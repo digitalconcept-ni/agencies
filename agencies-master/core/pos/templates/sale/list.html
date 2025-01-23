@@ -1,13 +1,114 @@
-{% extends 'list.html' %}
+{% extends 'list2.html' %}
 {% load static %}
-{% block head_list %}
-    <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/spanish.js' %}"></script>
-    <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/daterangepicker.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'lib/bootstrap-daterangepicker-3.1/css/daterangepicker.css' %}"/>
+
+{% block head_list_extra %}
+    {# sale JS file #}
     <script src="{% static 'sale/js/list.js' %}"></script>
 {% endblock %}
 
-{% block javascript %}
+{% block list_controls %}
+
+    {# NAV TABS #}
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="search-tab" data-bs-toggle="tab" data-bs-target="#search" type="button"
+                    role="tab" aria-controls="search" aria-selected="true">Consulta
+            </button>
+        </li>
+        {% if request.user.is_superuser == True %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
+                        role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">Descarga de guía
+                </button>
+            </li>
+        {% endif %}
+    </ul>
+
+    {# BODY TABS #}
+    <div class="tab-content pt-2 mb-4 mt-3" id="myTabContent">
+        <div class="tab-pane fade active show" id="search" role="tabpanel" aria-labelledby="search-tab">
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="form-group">
+                        <label class="form-label">Rangos de fechas:</label>
+                        <div class="input-group mb-3">
+                            {{ form.date_range }}
+                            <button class="btn btn-primary btnSearch" type="button">
+                                <i class="bi bi-calendar-range"></i> Rango
+                            </button>
+                            <button class="btn btn-secondary btnSearchAll" type="button">
+                                <i class="bi bi-list-columns-reverse"></i> Todas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+
+            <div class="row">
+                <div class="col-lg-4 col-md-12">
+                    <div class="form-group">
+                        {# checbox for maintence the session user active #}
+                        <div class="form-check form-switch form-check-inline form-check-reverse">
+                            <label class="form-check-label form-label" for="idSession">Mantener sesión: </label>
+                            <input type="checkbox" id="idSession" class="form-check-input" checked>
+                        </div>
+                        <div class="input-group mb-3">
+                            <select name="idPreSeles" id="selectPreSales" class="form-control select2">
+                                <option value="">Selecciona el preventa</option>
+                                {% for u in pre_sales %}
+                                    <option value="{{ u.id }}">{{ u.username }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <button class="btn btn-primary disabled" type="button" id="btnDonwloadGuide">
+                                <i class="bi bi-cloud-arrow-down"></i>
+                            </button>
+
+                            <a href="" class="btn btn-primaryx disabled d-none" id="iconDonwload" target="_blank">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                            </a>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                {# select for indicate donwload rangue per hours guide #}
+                <div class="col-lg-2 col-md-12">
+
+                    <label for="selectRangeHourStart" class="form-label">Hora Inicial:</label>
+                    <div class="input-group">
+                        <select class="form-control" name="selectRangeHourStart" id="selectRangeHourStart">
+                            <option> -- : --</option>
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-2 col-md-12">
+
+                    <label for="selectRangeHourEnd" class="form-label">Hora Final</label>
+                    <div class="input-group">
+                        <select class="form-control" name="selectRangeHourEnd" id="selectRangeHourEnd">
+                            <option> -- : --</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <hr>
+
+
+{% endblock %}
+
+{% block extra_code %}
     <div class="modal fade" id="myModalProducts" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -20,7 +121,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered table-sm" id="tblProducts">
+                    <table class="table table-striped table-valign-middle" id="tblProducts">
                         <thead>
                         <tr>
                             <th>Producto</th>
@@ -37,83 +138,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block content_list_before %}
-    <div class="row">
-        <div class="col-lg-4 col-md-12">
-
-            <div class="form-group">
-                <label>Rangos de fechas:</label>
-                <div class="input-group mb-3">
-                    {{ form.date_range }}
-                    <div class="input-group-append ">
-                        <button class="btn btn-success btnSearch" type="button">
-                            <i class="fas fa-calendar-check"></i> Buscar
-                        </button>
-                        <button class="btn btn-warning btnSearchAll" type="button">
-                            <i class="fas fa-calendar-check"></i> todas
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {% if request.user.is_superuser == True %}
-            <div class="col-lg-4 col-md-12">
-                <label>Descarga de guía: </label>
-
-                {# checbox for maintence the session user active #}
-                <input type="checkbox" checked id="idSession" style="margin-left: 1.2rem">
-                <label>Mantener sesion: </label>
-
-                <div class="input-group mb-3">
-                    <select name="idPreSeles" id="selectPreSales" class="form-control">
-                        <option value="">Selecciona el preventa</option>
-                        {% for u in pre_sales %}
-                            <option value="{{ u.id }}">{{ u.username }}</option>
-                        {% endfor %}
-                    </select>
-                    <div class="input-group-append">
-
-                        <button class="btn btn-success disabled" type="button" id="btnDonwloadGuide">
-                            <i class="fas fa-download"></i> Descargar
-                        </button>
-                        <a href="" class="btn btn-warning disabled d-none" id="iconDonwload" target="_blank">
-                            <i class="fas fa-file"></i>
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            {# select for indicate donwload rangue per hours guide #}
-            <div class="col-lg-2 col-md-12">
-
-                <label for="selectRangeHourStart">Hora Inicial</label>
-                <div class="input-group">
-                    <select class="form-control" name="selectRangeHourStart" id="selectRangeHourStart">
-                        <option> --: --</option>
-
-                    </select>
-                </div>
-
-            </div>
-
-            <div class="col-lg-2 col-md-12">
-
-                <label for="selectRangeHourEnd">Hora Final</label>
-                <div class="input-group">
-                    <select class="form-control" name="selectRangeHourEnd" id="selectRangeHourEnd">
-                        <option> --: --</option>
-                    </select>
-                </div>
-
-            </div>
-        {% endif %}
-
-    </div>
-    <hr>
 {% endblock %}

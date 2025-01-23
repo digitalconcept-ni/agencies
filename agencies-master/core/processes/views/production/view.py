@@ -174,7 +174,6 @@ class ProductionCreateView(ValidatePermissionRequiredMixin, CreateView):
 
                     prod = production()
                     prod.user_id = request.user.id
-                    prod.date_joined = request.POST['date_joined']
                     if request.POST['date_process'] != '':
                         prod.date_process = request.POST['date_process']
                     prod.save()
@@ -305,7 +304,6 @@ class ProductionUpdateView(ValidatePermissionRequiredMixin, UpdateView):
 
                     prod = self.get_object()
                     prod.user_id = request.user.id
-                    prod.date_joined = request.POST['date_joined']
                     if request.POST['date_process'] != '':
                         prod.date_process = request.POST['date_process']
                     prod.save()

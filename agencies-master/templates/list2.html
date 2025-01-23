@@ -51,6 +51,26 @@
             {% block list_body %}
 
                 {% block list_controls %}
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="form-group">
+                                <label class="form-label">Rangos de fechas:</label>
+                                <div class="input-group mb-3">
+                                    {{ form.date_range }}
+                                    <button class="btn btn-primary btnSearch" type="button">
+                                        <i class="bi bi-calendar-range"></i> Rango
+                                    </button>
+                                    <button class="btn btn-secondary btnSearchAll" type="button">
+                                        <i class="bi bi-list-columns-reverse"></i> Todas
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% block list_controls_extra %}
+
+                        {% endblock %}
+                    </div>
+
 
                 {% endblock %}
 

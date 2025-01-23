@@ -1,26 +1,23 @@
-{% extends 'list.html' %}
+{% extends 'list2.html' %}
 {% load static %}
-{% block head_list %}
-    <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/spanish.js' %}"></script>
-    <script src="{% static 'lib/bootstrap-daterangepicker-3.1/js/daterangepicker.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'lib/bootstrap-daterangepicker-3.1/css/daterangepicker.css' %}"/>
+
+{% block head_list_extra %}
     <script src="{% static 'loss/js/list.js' %}"></script>
 {% endblock %}
 
-{% block javascript %}
-    <div class="modal fade" id="myModalProducts" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+{% block extra_code %}
+    {# MODAL PARA MOSTRAR EL DETALLE DE LAS PERDIDAS #}
+
+    <div class="modal fade" id="myModalProducts" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        <b><i class="fas fa-search"></i> Detalle de perdidas</b>
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h1 class="modal-title fs-5" id="modalTitle">Detalle</h1>
                 </div>
-                <div class="modal-body">
-                    <table class="table table-bordered table-sm" id="tblProducts">
+                <div class="modal-body" id="modalBody">
+                    {# SECTION OF THE TABLE THE MODAL INFORMATION  #}
+                    <table class="table table-striped table-valign-middle" id="tblProducts">
                         <thead>
                         <tr>
                             <th>Producto</th>
@@ -34,31 +31,13 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
-
-{% block content_list_before %}
-    <div class="row">
-        <div class="col-lg-4 col-md-12">
-
-            <div class="form-group">
-                <label>Rangos de fechas:</label>
-                <div class="input-group mb-3">
-                    {{ form.date_range }}
-                    <div class="input-group-append ">
-                        <button class="btn btn-success btnSearch" type="button">
-                            <i class="fas fa-calendar-check"></i> Buscar
-                        </button>
-                        <button class="btn btn-warning btnSearchAll" type="button">
-                            <i class="fas fa-calendar-check"></i> todas
-                        </button>
-                    </div>
+                <div class="modal-footer" id="modalFooter">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
                 </div>
             </div>
         </div>
-
     </div>
-    <hr>
+
 {% endblock %}

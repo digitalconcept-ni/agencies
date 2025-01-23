@@ -20,31 +20,10 @@ class ProductionForm(ModelForm):
         model = production
         fields = '__all__'
         widgets = {
-            'date_joined': forms.HiddenInput(attrs={
+            'date_process': forms.TextInput(attrs={
                 'value': datetime.now().strftime('%Y-%m-%d'),
-                'autocomplete': 'off',
-                'class': 'form-control datetimepicker-input',
-                'id': 'date_joined',
-                'data-target': '#date_joined',
-                'data-toggle': 'datetimepicker',
+                'type': 'date',
             }),
-            'date_process': forms.DateInput(attrs={
-                'value': datetime.now().strftime('%Y-%m-%d'),
-                'autocomplete': 'off',
-                'class': 'form-control datetimepicker-input',
-                'id': 'date_process',
-                'data-target': '#date_process',
-                'data-toggle': 'datetimepicker',
-            }),
-            # 'date_process': forms.DateTimeField(format='%Y-%m-%d %H:%M:%S', attrs={
-            #     'class': 'form-control datetimepicker-input',
-            #     'id': 'date_process',
-            #     'value': datetime.now().strftime('%Y-%m-%d'),
-            #     'data-toggle': 'datetimepicker',
-            #     'data-target': '#date_process'
-            # }),
-            # 'name': forms.TextInput(attrs={'placeholder': 'Ingrese un nombre'}),
-            # 'desc': forms.Textarea(attrs={'placeholder': 'Ingrese una descripción', 'rows': 3, 'cols': 3}),
         }
         exclude = ['user']
 

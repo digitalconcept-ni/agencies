@@ -48,7 +48,7 @@ var loss = {
             ],
             columnDefs: [
                 {
-                    targets: [0, 1, 2, 3, 4, 5],
+                    targets: '_all',
                     class: 'text-center',
                 },
                 {
@@ -57,48 +57,36 @@ var loss = {
                 },
                 {
                     targets: [1],
-                    orderable: false,
                     render: function (data, type, row) {
                         return '<a rel="remove" style="color: blue; cursor: pointer">' + data + '</a>';
                     }
                 },
                 {
                     targets: [2],
-                    orderable: false,
                     render: function (data, type, row) {
                         return parseFloat(data).toFixed(2);
                     }
                 },
                 {
                     targets: [4],
-                    orderable: false,
                     render: function (data, type, row) {
                         return parseFloat(data).toFixed(2);
                     }
                 },
                 {
                     targets: [3],
-                    orderable: false,
                     render: function (data, type, row) {
                         return '<input type="text" name="cant" class="form-control form-control-sm input-sm" autocomplete="off" value="' + 1 + '">';
                     }
                 },
                 {
                     targets: [-1],
-                    orderable: false,
                     render: function (data, type, row) {
                         return `<textarea style="resize: none;" class="form-control" name="razon" id="razon" cols="50" rows="3" placeholder="Describe el porqué"></textarea>`
                     }
                 },
             ],
-            rowCallback(row, data, displayNum, displayIndex, dataIndex) {
-                $(row).find('input[name="cant"]').TouchSpin({
-                    min: 1,
-                    max: 1000,
-                    step: 1
-                });
 
-            },
         });
     },
 };
@@ -206,7 +194,6 @@ $(function () {
             var tr = tblProducts.cell($(this).closest('td, li')).index();
             loss.details.products[tr.row].cant = cant;
             loss.calculateInvoice();
-            console.log($('td:nth-last-child(2)', tblProducts.row(tr.row).node()));
             $('td:nth-last-child(2)', tblProducts.row(tr.row).node()).html(loss.details.products[tr.row].subtotal.toFixed(2));
         })
         .on('change', 'textarea[name="razon"]', function () {
@@ -215,7 +202,7 @@ $(function () {
             loss.details.products[tr.row].razon = r;
         })
 
-    $('.btnRemoveAll').on('click', function () {
+    $('#btnRemoveAll').on('click', function () {
         if (loss.details.products.length === 0) return false;
         alert_action('Notificación', '¿Estas seguro de eliminar todos los details de tu detalle?', function () {
             loss.details.products = [];
@@ -231,14 +218,6 @@ $(function () {
 
     // Form loss
 
-    $('#date_joined').datetimepicker({
-        format: 'YYYY-MM-DD',
-        useCurrent: false,
-        locale: 'es',
-        orientation: 'bottom',
-        keepOpen: false
-    });
-
     $('#frmloss').on('submit', function (e) {
         e.preventDefault();
 
@@ -249,6 +228,7 @@ $(function () {
 
         var success_url = this.getAttribute('data-url');
         var parameters = new FormData(this);
+        parameters.append('total', $('input[name="total"]').val());
         parameters.append('products', JSON.stringify(loss.details.products));
         parameters.append('products_review', JSON.stringify(loss.details.products_review));
         submit_with_ajax(pathname, 'Notificación',
