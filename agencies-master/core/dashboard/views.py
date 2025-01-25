@@ -209,7 +209,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 data = []
                 total = 0
                 for i in appliedCredit:
-                    total += f'{i.total:,.2f}'
+                    total += float(i.total)
                     data.append([i.id, i.purchase_order, i.user.username, i.client.names, i.end, f'{i.total:,.2f}'])
                 data.append(['--', '----', '----', '----', 'Total', f'{total:,.2f}'])
         except Exception as e:
