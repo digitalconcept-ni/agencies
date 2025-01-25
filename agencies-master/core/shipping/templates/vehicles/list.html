@@ -1,9 +1,12 @@
-{% extends 'list.html' %}
+{% extends 'list2.html' %}
 {% load static %}
-{% block head_list %}
+
+{% block head_list_extra %}
     <script src="{% static 'vehicles/js/list.js' %}"></script>
 {% endblock %}
 
-{% block javascript %}
+{% block daterangepicker %}
+{% endblock %}
 
+{% block list_controls %}
 {% endblock %}

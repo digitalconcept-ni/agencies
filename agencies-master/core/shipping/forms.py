@@ -10,8 +10,10 @@ class VehiclesForm(ModelForm):
         model = vehicles
         fields = '__all__'
         widgets = {
-            'date_joined': forms.HiddenInput(attrs={
+            'date_joined': forms.TextInput(attrs={
                 'value': datetime.now().strftime('%Y-%m-%d'),
+                'class': 'form-control',
+                'type': 'date',
             }),
         }
 
@@ -37,22 +39,15 @@ class DeliveriesForm(ModelForm):
             'date_joined': forms.HiddenInput(attrs={
                 'value': datetime.now().strftime('%Y-%m-%d'),
             }),
-            'shipping_date': forms.DateInput(attrs={
-                'class': 'datetimepicker-input',
-                'id': 'shipping_date',
+            'shipping_date': forms.TextInput(attrs={
                 'value': datetime.now().strftime('%Y-%m-%d'),
-                'data-toggle': 'datetimepicker',
-                'data-target': 'shipping_date',
-                'maxlength': '10',
-
+                'class': 'form-control',
+                'type': 'date',
             }),
-            'delivery_date': forms.DateInput(attrs={
-                'class': 'datetimepicker-input',
-                'id': 'delivery_date',
+            'delivery_date': forms.TextInput(attrs={
                 'value': datetime.now().strftime('%Y-%m-%d'),
-                'data-toggle': 'datetimepicker',
-                'data-target': 'delivery_date',
-                'maxlength': '10',
+                'class': 'form-control',
+                'type': 'date',
             }),
         }
         exclude = ['status', 'total_distance']
