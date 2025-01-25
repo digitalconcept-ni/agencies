@@ -103,7 +103,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 appliedCredit = querySales.filter(Q(payment='credit') & Q(applied=False)).count()
 
                 data = {
-                    'sales': countSalesToday,
+                    'sales-today': countSalesToday,
                     'amount': countSalesTodayMoney,
                     'products': totalProductsQuery,
                     'clients': totalClientsQuery,
