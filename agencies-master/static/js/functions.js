@@ -106,68 +106,6 @@ function submit_with_ajax(url, title, content, parameters, callback) {
         }
 
     });
-
-    // $.confirm({
-    //     theme: 'material',
-    //     title: title,
-    //     icon: 'fa fa-info',
-    //     content: content,
-    //     columnClass: 'small',
-    //     typeAnimated: true,
-    //     cancelButtonClass: 'btn-primary',
-    //     draggable: true,
-    //     dragWindowBorder: false,
-    //     buttons: {
-    //         info: {
-    //             text: "Si",
-    //             btnClass: 'btn-primary',
-    //             action: function () {
-    //                 // Agregamos el preloader al bosy
-    //                 document.body.prepend(preloader);
-    //                 $.ajax({
-    //                     url: url,
-    //                     data: parameters,
-    //                     type: 'POST',
-    //                     dataType: 'json',
-    //                     headers: {
-    //                         'X-CSRFToken': csrftoken
-    //                     },
-    //                     processData: false,
-    //                     contentType: false,
-    //                     success: function (request) {
-    //
-    //                         // Quitamos el preloader cuando se haya cumplido la accion
-    //                         if (preloader) {
-    //                             preloader.remove();
-    //                         }
-    //
-    //                         if (request.hasOwnProperty('info')) {
-    //                             message_info(request.info);
-    //                             callback(request);
-    //                             return false;
-    //                         }
-    //                         if (!request.hasOwnProperty('error')) {
-    //                             callback(request);
-    //                             return false;
-    //                         } else {
-    //                             message_error(request.error);
-    //                         }
-    //                     },
-    //                     error: function (jqXHR, textStatus, errorThrown) {
-    //                         message_error(errorThrown + ' ' + textStatus);
-    //                     }
-    //                 });
-    //             }
-    //         },
-    //         danger: {
-    //             text: "No",
-    //             btnClass: 'btn-red',
-    //             action: function () {
-    //
-    //             }
-    //         },
-    //     }
-    // })
 }
 
 function alert_action(title, content, callback, cancel) {

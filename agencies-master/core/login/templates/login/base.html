@@ -32,7 +32,7 @@
     <script src="{% static 'lib2/sweetalert2-11.0.16/sweetalert2.all.min.js' %}"></script>
 
     {# loader#}
-    <link rel="stylesheet" href="{% static 'css/loader.css' %}">
+    <link rel="stylesheet" href="{% static 'css/loader2.css' %}">
 
     <!-- Functions -->
     <script defer src="{% static 'js/functions.js' %}"></script>
@@ -105,182 +105,194 @@
 <body class="hold-transition login-page" onKeyDown="checkKey(event)">
 <!-- Preloader -->
 <div id="preloader">
-
-    <span id="title-loading">Cargando...</span>
-
-    <div class="preloaer-container">
-
-        <div class="h1Container">
-
-            <div class="cube h1 w1 l1">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h1 w1 l2">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h1 w1 l3">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h1 w2 l1">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h1 w2 l2">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h1 w2 l3">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h1 w3 l1">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h1 w3 l2">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h1 w3 l3">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
+    <div class="socket">
+        <div class="gel center-gel">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c1 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c2 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c3 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c4 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c5 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c6 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
         </div>
 
-        <div class="h2Container">
-
-            <div class="cube h2 w1 l1">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h2 w1 l2">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h2 w1 l3">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h2 w2 l1">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h2 w2 l2">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h2 w2 l3">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h2 w3 l1">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h2 w3 l2">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h2 w3 l3">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
+        <div class="gel c7 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
         </div>
 
-        <div class="h3Container">
-
-            <div class="cube h3 w1 l1">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h3 w1 l2">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h3 w1 l3">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h3 w2 l1">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h3 w2 l2">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h3 w2 l3">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h3 w3 l1">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h3 w3 l2">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
-
-            <div class="cube h3 w3 l3">
-                <div class="face top"></div>
-                <div class="face izquierda"></div>
-                <div class="face derecha"></div>
-            </div>
+        <div class="gel c8 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
         </div>
-
+        <div class="gel c9 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c10 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c11 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c12 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c13 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c14 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c15 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c16 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c17 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c18 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c19 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c20 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c21 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c22 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c23 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c24 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c25 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c26 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c28 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c29 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c30 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c31 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c32 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c33 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c34 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c35 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c36 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c37 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
     </div>
 </div>
 

@@ -50,4 +50,8 @@ $(function () {
 
     retryGeolocation();
 
+    $('form').on('submit', 'form', function (event) {
+        document.body.prepend(preloader);
+    })
+
 });
