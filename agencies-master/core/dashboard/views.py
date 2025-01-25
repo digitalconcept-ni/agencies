@@ -104,7 +104,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
                 data = {
                     'sales-today': countSalesToday,
-                    'amount': countSalesTodayMoney,
+                    'amount': f'{countSalesTodayMoney:,.2f}',
                     'products': totalProductsQuery,
                     'clients': totalClientsQuery,
                     'lower-inventory': lowInventory,
