@@ -66,7 +66,7 @@ TENANT_APPS = [
     'core.reports',
     'core.homepage',
     'core.pos',
-    # 'core.maps',
+    'core.maps',
     'core.security',
     'core.processes',
     'core.shipping',
