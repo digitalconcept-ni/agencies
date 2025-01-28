@@ -4,5 +4,5 @@ from core.maps.views import MapListView
 
 urlpatterns = [
     # dashboard
-    path('', MapListView.as_view(), name='client_maps'),
+    path('', MapListView.as_view(), name='map'),
 ]

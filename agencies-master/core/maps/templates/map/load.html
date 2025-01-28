@@ -1,0 +1,52 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Map</title>
+
+    {# styles for leaflet maps  #}
+    <link rel="stylesheet" href="{% static 'lib2/leaflet/leaflet.css' %}"/>
+    {# styles  #}
+    <link rel="stylesheet" href="{% static 'map/css/map.css' %}">
+
+</head>
+<body>
+
+{# contenedo rdel mapa #}
+<div id="map">
+
+</div>
+
+{# OPTENEMOS EL CONTEXTO DE LOS CLIENTES PAR AMOSTRARLOS #}
+<script>
+    const points = {{ points|safe }}
+</script>
+
+{# script leaflet #}
+<script src="{% static 'lib2/leaflet/leaflet.js' %}"></script>
+{# script main map #}
+<script src="{% static 'map/js/config.js' %}"></script>
+{# addClientMarkers JS file para cargar los markers de los PDV #}
+<script src="{% static 'map/js/addClientMarkers.js' %}"></script>
+
+
+{#<script>#}
+{#    var map = L.map('map').setView([12.1243335, -86.3092771], 14);#}
+{##}
+{#    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {#}
+{#        maxZoom: 17,#}
+{#        attribution: '© OpenStreetMap'#}
+{#    }).addTo(map);#}
+{##}
+{#    const randomPoint = L.marker([12.137594, -86.286632]).addTo(map);#}
+{##}
+{#    map.fitWorld([#}
+{#        [randomPoint.getLatLng().lat, randomPoint.getLatLng().lng]#}
+{#    ])#}
+{#</script>#}
+
+</body>
+</html>

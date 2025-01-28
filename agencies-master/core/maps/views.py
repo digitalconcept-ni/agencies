@@ -1,0 +1,84 @@
+import json
+
+from django.views.generic import FormView
+
+from core.pos.mixins import ValidatePermissionRequiredMixin
+from core.pos.models import Client
+from core.reports.forms import ReportForm
+
+# Create your views here.
+
+class MapListView(ValidatePermissionRequiredMixin, FormView):
+    form_class = ReportForm
+    template_name = 'map/load.html'
+    permission_required = 'view_sale'
+
+    # FUncion para obtener los PDV
+    def getClientsPoints(self):
+        query = Client.objects.filter(is_active=True)
+        data = [i.toJSON() for i in query if i.lat and i.lng]
+        print(data)
+        return json.dumps(data)
+
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        # try:
+        #     action = request.POST['action']
+        #     if action == 'apply_credit':
+        #         s = Sale.objects.get(id=request.POST['id'])
+        #         s.applied = True
+        #         s.save()
+        #     elif action == 'download_guides':
+        #         data = []
+        #         param = {
+        #             'id': request.POST['id'],
+        #             'tenant': request.tenant.schema_name,
+        #             'user': request.user,
+        #             'uri': request.build_absolute_uri(),
+        #             'session': request.session,
+        #         }
+        #         path = self.guide(param)
+        #         data = path
+        #     elif action == 'search':
+        #         data = []
+        #         start_date = request.POST['start_date']
+        #         end_date = request.POST['end_date']
+        #         queryset = Sale.objects.select_related()
+        #         if len(start_date) and len(end_date) and request.user.is_superuser:
+        #             queryset = queryset.filter(date_joined__range=[start_date, end_date])
+        #         elif len(start_date) and len(end_date) and not request.user.is_superuser:
+        #             queryset = queryset.filter(
+        #                 Q(user_id=request.user.id) & Q(date_joined__range=[start_date, end_date]))
+        #         elif not len(start_date) and not len(end_date) and not request.user.is_superuser:
+        #             queryset = queryset.filter(user_id=request.user.id)
+        #
+        #         for i in queryset:
+        #             data.append(i.toLIST())
+        #     elif action == 'search_products_detail':
+        #         data = []
+        #         for i in SaleProduct.objects.filter(sale_id=request.POST['id']):
+        #             data.append(i.toJSON())
+        #     elif action == 'delete':
+        #         sale = Sale.objects.get(id=request.POST['id'])
+        #         set = sale.saleproduct_set.all()
+        #         for s in set:
+        #             s.product.stock += s.cant
+        #             s.save()
+        #         sale.delete()
+        #     else:
+        #         data['error'] = 'No se ha encontrado el action'
+        # except Exception as e:
+        #     # print(str(e))
+        #     data['error'] = str(e)
+        # return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Mapa de clientes'
+        context['points'] = self.getClientsPoints()
+        # context['create_url'] = reverse_lazy('sale_create')
+        # context['list_url'] = reverse_lazy('sale_list')
+        context['entity'] = 'Mapa'
+        # context['pre_sales'] = User.objects.filter(presale=True)
+        return context

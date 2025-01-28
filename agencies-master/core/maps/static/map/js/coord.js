@@ -3,8 +3,8 @@ let userLng;
 
 const options = {
     enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 2000
+    timeout: 30000,
+    maximumAge: 27000
 };
 
 const success = (pos) => {
@@ -34,4 +34,4 @@ const handleError = (error) => {
 }
 
 // navigator.geolocation.watchPosition(success, handleError, options);
-navigator.geolocation.getCurrentPosition(success, handleError, options);
+// navigator.geolocation.getCurrentPosition(success, handleError, options);
