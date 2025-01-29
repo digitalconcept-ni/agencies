@@ -34,15 +34,19 @@ class MapListView(ValidatePermissionRequiredMixin, FormView):
 
     # Funcion para obtener los PDV
     def getClientsPoints(self):
-        data = []
-        query = Client.objects.filter(is_active=True)
-        for i in query:
-            # Validamos si las coordenadas no son de tipo float
-            # Si no lo son las pasamos a float para su validacion
-            lat = float(i.lat) if i.lat else None
-            lng = float(i.lng) if i.lng else None
-            if lat is not None and lng is not None and self.is_valid_coordinate(lat, lng):
-                data.append(i.toJSON())
+        try:
+            data = []
+            query = Client.objects.filter(is_active=True)
+            for i in query:
+                # Validamos si las coordenadas no son de tipo float
+                # Si no lo son las pasamos a float para su validacion
+                if i.lat not in [None, 'undefined'] or i.lng not in [None, 'undefined']:
+                    lat = float(i.lat)
+                    lng = float(i.lng)
+                    if self.is_valid_coordinate(lat, lng):
+                        data.append(i.toJSON())
+        except ValueError as e:
+            data = {'error': str(e)}
         return json.dumps(data)
 
     def post(self, request, *args, **kwargs):
