@@ -41,6 +41,8 @@ class MapListView(ValidatePermissionRequiredMixin, FormView):
                 # Validamos si las coordenadas no son de tipo float
                 # Si no lo son las pasamos a float para su validacion
                 if i.lat not in [None, 'undefined'] or i.lng not in [None, 'undefined']:
+                    cleaned_value = i.lat.strip().rstrip('.')
+                    cleaned_value != '' and cleaned_value.replace('.', '', 1).isdigit()
                     lat = float(i.lat)
                     lng = float(i.lng)
                     if self.is_valid_coordinate(lat, lng):
