@@ -2,7 +2,7 @@
 
 
 // Dibujamos los marcadores en el mapa
-points.map((point) => {
+points.map((point.data) => {
     L.marker([point.lat, point.lng]).addTo(map)
         .bindPopup(
             `<h4>${point.names}</h4> <p>${point.address}</p>`

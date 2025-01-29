@@ -22,7 +22,8 @@
 
 {# OPTENEMOS EL CONTEXTO DE LOS CLIENTES PAR AMOSTRARLOS #}
 <script>
-    const points = {{ points|safe }}
+    const points = {{ points|safe }};
+    console.log(points.errors)
 </script>
 
 {# script leaflet #}
