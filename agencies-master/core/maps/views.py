@@ -33,23 +33,54 @@ class MapListView(ValidatePermissionRequiredMixin, FormView):
         return -90 <= lat <= 90 and -180 <= lng <= 180
 
     # Funcion para obtener los PDV
+
     def getClientsPoints(self):
-        try:
-            data = []
-            query = Client.objects.filter(is_active=True)
-            for i in query:
+        data = []
+        errors = []  # Lista para almacenar errores
+
+        query = Client.objects.filter(is_active=True)
+        for i in query:
+            try:
                 # Validamos si las coordenadas no son de tipo float
-                # Si no lo son las pasamos a float para su validacion
-                if i.lat not in [None, 'undefined'] or i.lng not in [None, 'undefined']:
+                # Si no lo son, las pasamos a float para su validación
+                if i.lat not in [None, 'undefined'] and i.lng not in [None, 'undefined']:
                     cleaned_value = i.lat.strip().rstrip('.')
-                    cleaned_value != '' and cleaned_value.replace('.', '', 1).isdigit()
-                    lat = float(i.lat)
-                    lng = float(i.lng)
-                    if self.is_valid_coordinate(lat, lng):
-                        data.append(i.toJSON())
-        except ValueError as e:
-            data = {'error': str(e)}
-        return json.dumps(data)
+                    if cleaned_value != '' and cleaned_value.replace('.', '', 1).isdigit():
+                        lat = float(i.lat)
+                        lng = float(i.lng)
+                        if self.is_valid_coordinate(lat, lng):
+                            data.append(i.toJSON())
+                    else:
+                        errors.append({'id': i.id, 'error': 'Coordenadas no válidas'})
+                else:
+                    errors.append({'id': i.id, 'error': 'Coordenadas no definidas'})
+            except ValueError as e:
+                errors.append({'id': i.id, 'error': str(e)})
+
+        # Si hay errores, los incluimos en la respuesta
+        if errors:
+            return json.dumps({'data': data, 'errors': errors})
+
+        return json.dumps({'data': data})
+
+    # def getClientsPoints(self):
+    #     try:
+    #         data = []
+    #         errors = []  # Lista para almacenar errores
+    #         query = Client.objects.filter(is_active=True)
+    #         for i in query:
+    #             # Validamos si las coordenadas no son de tipo float
+    #             # Si no lo son las pasamos a float para su validacion
+    #             if i.lat not in [None, 'undefined'] or i.lng not in [None, 'undefined']:
+    #                 cleaned_value = i.lat.strip().rstrip('.')
+    #                 cleaned_value != '' and cleaned_value.replace('.', '', 1).isdigit()
+    #                 lat = float(i.lat)
+    #                 lng = float(i.lng)
+    #                 if self.is_valid_coordinate(lat, lng):
+    #                     data.append(i.toJSON())
+    #     except ValueError as e:
+    #         data = {'error': str(e)}
+    #     return json.dumps(data)
 
     def post(self, request, *args, **kwargs):
         data = {}
