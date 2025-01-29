@@ -5,7 +5,7 @@
 points.map((point) => {
     L.marker([point.lat, point.lng]).addTo(map)
         .bindPopup(
-            `<p><b>Cliente:</b> ${point.names}</p> <p><b>  Telefono: </b> ${point.phone_number} </p>`
+            `<h4>${point.names}</h4> <p>${point.address}</p>`
         )
 });
 

@@ -6,6 +6,7 @@ from core.pos.mixins import ValidatePermissionRequiredMixin
 from core.pos.models import Client
 from core.reports.forms import ReportForm
 
+
 # Create your views here.
 
 class MapListView(ValidatePermissionRequiredMixin, FormView):
@@ -13,13 +14,37 @@ class MapListView(ValidatePermissionRequiredMixin, FormView):
     template_name = 'map/load.html'
     permission_required = 'view_sale'
 
-    # FUncion para obtener los PDV
+    def is_valid_coordinate(self, lat, lng):
+        """
+        Verifica si las coordenadas son válidas.
+
+        Args:
+            lat (float): Latitud a verificar.
+            lng (float): Longitud a verificar.
+
+        Returns:
+            bool: True si las coordenadas son válidas, False en caso contrario.
+        """
+        # Verificar que las coordenadas sean números
+        if not isinstance(lat, (int, float)) or not isinstance(lng, (int, float)):
+            return False
+
+        # Verificar el rango de las coordenadas
+        return -90 <= lat <= 90 and -180 <= lng <= 180
+
+    # Funcion para obtener los PDV
     def getClientsPoints(self):
+        data = []
         query = Client.objects.filter(is_active=True)
-        data = [i.toJSON() for i in query if i.lat and i.lng]
+        for i in query:
+            # Validamos si las coordenadas no son de tipo float
+            # Si no lo son las pasamos a float para su validacion
+            lat = float(i.lat) if i.lat is not None else None
+            lng = float(i.lng) if i.lng is not None else None
+            if lat is not None and lng is not None and self.is_valid_coordinate(lat, lng):
+                data.append(i.toJSON())
         print(data)
         return json.dumps(data)
-
 
     def post(self, request, *args, **kwargs):
         data = {}
