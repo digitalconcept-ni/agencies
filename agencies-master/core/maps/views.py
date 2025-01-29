@@ -39,11 +39,11 @@ class MapListView(ValidatePermissionRequiredMixin, FormView):
         for i in query:
             # Validamos si las coordenadas no son de tipo float
             # Si no lo son las pasamos a float para su validacion
-            lat = float(i.lat) if i.lat is not None else None
-            lng = float(i.lng) if i.lng is not None else None
-            if lat is not None and lng is not None and self.is_valid_coordinate(lat, lng):
-                data.append(i.toJSON())
-        print(data)
+            if i.lat and i.lng:
+                lat = float(i.lat) if i.lat is not None else None
+                lng = float(i.lng) if i.lng is not None else None
+                if lat is not None and lng is not None and self.is_valid_coordinate(lat, lng):
+                    data.append(i.toJSON())
         return json.dumps(data)
 
     def post(self, request, *args, **kwargs):
