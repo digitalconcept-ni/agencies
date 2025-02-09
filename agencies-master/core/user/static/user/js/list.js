@@ -52,7 +52,7 @@ var user = {
         {
             targets: [-1],
             render: function (data, type, row) {
-                return `<a href="${pathname}update/row[0]/" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></a>`;
+                return `<a href="${pathname}update/${row[0]}/" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></a>`;
                 // buttons += '<a rel="delete" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
                 // return buttons;
             }
