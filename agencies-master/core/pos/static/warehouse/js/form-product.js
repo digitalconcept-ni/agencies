@@ -206,7 +206,7 @@ $(function () {
                 console.log(request);
 
                 request.forEach(item => {
-                    item.cant = item.stock;
+                    item.cant = 1;
                     product.addProduct(item);
                 })
                 product.listProducts();

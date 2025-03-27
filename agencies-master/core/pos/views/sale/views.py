@@ -196,9 +196,14 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             elif action == 'delete':
                 sale = Sale.objects.get(id=request.POST['id'])
                 set = sale.saleproduct_set.all()
+                warehouse_update = []
                 for s in set:
-                    s.product.stock += s.cant
-                    s.save()
+                    product_warehouse = ProductWarehouse.objects.get(
+                        warehouse__is_central=1, product_id=s.product_id)
+                    product_warehouse.stock += s.cant
+                    warehouse_update.append(product_warehouse)
+
+                ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
                 sale.delete()
             else:
                 data['error'] = 'No se ha encontrado el action'
@@ -462,6 +467,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
             #     item['cant'] = i.cant
             item['subtotal'] = f'{i.subtotal:.2f}'
             item['restore'] = i.restore
+            item['initial_restore'] = i.restore
             item['cant'] = i.cant
             item['before'] = True
             data.append(item)
@@ -566,13 +572,13 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                                 if restore:
                                     product_warehouse.stock += p['cant']
                                 else:
-                                    product_warehouse.stock -= p['cant']
-
-                            if 'initial_amount' in p:
-                                # SI fue modificado le restamos el valor anterior y le sumamos la cantidad actual
-                                product_warehouse.stock = (product_warehouse.stock - int(
-                                    p['initial_amount'])) + p['cant']
-
+                                    if bool(p['initial_restore']):
+                                        product_warehouse.stock -= p['cant']
+                                    else:
+                                        if 'initial_amount' in p:
+                                            # SI fue modificado le restamos el valor anterior y le sumamos la cantidad actual
+                                            product_warehouse.stock = (product_warehouse.stock + int(
+                                                p['initial_amount'])) - p['cant']
                         warehouse_update.append(product_warehouse)
 
                     SaleProduct.objects.bulk_create(sale_product_create)
