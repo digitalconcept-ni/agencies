@@ -11,7 +11,7 @@ var sale = {
         discount: 0.00,
         total: 0.00,
         products: [],
-        products_review: []
+        products_delete: []
     },
     getProductsIds: function () {
         return this.details.products.map(value => value.id);
@@ -287,20 +287,26 @@ $(function () {
             var tr = tblProducts.cell($(this).closest('td, li')).index();
             alert_action('Notificación', '¿Estas seguro de eliminar el producto de tu detalle?',
                 function () {
-                    sale.details.products.splice(tr.row, 1);
-                    tblProducts.row(tr.row).remove().draw();
-                    sale.calculateInvoice();
-                }, function () {
-
-                });
+                    let delItem = sale.details.products.splice(tr.row, 1);
+                    delItem[0].delete = true;
+                    sale.details.products_delete.push(delItem[0]);
+                    sale.listProducts();
+                }, function(){});
         })
         .on('change', 'input[name="cant"]', function () {
             console.clear();
             var cant = parseInt($(this).val());
             var tr = tblProducts.cell($(this).closest('td, li')).index();
+            if (action === 'edit') {
+                if (sale.details.products[tr.row].hasOwnProperty('before') &&
+                    !sale.details.products[tr.row].hasOwnProperty('initial_amount')) {
+                    sale.details.products[tr.row]['initial_amount'] = sale.details.products[tr.row][e.target.name];
+                }
+            }
+
             sale.details.products[tr.row].cant = cant;
             sale.calculateInvoice();
-            $('td:last', tblProducts.row(tr.row).node()).html('$' + sale.details.products[tr.row].subtotal.toFixed(2));
+            $('td:last', tblProducts.row(tr.row).node()).html(sale.details.products[tr.row].subtotal.toFixed(2));
         });
 
     $('.btnRemoveAll').on('click', function () {
@@ -440,8 +446,7 @@ $(function () {
 
         var success_url = this.getAttribute('data-url');
         var parameters = new FormData(this);
-        parameters.append('products', JSON.stringify(sale.details.products));
-        parameters.append('products_review', JSON.stringify(sale.details.products_review));
+        parameters.append('details', JSON.stringify(sale.details));
         parameters.append('lat', $('input[name="latitud"]').val());
         parameters.append('lng', $('input[name="longitud"]').val());
         // parameters.append('coords', true);
@@ -464,7 +469,7 @@ $(function () {
         let canceledDate = f.join('-');
         end.val(canceledDate)
     }
-    if ($('#id_payment').val() == 'credit') {
+    if ($('#id_payment').val() === 'credit') {
         $('#block-credit').css('display', 'flex');
     }
 
