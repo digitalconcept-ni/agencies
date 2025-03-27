@@ -200,7 +200,8 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 for s in set:
                     product_warehouse = ProductWarehouse.objects.get(
                         warehouse__is_central=1, product_id=s.product_id)
-                    product_warehouse.stock += s.cant
+                    if not s.restore:
+                        product_warehouse.stock += s.cant
                     warehouse_update.append(product_warehouse)
 
                 ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
