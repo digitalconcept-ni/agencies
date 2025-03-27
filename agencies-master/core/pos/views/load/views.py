@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views.generic import ListView
 
 from core.pos.choices import random_code
-from core.pos.models import Product, Brands
+from core.pos.models import Product, Brands, Category
 
 
 class loadCsvView(LoginRequiredMixin, ListView):
@@ -18,11 +18,24 @@ class loadCsvView(LoginRequiredMixin, ListView):
         try:
             selection = request.POST['selection']
             update = request.POST['update']
-            if selection == 'product':
+            file = request.FILES['file']
+            decode_file = file.read().decode("utf-8").splitlines()
+            reader = csv.reader(decode_file, delimiter=';')
+
+            if selection == 'category':
+                category_update = []
+                for row in reader:
+                    cat = Category(
+                        name=row[0].strip(),
+                        desc=row[0].strip(),
+                    )
+                    category_update.append(cat)
+                Category.objects.bulk_create(category_update)
+                data['success'] = 'Categorias grabadas exitosamente'
+
+            elif selection == 'product':
                 product_list = []
-                file = request.FILES['file']
-                decode_file = file.read().decode("utf-8").splitlines()
-                reader = csv.reader(decode_file)
+
                 if update == 'true':
                     print('update')
                     product = Product()
@@ -50,14 +63,11 @@ class loadCsvView(LoginRequiredMixin, ListView):
                     data['success'] = 'Proceso terminado con exito'
             elif selection == 'brands':
                 brand_list = []
-                file = request.FILES['file']
-                decode_file = file.read().decode("utf-8").splitlines()
-                reader = csv.reader(decode_file)
-
                 for row in reader:
+                    print(row)
                     brand = Brands(
-                        name=row[0],
-                        description=row[1]
+                        name=row[0].strip(),
+                        description=row[1].strip()
                     )
                     brand_list.append(brand)
                 Brands.objects.bulk_create(brand_list)

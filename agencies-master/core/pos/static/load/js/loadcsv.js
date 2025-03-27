@@ -24,8 +24,8 @@ $(function () {
                     'X-CSRFToken': csrftoken
                 },
                 success: function (response) {
-                    loader.style.opacity = 0
-                    loader.style.visibility = 'hidden'
+                    // loader.style.opacity = 0
+                    // loader.style.visibility = 'hidden'
                     if (response.hasOwnProperty('error')) {
                         message_error(response.error)
                     } else {
