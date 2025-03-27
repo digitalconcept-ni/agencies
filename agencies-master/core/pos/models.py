@@ -260,7 +260,7 @@ class ProductWarehouse(models.Model):
 
 class Shopping(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, verbose_name='Proveedor')
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, verbose_name='Bodega')
+    warehouse = models.ForeignKey(Warehouse, null=True, on_delete=models.CASCADE, verbose_name='Bodega')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario')
     cant = models.IntegerField(default=0)
     invoice_number = models.CharField(max_length=10, default='F000000000')
