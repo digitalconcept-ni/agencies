@@ -23,14 +23,15 @@ class loadCsvView(LoginRequiredMixin, ListView):
             reader = csv.reader(decode_file, delimiter=';')
 
             if selection == 'category':
-                category_update = []
-                for row in reader:
-                    cat = Category(
-                        name=row[0].strip(),
-                        desc=row[0].strip(),
-                    )
-                    category_update.append(cat)
-                Category.objects.bulk_create(category_update)
+                # category_update = []
+                # for row in reader:
+                #     cat = Category(
+                #         name=row[0].strip(),
+                #         desc=row[0].strip(),
+                #     )
+                #     category_update.append(cat)
+                # Category.objects.bulk_create(category_update)
+                Category.objects.filter(name='', desc='').delete()
                 data['success'] = 'Categorias grabadas exitosamente'
 
             elif selection == 'product':
