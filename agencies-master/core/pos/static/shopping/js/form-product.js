@@ -3,20 +3,19 @@ var select_search_product, tblSearchProducts;
 
 var product = {
     getProductsIds: function () {
-        return sale.details.products.map(value => value.id);
+        return shopping.details.products.map(value => value.id);
     },
     addProduct: function (item) {
-        sale.details.products.push(item);
+        shopping.details.products.push(item);
         this.listProducts();
     },
     listProducts: function () {
-
-        sale.calculateInvoice();
+        shopping.calculateInvoice();
         tblProducts = $('#tblProducts').DataTable({
             responsive: true,
             autoWidth: false,
             destroy: true,
-            data: sale.details.products,
+            data: shopping.details.products,
             columns: [
                 {"data": "id"},
                 {"data": "cant"},
@@ -87,30 +86,6 @@ var product = {
                         return formatNumber(data);
                     }
                 },],
-            rowCallback(row, data, displayNum, displayIndex, dataIndex) {
-                // $(row).find('input[name="cant"]').TouchSpin({
-                //     min: 1,
-                //     max: 1000000,
-                //     step: 1
-                // });
-                // $(row).find('input[name="cost"]').TouchSpin({
-                //     min: 0.01,
-                //     max: 1000000,
-                //     step: 0.01,
-                //     decimals: 2,
-                //     boostat: 5,
-                //     maxboostedstep: 10,
-                // });
-                // $(row).find('input[name="pvp"]').TouchSpin({
-                //     min: 0.01,
-                //     max: 1000000,
-                //     step: 0.01,
-                //     decimals: 2,
-                //     boostat: 5,
-                //     maxboostedstep: 10,
-                // });
-
-            },
         });
     },
 };
@@ -124,7 +99,6 @@ $(function () {
     $('.btnCreateProduct').on('click', function () {
         $('#myModalCreateProduct').modal('show');
     });
-
 
     $('#myModalCreateProduct').on('hidden.bs.modal', function (e) {
         $('#frmCreateProduct').trigger('reset');
@@ -167,7 +141,7 @@ $(function () {
                 };
             },
         },
-        placeholder: 'Ingrese una descripción',
+        placeholder: 'Buscar producto (nombre o código)',
         minimumInputLength: 1,
         templateResult: function (repo) {
             if (repo.loading) {
@@ -191,8 +165,7 @@ $(function () {
                 //'<br>' +
                 '<p style="margin-bottom: 0;">' +
                 '<b>Nombre:</b> ' + repo.full_name + '<br>' +
-                '<b>Stock bodega: </b>' + stock + '<br>' +
-                '<b>Stock poryecto: </b>' + stock_project +
+                '<b>Stock: </b>' + stock + '<br>' +
                 '</p>' +
                 '</div>' +
                 '</div>' +
@@ -214,40 +187,62 @@ $(function () {
         .off()
         .on('click', 'a[rel="remove"]', function () {
             var tr = tblProducts.cell($(this).closest('td, li')).index();
-            var delItem = sale.details.products.splice(tr.row, 1);
-            sale.details.products_delete.push(delItem[0]);
-            tblProducts.row(tr.row).remove().draw();
-            sale.calculateInvoice();
+            var delItem = shopping.details.products.splice(tr.row, 1);
+            delItem[0].delete = true;
+            shopping.details.products_delete.push(delItem[0]);
+            // tblProducts.row(tr.row).remove().draw();
+            product.listProducts();
         })
         .on('change', 'input', function (e) {
-            console.clear();
+            // console.clear();
 
             var value = $(this).val();
             var tr = tblProducts.cell($(this).closest('td, li')).index();
 
+            // cantidad para bodega
+            if (e.target.name === 'cant') {
+                if (action === 'edit') {
+                    if (shopping.details.products[tr.row].hasOwnProperty('before') &&
+                        !shopping.details.products[tr.row].hasOwnProperty('initial_amount')) {
+                        shopping.details.products[tr.row]['initial_amount'] = shopping.details.products[tr.row][e.target.name];
+                    }
+                }
+                shopping.details.products[tr.row][e.target.name] = parseInt(value);
+
+                shopping.calculateInvoice();
+                $('td:last', tblProducts.row(tr.row).node()).html(formatNumber(shopping.details.products[tr.row].subtotal));
+
+            }
+
             // Costo del producto
-            if (e.target.name === 'cost' || e.target.name === 'cant') {
-                sale.details.products[tr.row][`${e.target.name}`] = parseFloat(value);
-                sale.calculateInvoice();
-                $('td:last', tblProducts.row(tr.row).node()).html(formatNumber(sale.details.products[tr.row].subtotal));
+            if (e.target.name === 'cost') {
+                if (action === 'edit') {
+                    if (shopping.details.products[tr.row].hasOwnProperty('before') &&
+                        !shopping.details.products[tr.row].hasOwnProperty('initial_amount')) {
+                        shopping.details.products[tr.row]['initial_amount'] = shopping.details.products[tr.row][e.target.name];
+                    }
+                }
+                shopping.details.products[tr.row][`${e.target.name}`] = parseFloat(value);
+
+                shopping.calculateInvoice();
+                $('td:last', tblProducts.row(tr.row).node()).html(formatNumber(shopping.details.products[tr.row].subtotal));
             }
 
             // Costo del Precio de venta
             if (e.target.name === 'pvp') {
-                sale.details.products[tr.row].pvp = parseFloat(value);
-
+                shopping.details.products[tr.row].pvp = parseFloat(value);
             }
 
             // expiration
             if (e.target.name === 'expiration') {
-                sale.details.products[tr.row].expiration = value;
+                shopping.details.products[tr.row].expiration = value;
             }
         })
 
     $('.btnRemoveAll').on('click', function () {
-        if (sale.details.products.length === 0) return false;
+        if (shopping.details.products.length === 0) return false;
         alert_action('Notificación', '¿Estas seguro de eliminar todos los details de tu detalle?', function () {
-            sale.details.products = [];
+            shopping.details.products = [];
             product.listProducts();
         }, function () {
 

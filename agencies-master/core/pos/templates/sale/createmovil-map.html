@@ -1,0 +1,191 @@
+{% extends 'list2.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load core_app_extras %}
+
+{% block head_list_extra %}
+    {# validateConnection JS file #}
+    <script defer src="{% static 'js/connection.js' %}"></script>
+    {# sale form movil JS file #}
+    <script src="{% static 'sale/js/formmovil-map.js' %}"></script>
+
+    <style>
+        body {
+            padding-bottom: 120px; /* Altura del footer */
+        }
+
+        footer {
+            position: fixed;
+            height: 120px;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            padding: 10px;
+            border-radius: 15px 15px 0 0;
+            color: white;
+            font-weight: 700;
+        }
+    </style>
+
+{% endblock %}
+
+{% block body %}
+    <form id="frmSale" method="post" data-url="{{ list_url }}">
+        <input type="hidden" id="client_id" name="client" value="">
+
+        <header id="header" class="header fixed-top d-flex align-items-center justify-content-between pe-3">
+
+            <a href="{% url 'client-detail' %}" class="btn btn-danger">
+                <i class="bi bi-box-arrow-left h-75"></i>
+            </a>
+            <h6 class="text-center" id="span-client-information"></h6>
+            <button type="submit" class="btn btn-success" id="send-form">
+                <i class="bi bi-floppy"></i>
+            </button>
+
+
+        </header><!-- End Header -->
+
+        <main id="main" class="pt-0 p-1">
+
+            <div class="card mb-0 mt-2">
+                <div class="card-body">
+                    <div class="row pt-3 pb-2">
+                        <div class="col">
+                            {# SPACE FOR SEARCH PRODUCTS #}
+                            <div class="form-group">
+                                {#                                <label>Buscador de productos:</label>#}
+                                <div class="input-group">
+                                    <select class="form-control select2" name="search_product"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# TABS #}
+                    <ul class="nav nav-tabs nav-tabs-bordered" id="borderedTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="productos-tab" data-bs-toggle="tab"
+                                    data-bs-target="#bordered-productos"
+                                    type="button" role="tab" aria-controls="productos" aria-selected="false"
+                                    tabindex="-1">
+                                Productos
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pago-tab" data-bs-toggle="tab"
+                                    data-bs-target="#bordered-pago" type="button" role="tab" aria-controls="pago"
+                                    aria-selected="false" tabindex="-1">Forma de pago
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tab-content" id="borderedTabContent">
+                {# ROW FOR THE TABLE INSERT PRODUCT #}
+                <div class="tab-pane fade show active" id="bordered-productos" role="tabpanel"
+                     aria-labelledby="productos-tab">
+                    <table class="table table-striped table-valign-middle table-hover" id="tblProducts">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Producto</th>
+                            <th>Cant</th>
+                            <th>Precio</th>
+                            <th>Sub</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        </tbody>
+                    </table>
+
+                </div>
+                {# FORMA DE PAGO #}
+
+                <div class="tab-pane fade pt-2" id="bordered-pago" role="tabpanel"
+                     aria-labelledby="pago-tab">
+
+                    <div class="row">
+                        <div class="col-6">
+                            <label>{{ form.purchase_order.label }}: </label>
+                            {{ form.purchase_order|add_class:'form-control'|attr:'autocomplete:off' }}
+                        </div>
+                        <div class="col-6">
+                            <label>Descuento:</label>
+                            {{ form.discount }}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {# PART OF DETAIL OF INVOICE #}
+            <footer class="bg-success">
+                {# FILA DEL SUB TOTAL Y CUANTO DEL IVA#}
+                <div class="row g-3 ">
+                    <div class="col">
+                        <label for="id_subtotal_exempt" class="col-form-label text-center">Sub exento:</label>
+                    </div>
+
+                    <div class="col">
+                        <input type="text" id="id_subtotal_exempt" name="subtotal_exempt"
+                               class="form-control-plaintext text-center text-light"
+                               value="0.00">
+                    </div>
+
+                    {# SUb IVA #}
+                    <div class="col">
+                        <label for="id_subtotal_exempt" class="col-form-label text-center">Sub IVA:</label>
+                    </div>
+
+                    <div class="col">
+                        <input type="text" id="id_subtotal" name="subtotal"
+                               class="form-control-plaintext text-center text-light"
+                               value="0.00">
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col text-center">
+                        <label for="ivacalc" class="col-form-label text-center">iva:</label>
+                    </div>
+
+                    <div class="col">
+                        <input type="text" id="ivacalc" readonly name="ivacalc"
+                               class="form-control-plaintext text-center text-light"
+                               value="0.00">
+                    </div>
+
+                    <div class="col">
+                        <label for="id_total" class="col-form-label text-center">Total:</label>
+                    </div>
+
+                    <div class="col">
+                        <input type="text" id="id_total" readonly name="total"
+                               class="form-control-plaintext text-center text-light"
+                               value="0.00">
+                    </div>
+                </div>
+
+                {#PARTE DEL IVA CALCULADO Y DEL TOTAL A PAGAR#}
+            </footer>
+
+        </main>
+    </form>
+
+    <script>
+
+        {# Optenemos la informacion del cliente de la session #}
+        let cliente = JSON.parse(sessionStorage.getItem('cliente'));
+        document.getElementById('client_id').value = cliente.id
+
+        let spanClientInformation = document.getElementById('span-client-information');
+        spanClientInformation.innerText = `${cliente.id} - ${cliente.names}`
+
+        sale.details.products = {{ products|safe }};
+        sale.details.products_review = {{ products|safe }};
+        // Se removio el vents.list(); para calcular bien el iva en el editar. Revisar al final del archivo form.js se lo puso.
+    </script>
+{% endblock %}

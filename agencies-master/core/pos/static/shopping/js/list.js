@@ -11,7 +11,7 @@ var sale = {
             targets: [0],
             render: function (data, type, row) {
 
-                if (row[12][1] === true) {
+                if (row[13][1] === true) {
                     return `<span class="badge bg-success">${data}</span>`
                 } else {
                     return `<span class="badge bg-secondary">${data}</span>`
@@ -55,7 +55,7 @@ var sale = {
         let data = {
             'data': parameters,
             'inserInto': 'rowList',
-            'th': ['Nro', 'Usuario', 'Proveedor', 'Numero de factura', 'Fecha', 'Items', 'Descuento', 'Sub total', 'Iva', '2%', '1%' , 'Total', 'Opciones'],
+            'th': ['Nro', 'Usuario', 'Bodega', 'Proveedor', 'Numero de factura', 'Fecha', 'Items', 'Descuento', 'Sub total', 'Iva', '2%', '1%' , 'Total', 'Opciones'],
             'table': 'tableList',
             'config': sale.config,
             'modal': false,

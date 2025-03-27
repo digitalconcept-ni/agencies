@@ -21,7 +21,7 @@ from weasyprint import HTML, CSS
 
 from core.pos.forms import SaleForm, ClientForm, SaleMovilForm
 from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin, deviceVerificationMixin
-from core.pos.models import Sale, Product, SaleProduct, Client, Company
+from core.pos.models import Sale, Product, SaleProduct, Client, Company, ProductWarehouse
 from core.reports.forms import ReportForm
 
 
@@ -246,16 +246,55 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                 ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
-                # products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
-                products = Product.objects.filter(Q(name__icontains=term) | Q(code__icontains=term)).filter(
-                    Q(stock__gt=0) | Q(is_inventoried=False))
-                for i in products.exclude(id__in=ids_exclude)[0:10]:
-                    item = i.toJSON()
+
+                product_warehouse = ProductWarehouse.objects.filter(
+                    Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
+                    Q(product__name__icontains=term) | Q(product__code__icontains=term) &
+                    Q(product__is_inventoried=True))
+
+                for i in product_warehouse.exclude(product_id__in=ids_exclude)[0:10]:
+                    item = i.product.toJSON()
                     item['text'] = i.__str__()
+                    item['stock'] = i.stock
                     data.append(item)
-            elif action == 'add':
+            elif action == 'add_map':
                 with transaction.atomic():
                     products = json.loads(request.POST['products'])
+                    now = datetime.now()
+                    # today = str(now.date())
+                    # exist = Sale.objects.filter(Q(date_joined=today) & Q(client_id=request.POST['client'])).exists()
+                    # if exist:
+                    #     data['error'] = 'El cliente ya cuenta con una factura, favor de modificar la actual'
+                    # else:
+                    sale = Sale()
+                    sale.user_id = request.user.id
+                    sale.user_commissions = request.user.username
+                    sale.purchase_order = request.POST['purchase_order']
+                    sale.client_id = int(request.POST['client'])
+                    sale.subtotal_exempt = float(request.POST['subtotal_exempt'])
+                    sale.discount = float(request.POST['discount'])
+                    sale.save()
+                    for i in products:
+                        detail = SaleProduct()
+                        detail.sale_id = sale.id
+                        detail.product_id = int(i['id'])
+                        detail.cant = int(i['cant'])
+                        detail.price = float(i['pvp'])
+                        detail.subtotal = detail.cant * detail.price
+                        detail.save()
+                        if detail.product.is_inventoried:
+                            detail.product.stock -= detail.cant
+                            detail.product.save()
+
+                    sale.calculate_invoice()
+                    data = {'id': sale.id}
+            elif action == 'add':
+                with transaction.atomic():
+                    details = json.loads(request.POST['details'])
+                    products = details['products']
+
+                    print(products)
+
                     now = datetime.now()
                     today = str(now.date())
                     exist = Sale.objects.filter(Q(date_joined=today) & Q(client_id=request.POST['client'])).exists()
@@ -265,7 +304,6 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                         sale = Sale()
                         sale.user_id = request.user.id
                         sale.user_commissions = request.POST['user_com']
-                        # sale.date_joined = request.POST['date_joined']
                         sale.purchase_order = request.POST['purchase_order']
                         sale.client_id = int(request.POST['client'])
                         if request.POST['payment'] == 'credit':
@@ -274,22 +312,47 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                             sale.end = request.POST['end']
                         else:
                             sale.payment = request.POST['payment']
-                        # sale.iva = float(request.POST['iva'])
-                        sale.subtotal_exempt = float(request.POST['subtotal_exempt'])
-                        sale.discount = float(request.POST['discount'])
+                        sale.subtotal_exempt = float(details['subtotal_exempt'])
+                        sale.discount = float(details['discount'])
                         sale.save()
-                        for i in products:
-                            detail = SaleProduct()
-                            detail.sale_id = sale.id
-                            detail.product_id = int(i['id'])
-                            detail.cant = int(i['cant'])
-                            detail.price = float(i['pvp'])
-                            detail.subtotal = detail.cant * detail.price
-                            detail.save()
-                            if detail.product.is_inventoried:
-                                detail.product.stock -= detail.cant
-                                detail.product.save()
 
+                        sale_product_create = []
+                        warehouse_update = []
+
+                        for p in products:
+                            # Buscamos el porducto a actualiza en la bodega correspondiente
+                            product_warehouse = ProductWarehouse.objects.filter(
+                                warehouse__is_central=1, product_id=int(p['id'])).first()
+
+                            sp = SaleProduct(
+                                sale_id=sale.id,
+                                product_id=int(p['id']),
+                                cant=int(p['cant']),
+                                price=float(p['pvp']),
+                                subtotal=float(p['subtotal'])
+                            )
+                            sale_product_create.append(sp)
+
+                            # Actualizamos el stock de la bdoega CENTRAL
+                            product_warehouse.stock -= p['cant']
+                            warehouse_update.append(product_warehouse)
+
+                        # for i in products:
+                        #     detail = SaleProduct()
+                        #     detail.sale_id = sale.id
+                        #     detail.product_id = int(i['id'])
+                        #     detail.cant = int(i['cant'])
+                        #     detail.price = float(i['pvp'])
+                        #     detail.subtotal = detail.cant * detail.price
+                        #     detail.save()
+                        #     if detail.product.is_inventoried:
+                        #         detail.product.stock -= detail.cant
+                        #         detail.product.save()
+
+                        # Agregamos el detalle de la venta
+                        SaleProduct.objects.bulk_create(sale_product_create)
+                        # Actualizamos los porductos vendidos en la bodega central
+                        ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
                         sale.calculate_invoice()
 
                         # if request.POST['coords'] != 'false':
@@ -393,12 +456,14 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
         sale = self.get_object()
         for i in sale.saleproduct_set.all():
             item = i.product.toJSON()
-            if i.restore:
-                item['cant'] = 1
-                item['subtotal'] = f'{i.product.pvp:.2f}'
-            else:
-                item['cant'] = i.cant
+            # if i.restore:
+            #     item['cant'] = 1
+            # else:
+            #     item['cant'] = i.cant
+            item['subtotal'] = f'{i.subtotal:.2f}'
             item['restore'] = i.restore
+            item['cant'] = i.cant
+            item['before'] = True
             data.append(item)
         return json.dumps(data)
 
@@ -422,15 +487,25 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                 ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
-                products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
-                for i in products.exclude(id__in=ids_exclude)[0:10]:
-                    item = i.toJSON()
+
+                product_warehouse = ProductWarehouse.objects.filter(
+                    Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
+                    Q(product__name__icontains=term) | Q(product__code__icontains=term) &
+                    Q(product__is_inventoried=True))
+
+                for i in product_warehouse.exclude(product_id__in=ids_exclude)[0:10]:
+                    item = i.product.toJSON()
                     item['text'] = i.__str__()
+                    item['stock'] = i.stock
                     data.append(item)
             elif action == 'edit':
                 with transaction.atomic():
-                    products = json.loads(request.POST['products'])
-                    products_review = json.loads(request.POST['products_review'])
+                    details = json.loads(request.POST['details'])
+                    products = details['products']
+                    products_delete = details['products_delete']
+
+                    # Unificamos ambas listas para poder hacer una sola actualizacion masiva
+                    totalProducts = products + products_delete
 
                     sale = self.get_object()
                     sale.user_commissions = request.POST['user_com']
@@ -443,58 +518,109 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     else:
                         sale.payment = request.POST['payment']
                     # sale.iva = float(request.POST['iva'])
-                    sale.subtotal_exempt = float(request.POST['subtotal_exempt'])
-                    sale.discount = float(request.POST['discount'])
+                    sale.subtotal_exempt = float(details['subtotal_exempt'])
+                    sale.discount = float(details['discount'])
                     sale.save()
 
                     # Eliminamos de la tabla los productos anteriormente agregados
                     sale.saleproduct_set.all().delete()
                     listProductId = []  # Lista que obtendra los id de los productos ingresados
-                    pr = [pr.get('id') for pr in products_review]
+                    # pr = [pr.get('id') for pr in products_review]
 
-                    for p in products:
-                        detail = SaleProduct()
-                        detail.sale_id = sale.id
-                        detail.product_id = int(p['id'])
-                        detail.restore = bool(p['restore'])
+                    sale_product_create = []
+                    warehouse_update = []
+                    for p in totalProducts:
+                        restore = bool(p['restore']) # Fue devuelto si o no
+
                         # Si es True se toma como devolucion y se agrega a cantidad en 0 para que no se tome encuenta
                         # al calcular la factura
-                        if detail.restore:
-                            detail.cant = 0
+                        if restore:
+                            subtotal = 0.00
                         else:
-                            detail.cant = int(p['cant'])
-                        detail.price = float(p['pvp'])
-                        detail.subtotal = detail.cant * detail.price
-                        detail.save()
-                        if detail.product.is_inventoried:
-                            if p['id'] in pr:
-                                # print('indice existe: ', indice)
-                                indice = pr.index(p['id'])
-                                # Validamos si antetiormente fue devolucion
-                                if detail.restore:
-                                    detail.product.stock += products_review[indice]['cant']
-                                else:
-                                    if bool(products_review[indice]['restore']):
-                                        detail.product.stock -= p['cant']
-                                    else:
-                                        detail.product.stock = (detail.product.stock + products_review[indice][
-                                            'cant']) - p['cant']
-                                detail.product.save()
-                            else:
-                                detail.product.stock -= p['cant']
-                                detail.product.save()
-                        listProductId.append(p['id'])
+                            subtotal = float(p['subtotal'])
 
-                    if len(pr) != 0:
-                        for i in pr:
-                            if i not in listProductId:
-                                indice = pr.index(i)
-                                # print('indice no existe: ', indice)
-                                # print('No existe: ', i)
-                                if bool(products_review[indice]['restore']) == False:
-                                    detail.product_id = int(i)
-                                    detail.product.stock = detail.product.stock + products_review[indice]['cant']
-                                    detail.product.save()
+                        # Buscamos el porducto a actualiza en la bodega correspondiente
+                        product_warehouse = ProductWarehouse.objects.filter(
+                            warehouse__is_central=1, product_id=int(p['id'])).first()
+
+                        if 'delete' in p:
+                            product_warehouse.stock += p['cant']
+                        else:
+                            saleproduct = SaleProduct(
+                                sale_id=sale.id,
+                                product_id=int(p['id']),
+                                restore=bool(p['restore']),
+                                cant=int(p['cant']),
+                                price=float(p['pvp']),
+                                subtotal=subtotal
+                            )
+                            sale_product_create.append(saleproduct)
+
+                            # En caso que el producto actual es NUEVO, le restamos la cantidad actual
+                            if 'before' not in p:
+                                product_warehouse.stock -= p['cant']
+                            else:
+                                # Verificamos si es devolucion
+                                # si anteriormente fue facturado y se devolvio se suma al inventario
+                                # De lo contrario se le resta
+                                if restore:
+                                    product_warehouse.stock += p['cant']
+                                else:
+                                    product_warehouse.stock -= p['cant']
+
+                            if 'initial_amount' in p:
+                                # SI fue modificado le restamos el valor anterior y le sumamos la cantidad actual
+                                product_warehouse.stock = (product_warehouse.stock - int(
+                                    p['initial_amount'])) + p['cant']
+
+                        warehouse_update.append(product_warehouse)
+
+                    SaleProduct.objects.bulk_create(sale_product_create)
+                    ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
+
+                    # for p in products:
+                    #     detail = SaleProduct()
+                    #     detail.sale_id = sale.id
+                    #     detail.product_id = int(p['id'])
+                    #     detail.restore = bool(p['restore'])
+                    #     # Si es True se toma como devolucion y se agrega a cantidad en 0 para que no se tome encuenta
+                    #     # al calcular la factura
+                    #     if detail.restore:
+                    #         detail.cant = 0
+                    #     else:
+                    #         detail.cant = int(p['cant'])
+                    #     detail.price = float(p['pvp'])
+                    #     detail.subtotal = detail.cant * detail.price
+                    #     detail.save()
+                    #     if detail.product.is_inventoried:
+                    #         if p['id'] in pr:
+                    #             # print('indice existe: ', indice)
+                    #             indice = pr.index(p['id'])
+                    #             # Validamos si antetiormente fue devolucion
+                    #             if detail.restore:
+                    #                 detail.product.stock += products_review[indice]['cant']
+                    #             else:
+                    #                 if bool(products_review[indice]['restore']):
+                    #                     detail.product.stock -= p['cant']
+                    #                 else:
+                    #                     detail.product.stock = (detail.product.stock + products_review[indice][
+                    #                         'cant']) - p['cant']
+                    #             detail.product.save()
+                    #         else:
+                    #             detail.product.stock -= p['cant']
+                    #             detail.product.save()
+                    #     listProductId.append(p['id'])
+
+                    # if len(pr) != 0:
+                    #     for i in pr:
+                    #         if i not in listProductId:
+                    #             indice = pr.index(i)
+                    #             # print('indice no existe: ', indice)
+                    #             # print('No existe: ', i)
+                    #             if bool(products_review[indice]['restore']) == False:
+                    #                 detail.product_id = int(i)
+                    #                 detail.product.stock = detail.product.stock + products_review[indice]['cant']
+                    #                 detail.product.save()
 
                     sale.calculate_invoice()
                     data = {'id': sale.id}

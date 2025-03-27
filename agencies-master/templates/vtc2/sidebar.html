@@ -10,7 +10,7 @@
             </a>
         </li><!-- End Dashboard Nav -->
 
-         <li class="nav-item">
+        <li class="nav-item">
             <a class="nav-link collapsed" href="{% url 'company_update' %}">
                 <i class="bi bi-building"></i>
                 <span>Compañia</span>
@@ -41,6 +41,13 @@
             </ul>
         </li>
         <!-- End Products Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" href={% url 'warehouse_list' %}>
+                <i class="bi bi-house-door"></i>
+                <span>Bodegas</span>
+            </a>
+        </li><!-- End Warehouse Nav -->
 
 
         <li class="nav-item">
@@ -109,13 +116,46 @@
         <!-- End Clients Nav -->
 
         <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#planning-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-clipboard-data "></i><span>Planeamiento</span>
+                <i class="bi bi-chevron-down ms-auto"></i>
+
+            </a>
+            <ul id="planning-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{% url 'zone_list' %}">
+                        <i class="bi bi-circle"></i><span>Zonas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'route_list' %}">
+                        <i class="bi bi-circle"></i><span>Rutas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'modulo_list' %}">
+                        <i class="bi bi-circle"></i><span>Modulos</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <!-- End Planeameinto Nav -->
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" href={% url 'map' %}>
+                <i class="bi bi-map"></i>
+                <span>Mapa</span>
+            </a>
+        </li><!-- End Mapa Nav -->
+
+        <li class="nav-item">
             <a class="nav-link collapsed" href={% url 'sale_list' %}>
                 <i class="bi bi-cash-coin"></i>
                 <span>Ventas</span>
             </a>
         </li><!-- End ventas Nav -->
 
-         <li class="nav-item">
+        <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#shipping-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-truck"></i><span>Envíos</span><i
                     class="bi bi-chevron-down ms-auto"></i>
@@ -141,7 +181,7 @@
                 <span>Reportes</span>
             </a>
         </li><!-- End ventas Nav -->
-        
+
         <li class="nav-item">
             <a class="nav-link collapsed" href="{% url 'user_list' %}">
                 <i class="bi bi-people"></i>

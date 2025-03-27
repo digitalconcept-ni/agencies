@@ -1,4 +1,4 @@
-var sale = {
+var shopping = {
     details: {
         subtotal: 0.00, // Sub total con descueto
         discount: 0.00,
@@ -15,6 +15,7 @@ var sale = {
         }
     },
     calculateInvoice: function () {
+
         let discount = $('input[name="discount"]').val();
         let iva = $('input[name="iva"]');
         let income_tax = $('input[name="income_tax"]');
@@ -59,7 +60,7 @@ $(function () {
         if ($(this).val() === '') {
             $(this).val(0.00)
         }
-        sale.calculateInvoice();
+        shopping.calculateInvoice();
     })
 
     // Funcion para saber que btn esta seleccionado el usuairo
@@ -75,60 +76,57 @@ $(function () {
             .find('.bi').toggleClass('bi-check-circle bi-ban')
 
         if (_this.hasClass('btn-danger')) {
-            sale.details.calc[`${buttonId}`] = false;
+            shopping.details.calc[`${buttonId}`] = false;
         }
         if (_this.hasClass('btn-success')) {
-            sale.details.calc[`${buttonId}`] = true;
+            shopping.details.calc[`${buttonId}`] = true;
         }
 
-        sale.calculateInvoice();
+        shopping.calculateInvoice();
 
     });
 
     // Verificando los valores de los impuesto
 
-    if (action == 'edit') {
+    if (action === 'edit') {
         // Cambiamos la clase del tbn y el icono
         $.each($('.btn-calc'), function (index, item) {
             var buttonId = $(item).attr('id');
             var inputValue = $(`#id_${buttonId}`).val();
 
-            console.log(inputValue)
             // Verificamos si el valor es mayor que 0.00
             if (inputValue > 0.00) {
                 // Si el botón no tiene la clase btn-success, la agregamos
                 if (!$(item).hasClass('btn-success')) {
                     $(item).addClass('btn-success').removeClass('btn-danger')
                         .find('.bi').removeClass('bi-ban').addClass('bi-check-circle');
-                    sale.details.calc[`${buttonId}`] = true; // Establecer en true
+                    shopping.details.calc[`${buttonId}`] = true; // Establecer en true
                 } else {
                     // Si ya tiene la clase btn-success, mantenemos el valor en true
-                    sale.details.calc[`${buttonId}`] = true;
+                    shopping.details.calc[`${buttonId}`] = true;
                 }
             } else {
                 // Si el valor es menor o igual a 0.00, cambiamos a btn-danger
                 $(item).addClass('btn-danger').removeClass('btn-success')
                     .find('.bi').removeClass('bi-check-circle').addClass('bi-ban');
-                sale.details.calc[`${buttonId}`] = false; // Establecer en false
+                shopping.details.calc[`${buttonId}`] = false; // Establecer en false
             }
         })
     }
 
 
-    $('#frmSale').on('submit', function (e) {
+    $('#frmshopping').on('submit', function (e) {
         e.preventDefault();
+        console.log(shopping.details.products)
 
-        if (sale.details.products.length === 0) {
+        if (shopping.details.products.length === 0) {
             message_error('Debe al menos tener un item en su detalle en su compra');
             return false;
         }
 
         var success_url = this.getAttribute('data-url');
         var parameters = new FormData(this);
-        parameters.append('products', JSON.stringify(sale.details.products));
-        if (action == 'edit') {
-            parameters.append('products_review', JSON.stringify(sale.details.products_delete));
-        }
+        parameters.append('details', JSON.stringify(shopping.details));
         submit_with_ajax(pathname, 'Notificación',
             '¿Estas seguro de realizar la siguiente acción?', parameters, function (response) {
                 location.href = success_url;

@@ -9,7 +9,7 @@ from django.views.generic import CreateView, FormView, UpdateView
 
 from core.pos.forms import ShoppingForm, SupplierForm, ProductForm
 from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin
-from core.pos.models import Product, Shopping, Supplier, ShoppingDetail
+from core.pos.models import Product, Shopping, Supplier, ShoppingDetail, ProductWarehouse, Warehouse
 from core.reports.forms import ReportForm
 
 
@@ -33,9 +33,14 @@ class ShoppingListView(ValidatePermissionRequiredMixin, FormView):
                     data.append(i.toLIST())
             elif action == 'delete':
                 sho = Shopping.objects.get(id=request.POST['id'])
+                warehouse_update = []
                 for s in sho.shoppingdetail_set.all():
-                    s.product.stock -= s.cant
-                    s.product.save()
+                    product_warehouse = ProductWarehouse.objects.get(
+                        warehouse_id=sho.warehouse_id, product_id=s.product_id)
+                    product_warehouse.stock -= s.cant
+                    warehouse_update.append(product_warehouse)
+
+                ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
                 sho.delete()
             elif action == 'search_invoice_number':
                 data = []
@@ -99,49 +104,90 @@ class ShoppingCreateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Cr
                     data.append(item)
             elif action == 'add':
                 with transaction.atomic():
+
                     # Json donde recolectamos los productos insertados por el usuario
-                    products = json.loads(request.POST['products'])
+                    details = json.loads(request.POST['details'])
+                    products = details['products']
+
+                    # Diccionaro donde almacenaremos los id de los producto y sus valores
+                    shopping_details = []
+                    product_update = []
+                    warehouse_update = []
+                    cantItemsShopping = 0
 
                     shopping = Shopping()
                     shopping.supplier_id = int(request.POST['supplier'])
+                    shopping.warehouse_id = int(request.POST['warehouse'])
                     shopping.user_id = request.user.id
                     shopping.invoice_number = request.POST['invoice_number']
                     shopping.date_joined = request.POST['date_joined']
-                    shopping.discount = float(request.POST['discount'])
-                    shopping.iva = float(request.POST['iva'])
-                    shopping.income_tax = float(request.POST['income_tax'])
-                    shopping.city_tax = float(request.POST['city_tax'])
+                    shopping.discount = float(details['discount'])
+                    shopping.iva = float(details['iva'])
+                    shopping.income_tax = float(details['income_tax'])
+                    shopping.city_tax = float(details['city_tax'])
                     shopping.save()
 
-                    # shopping = Shopping()
-                    # shopping.supplier_id = int(request.POST['supplier'])
-                    # shopping.user_id = request.POST['user_id']
-                    # shopping.invoice_number = request.POST['invoice_number']
-                    # shopping.date_joined = request.POST['date_joined']
-                    # shopping.iva = float(request.POST['iva'])
-                    # shopping.save()
+                    for p in products:
+                        shoppingDetail = ShoppingDetail(
+                            shopping_id=shopping.id,
+                            product_id=int(p['id']),
+                            cant=int(p['cant']),
+                            available=int(p['cant']),
+                            price=float(p['cost']),
+                            subtotal=float(p['subtotal']),
+                        )
+                        # Agregamos la instancia creada para la actualizacion masiva
+                        shopping_details.append(shoppingDetail)
 
-                    cantItemsShopping = 0
-                    for i in products:
-                        # print(i)
-                        # print(i['expiration'])
-                        detail = ShoppingDetail()
-                        detail.shopping_id = shopping.id
-                        detail.product_id = int(i['id'])
-                        detail.cant = int(i['cant'])
-                        detail.available = int(i['cant'])
-                        detail.price = float(i['cost'])
-                        detail.subtotal = detail.cant * detail.price
-                        detail.save()
-                        if not detail.product.is_inventoried:
-                            detail.product.is_inventoried = True
-                        if detail.product.is_inventoried:
-                            detail.product.stock += detail.cant
-                            detail.product.cost = float(i['cost'])
-                            detail.product.pvp = float(i['pvp'])
-                            detail.product.expiration = i['expiration']
-                            detail.product.save()
+                        # detail = ShoppingDetail()
+                        # detail.shopping_id = shopping.id
+                        # detail.product_id = int(i['id'])
+                        # detail.cant = int(i['cant'])
+                        # detail.available = int(i['cant'])
+                        # detail.price = float(i['cost'])
+                        # detail.subtotal = detail.cant * detail.price
+                        # detail.save()
+
+                        # Agregando datos al diccionario de productos
+
+                        product = shoppingDetail.product
+                        if not product.is_inventoried:
+                            product.is_inventoried = True
+
+                        product.cost = float(p['cost'])
+                        product.pvp = float(p['pvp'])
+                        product.expiration = p['expiration']
+
+                        # Optenemos el producto y la bodega a la cual actulizaremos
+                        product_warehouse = ProductWarehouse.objects.filter(
+                            warehouse_id=shopping.warehouse_id, product_id=int(p['id'])).first()
+
+                        # Si el producto en la bodega no existe, lo creamos
+                        if product_warehouse is None:
+                            warehouse = ProductWarehouse()
+                            warehouse.warehouse_id = shopping.warehouse_id
+                            warehouse.product_id = product.id
+                            warehouse.stock = p['cant']
+                            warehouse.save()
+                        else:
+                            # Sumamos la compra del producto a la bodega
+                            product_warehouse.stock += p['cant']
+                            warehouse_update.append(product_warehouse)
+
+                        product_update.append(product)
                         cantItemsShopping += 1
+
+                    # Actualizamos el stock de la bodega seleccionada
+                    # product_updates = []
+                    # for key, value in product_ids_dict.items():
+                    #     product_warehouse = ProductWarehouse.objects.get(
+                    #         warehouse_id=request.POST['warehouse'], product_id=key)
+                    #     product_warehouse.stock += value
+                    #     product_updates.append(product_warehouse)
+
+                    ShoppingDetail.objects.bulk_create(shopping_details)
+                    Product.objects.bulk_update(product_update, ['cost', 'pvp', 'expiration', 'is_inventoried'])
+                    ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
 
                     shopping.cant = + int(cantItemsShopping)
                     shopping.save()
@@ -203,6 +249,7 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
         for i in shopping.shoppingdetail_set.all():
             item = i.product.toJSON()
             item['cant'] = i.cant
+            item['before'] = True
             data.append(item)
         return json.dumps(data)
 
@@ -223,11 +270,11 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
                     data.append(item)
             elif action == 'search_products_select2':
                 data = []
-                ids_exclude = json.loads(request.POST['ids'])
+                # ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
                 # products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
-                products = Product.objects.filter(name__icontains=term)
+                products = Product.objects.filter(Q(name__icontains=term) | Q(code__icontains=term))
                 for i in products:
                     item = i.toJSON()
                     item['text'] = i.__str__()
@@ -236,10 +283,14 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
                 with transaction.atomic():
                     # Json donde optenemos los productos insertados por el usuario
                     products = json.loads(request.POST['products'])
-                    products_review = json.loads(request.POST['products_review'])
+                    products_delete = json.loads(request.POST['products_delete'])
+
+                    # Unificamos ambas listas para poder hacer una sola actualizacion masiva
+                    totalProducts = products + products_delete
 
                     shopping = self.get_object()
                     shopping.supplier_id = int(request.POST['supplier'])
+                    shopping.warehouse_id = int(request.POST['warehouse'])
                     shopping.invoice_number = request.POST['invoice_number']
                     shopping.discount = float(request.POST['discount'])
                     shopping.iva = float(request.POST['iva'])
@@ -249,48 +300,146 @@ class ShoppingUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Up
 
                     shopping.shoppingdetail_set.all().delete()
                     cantItemsShopping = 0
-                    listProductId = []  # Lista que obtendra los id de los productos ingresados
 
-                    pr = [pr.get('id') for pr in products_review]
+                    # Crear detalles de compra en una lista
+                    shopping_details = []
+                    product_updates = []
+                    warehouse_update = []
+
+                    for p in totalProducts:
+                        # Optenemos la bodega a la cual le actualizaremos el porducto
+                        product_warehouse = ProductWarehouse.objects.filter(
+                            warehouse_id=request.POST['warehouse'], product_id=int(p['id'])).first()
+
+                        # Verificamos si la consulta realizada exite para proceder a eliminarlo
+                        if product_warehouse is None:
+                            continue
+
+                        if 'delete' in p:
+                            product_warehouse.stock -= detail.cant
+                        else:
+                            detail = ShoppingDetail(
+                                shopping_id=shopping.id,
+                                product_id=int(p['id']),
+                                cant=int(p['cant']),
+                                price=float(p['cost']),
+                                subtotal=int(p['cant']) * float(p['cost'])
+                            )
+                            shopping_details.append(detail)
+
+                            # En caso que el producto actual es NUEVO Solo le sumamos la cantidad actual
+                            if 'before' not in p:
+                                product_warehouse.stock += detail.cant
+
+                            if 'initial_amount' in p:
+                                # SI fue modificado le restamos el valor anterior y le sumamos la cantidad actual
+                                product_warehouse.stock = (product_warehouse.stock - int(
+                                    p['initial_amount'])) + detail.cant
+
+                        warehouse_update.append(product_warehouse)
+
+                        # Actualizar el producto
+                        product = detail.product
+                        product.cost = float(p['cost'])
+                        product.pvp = float(p['pvp'])
+                        product.expiration = p['expiration']
+
+                        # Si el producto ingresado esta en estado NO inventariado
+                        # Lo ponemos en True par aque pueda ser buscado al momento de facturar
+                        if not detail.product.is_inventoried:
+                            detail.product.is_inventoried = True
+
+                        product_updates.append(product)
+                        cantItemsShopping += 1
+                    #
+                    ShoppingDetail.objects.bulk_create(shopping_details)
+                    Product.objects.bulk_update(product_updates, ['cost', 'pvp', 'expiration', 'is_inventoried'])
+                    ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
 
                     # Bloque para agregar el detalle de la compra a la tabla Shoopingdetails
-                    for p in products:
-                        detail = ShoppingDetail()
-                        detail.shopping_id = shopping.id
-                        detail.product_id = int(p['id'])
-                        detail.cant = int(p['cant'])
-                        detail.price = float(p['cost'])
-                        detail.subtotal = detail.cant * detail.price
-                        detail.save()
-                        if detail.product.is_inventoried:
-                            if p['id'] in pr:
-                                indice = pr.index(p['id'])
-                                detail.product.stock = (detail.product.stock - products_review[indice]['cant']) + \
-                                                       p['cant']
-                                detail.product.cost = float(p['cost'])
-                                detail.product.pvp = float(p['pvp'])
-                                detail.product.expiration = p['expiration']
-                                detail.product.save()
-                            else:
-                                detail.product.stock += p['cant']
-                                detail.product.cost = float(p['cost'])
-                                detail.product.pvp = float(p['pvp'])
-                                detail.product.expiration = p['expiration']
-                                detail.product.save()
-                        listProductId.append(p['id'])
-                        cantItemsShopping += 1
+                    # product_updates = [] # Lista para insertar los productos a actualizar stock
+                    # for p in products:
+                    #     detail = ShoppingDetail()
+                    #     detail.shopping_id = shopping.id
+                    #     detail.product_id = int(p['id'])
+                    #     detail.cant = int(p['cant'])
+                    #     detail.price = float(p['cost'])
+                    #     detail.subtotal = detail.cant * detail.price
+                    #     detail.save()
+                    #
+                    #     # Si el producto ingresado esta en estado NO inventariado
+                    #     # Lo ponemos en True par aque pueda ser buscado al momento de facturar
+                    #     if not detail.product.is_inventoried:
+                    #         detail.product.is_inventoried = True
+                    #
+                    #     # Actualizamos los valores del producto
+                    #     detail.product.cost = float(p['cost'])
+                    #     detail.product.pvp = float(p['pvp'])
+                    #     detail.product.expiration = p['expiration']
+                    #     detail.product.save()
+                    #
+                    #     product_warehouse = ProductWarehouse.objects.get(
+                    #         warehouse_id=request.POST['warehouse'], product_id=detail.product_id)
+                    #
+                    #     # En caso que el producto actual es NUEVO Solo le sumamos la cantidad actual
+                    #     if 'before' not in p:
+                    #         product_warehouse.stock += detail.cant
+                    #     else:
+                    #         if 'initial_amount' in p:
+                    #             # SI fue modificado le restamos el valor anterior y le sumamos la cantidad actual
+                    #             product_warehouse.stock = (product_warehouse.stock - int(p['initial_amount'])) + detail.cant
+                    #
+                    #     product_updates.append(product_warehouse)
+                    #
+                    #     # if detail.product.is_inventoried:
+                    #     #     if p['id'] in pr:
+                    #     #         indice = pr.index(p['id'])
+                    #     #         detail.product.stock = (detail.product.stock - products_review[indice]['cant']) + \
+                    #     #                                p['cant']
+                    #     #         detail.product.cost = float(p['cost'])
+                    #     #         detail.product.pvp = float(p['pvp'])
+                    #     #         detail.product.expiration = p['expiration']
+                    #     #         detail.product.save()
+                    #     #     else:
+                    #     #         detail.product.stock += p['cant']
+                    #     #         detail.product.cost = float(p['cost'])
+                    #     #         detail.product.pvp = float(p['pvp'])
+                    #     #         detail.product.expiration = p['expiration']
+                    #     #         detail.product.save()
+                    #     # listProductId.append(p['id'])
+                    #     cantItemsShopping += 1
 
                     # Ciclo para retroceder los cambios de los productos que fueron mal digitados
-                    if len(pr) != 0:
-                        for i in pr:
-                            print(i)
-                            if i not in listProductId:
-                                indice = pr.index(i)
-                                detail.product_id = int(i)
-                                detail.product.stock = detail.product.stock - products_review[indice]['cant']
-                                detail.product.cost = float(products_review[indice]['cost'])
-                                detail.product.pvp = float(products_review[indice]['pvp'])
-                                detail.product.save()
+                    # if len(pr) != 0:
+                    #     for i in pr:
+                    #         print(i)
+                    #         if i not in listProductId:
+                    #             indice = pr.index(i)
+                    #             detail.product_id = int(i)
+                    #             detail.product.stock = detail.product.stock - products_review[indice]['cant']
+                    #             detail.product.cost = float(products_review[indice]['cost'])
+                    #             detail.product.pvp = float(products_review[indice]['pvp'])
+                    #             detail.product.save()
+
+                    # Restamos el stok de los porudctos qu ese eliminaron toalmente
+                    # Del detalle de la factura
+                    # if len(products_delete) > 0:
+                    #     for pd in products_delete:
+                    #         prod = Product.objects.get(id=pd['id'])
+                    #         prod.stock -= pd['cant_store']
+                    #         prod.stock_project -= pd['cant_project']
+                    #         prod.save()
+
+                    # Actualizacon de stock de la bodega seleccionada
+
+                    # for key, value in product_ids_dict.items():
+                    #     product_warehouse = ProductWarehouse.objects.get(
+                    #         warehouse_id=request.POST['warehouse'], product_id=key)
+                    #     product_warehouse.stock += value
+                    #     product_updates.append(product_warehouse)
+
+                    # Actializamos de manera masiva los productos
+                    # ProductWarehouse.objects.bulk_update(product_updates, ['stock'])
 
                     shopping.cant = int(cantItemsShopping)
                     shopping.save()

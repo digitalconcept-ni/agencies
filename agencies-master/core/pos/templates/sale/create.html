@@ -13,6 +13,8 @@
     <script src="{% static 'lib/bootstrap-touchspin-4.2.5/js/jquery.bootstrap-touchspin.js' %}"></script>
 
     <script src="{% static 'sale/js/form.js' %}"></script>
+    {# file JS para los porductos #}
+    <script src="{% static 'sale/js/form-product.js' %}"></script>
 {% endblock %}
 
 {% block body_content %}
@@ -287,36 +289,36 @@
     {# // ****** END MODA CLIENT #}
 
     <!-- Modal -->
-{#    <div class="modal fade" id="myModalSearchProducts" tabindex="-1" role="dialog"#}
-{#         aria-hidden="true">#}
-{#        <div class="modal-dialog modal-lg" role="document">#}
-{#            <div class="modal-content">#}
-{#                <div class="modal-header">#}
-{#                    <h5 class="modal-title" id="exampleModalLabel">#}
-{#                        <b><i class="fas fa-search"></i> Búsqueda de Productos</b>#}
-{#                    </h5>#}
-{#                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
-{#                        <span aria-hidden="true">&times;</span>#}
-{#                    </button>#}
-{#                </div>#}
-{#                <div class="modal-body">#}
-{#                    <table class="table table-bordered table-sm" id="tblSearchProducts">#}
-{#                        <thead>#}
-{#                        <tr>#}
-{#                            <th>Producto</th>#}
-{#                            <th>Imagen</th>#}
-{#                            <th>Stock</th>#}
-{#                            <th>Precio Unitario</th>#}
-{#                            <th>Opciones</th>#}
-{#                        </tr>#}
-{#                        </thead>#}
-{#                        <tbody>#}
-{#                        </tbody>#}
-{#                    </table>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
+    {#    <div class="modal fade" id="myModalSearchProducts" tabindex="-1" role="dialog"#}
+    {#         aria-hidden="true">#}
+    {#        <div class="modal-dialog modal-lg" role="document">#}
+    {#            <div class="modal-content">#}
+    {#                <div class="modal-header">#}
+    {#                    <h5 class="modal-title" id="exampleModalLabel">#}
+    {#                        <b><i class="fas fa-search"></i> Búsqueda de Productos</b>#}
+    {#                    </h5>#}
+    {#                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
+    {#                        <span aria-hidden="true">&times;</span>#}
+    {#                    </button>#}
+    {#                </div>#}
+    {#                <div class="modal-body">#}
+    {#                    <table class="table table-bordered table-sm" id="tblSearchProducts">#}
+    {#                        <thead>#}
+    {#                        <tr>#}
+    {#                            <th>Producto</th>#}
+    {#                            <th>Imagen</th>#}
+    {#                            <th>Stock</th>#}
+    {#                            <th>Precio Unitario</th>#}
+    {#                            <th>Opciones</th>#}
+    {#                        </tr>#}
+    {#                        </thead>#}
+    {#                        <tbody>#}
+    {#                        </tbody>#}
+    {#                    </table>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
 
     <script>
         sale.details.products = {{ products|safe }};
