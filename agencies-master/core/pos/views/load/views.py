@@ -23,15 +23,15 @@ class loadCsvView(LoginRequiredMixin, ListView):
             reader = csv.reader(decode_file, delimiter=';')
 
             if selection == 'category':
-                # category_update = []
-                # for row in reader:
-                #     cat = Category(
-                #         name=row[0].strip(),
-                #         desc=row[0].strip(),
-                #     )
-                #     category_update.append(cat)
-                # Category.objects.bulk_create(category_update)
-                Category.objects.filter(name='', desc='').delete()
+                category_update = []
+                for row in reader:
+                    cat = Category(
+                        name=row[0].strip(),
+                        desc='',
+                    )
+                    category_update.append(cat)
+                Category.objects.bulk_create(category_update)
+                # Category.objects.filter(name='', desc='').delete()
                 data['success'] = 'Categorias grabadas exitosamente'
 
             elif selection == 'product':
@@ -63,15 +63,16 @@ class loadCsvView(LoginRequiredMixin, ListView):
                     Product.objects.bulk_create(product_list)
                     data['success'] = 'Proceso terminado con exito'
             elif selection == 'brands':
-                brand_list = []
-                for row in reader:
-                    print(row)
-                    brand = Brands(
-                        name=row[0].strip(),
-                        description=row[1].strip()
-                    )
-                    brand_list.append(brand)
-                Brands.objects.bulk_create(brand_list)
+                # brand_list = []
+                # for row in reader:
+                #     print(row)
+                #     brand = Brands(
+                #         name=row[0].strip(),
+                #         description=row[1].strip()
+                #     )
+                #     brand_list.append(brand)
+                # Brands.objects.bulk_create(brand_list)
+                Brands.objects.filter(name='', description='').delete()
                 data['success'] = 'Marcas grabadas exitosamente'
 
             return JsonResponse(data, safe=False)
