@@ -1,0 +1,41 @@
+{% extends 'list2.html' %}
+{% load static %}
+
+{% block head_list_extra %}
+
+    <script src="{% static 'warehouse/js/list.js' %}"></script>
+
+{% endblock %}
+
+{% block list_controls %}
+{% endblock %}
+
+
+{% block extra_code %}
+
+    <div class="modal fade" id="myModalProducts" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Detalle de bodega</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-valign-middle" id="tblProducts">
+                        <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Stock</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

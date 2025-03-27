@@ -96,6 +96,35 @@ class ProductForm(ModelForm):
         return data
 
 
+class WarehouseForm(ModelForm):
+
+    category = forms.ModelChoiceField(queryset=Category.objects.all(),
+                                      widget=forms.Select(attrs={'class': 'select2'}),
+                                      required=False)
+
+    class Meta:
+        model = Warehouse
+        fields = 'code', 'name', 'description', 'status'
+        widgets = {
+            'status': forms.Select(attrs={
+                'class': 'select2',
+                # 'style': 'width: 100%'
+            }),
+        }
+
+    # def save(self, commit=True):
+    #     data = {}
+    #     form = super()
+    #     try:
+    #         if form.is_valid():
+    #             form.save()
+    #         else:
+    #             data['error'] = form.errors
+    #     except Exception as e:
+    #         data['error'] = str(e)
+    #     return data
+
+
 class ClientForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -330,6 +359,9 @@ class SaleMovilForm(ModelForm):
 
 
 class ShoppingForm(ModelForm):
+    # warehouse = forms.ModelChoiceField(queryset=Warehouse.objects.filter(status=1),
+    #                                   widget=forms.Select(attrs={'class': 'select2 form-control'}))
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['supplier'].queryset = Supplier.objects.none()
@@ -340,6 +372,10 @@ class ShoppingForm(ModelForm):
         widgets = {
             'supplier': forms.Select(attrs={
                 'class': 'custom-select select2',
+                # 'style': 'width: 100%'
+            }),
+            'warehouse': forms.Select(attrs={
+                'class': 'form-control select2',
                 # 'style': 'width: 100%'
             }),
             'date_joined': forms.TextInput(attrs={

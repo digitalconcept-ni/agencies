@@ -12,6 +12,7 @@ from core.pos.views.product.views import *
 from core.pos.views.sale.views import *
 from core.pos.views.shopping.views import *
 from core.pos.views.supplier.view import *
+from core.pos.views.warehouse.views import WarehouseListView, WarehouseCreateView, WarehouseUpdateView
 
 urlpatterns = [
     # category
@@ -38,6 +39,11 @@ urlpatterns = [
     path('product/', ProductListView.as_view(), name='product_list'),
     path('product/add/', ProductCreateView.as_view(), name='product_create'),
     path('product/update/<int:pk>/', ProductUpdateView.as_view(), name='product_update'),
+
+    # Warehouse
+    path('bodegas/', WarehouseListView.as_view(), name='warehouse_list'),
+    path('bodegas/add/', WarehouseCreateView.as_view(), name='warehouse_create'),
+    path('bodegas/update/<int:pk>/', WarehouseUpdateView.as_view(), name='warehouse_update'),
 
     # supplier
     path('supplier/', SupplierListView.as_view(), name='supplier_list'),

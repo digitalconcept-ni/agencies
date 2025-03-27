@@ -120,6 +120,39 @@ class Brands(models.Model):
         ordering = ['-id']
 
 
+# Modelo para crear bodegas
+class Warehouse(models.Model):
+    STATUS_CHOICE = (
+        (1, 'ACTIVA'),
+        (0, 'INACTIVA'),
+    )
+
+    CENTRAL_CHOICE = (
+        (1, 'SI'),
+        (0, 'NO'),
+    )
+
+    code = models.CharField(max_length=6, verbose_name='Codigo')
+    name = models.CharField(max_length=100, verbose_name='Nombre')
+    description = models.CharField(max_length=100, verbose_name='Descripcion', null=True, blank=True)
+    status = models.IntegerField(choices=STATUS_CHOICE, default=1, verbose_name='Estado')
+    is_central = models.IntegerField(choices=CENTRAL_CHOICE, default=1, verbose_name='¿Es central?')
+
+    class Meta:
+        verbose_name = 'Bodega'
+        verbose_name_plural = 'Bodegas'
+        ordering = ['-id']
+
+    def __str__(self):
+        return f'{self.code} | {self.name}'
+
+    def toLIST(self):
+        item = [
+            self.id, self.code, self.name, self.get_is_central_display(), self.description, self.get_status_display(), self.id
+        ]
+        return item
+
+
 class Product(models.Model):
     # supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, verbose_name='Proveedor')
     brand = models.ForeignKey(Brands, on_delete=models.CASCADE, verbose_name='Marca', null=True, blank=True)
@@ -140,7 +173,7 @@ class Product(models.Model):
             brand = ' '
         else:
             brand = self.brand.name
-        return f'{self.code} - {self.name} {brand} {self.um}'
+        return f'{self.code} | {self.name} {brand} {self.um}'
 
     def get_total_earnings(self):
         # return sum([payment.amount for payment in self.objects.all()])
@@ -199,8 +232,35 @@ class Product(models.Model):
         ordering = ['id']
 
 
+# Modelo que relaciona los productos con las bodehas
+class ProductWarehouse(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Producto')
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, verbose_name='Bodega')
+    stock = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Stock')
+
+    class Meta:
+        verbose_name = 'Producto_Bodega'
+        verbose_name_plural = 'Productos_Bodegas'
+        ordering = ['id']
+
+    def __str__(self):
+        return f'{self.warehouse.name} - {self.warehouse.code}'
+
+    def toLIST(self):
+        item = [
+            self.id, self.warehouse.code, self.warehouse.name, self.warehouse.description, self.id
+        ]
+        return item
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['product'] = self.product.__str__()
+        return item
+
+
 class Shopping(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, verbose_name='Proveedor')
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, verbose_name='Bodega')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario')
     cant = models.IntegerField(default=0)
     invoice_number = models.CharField(max_length=10, default='F000000000')
@@ -245,7 +305,7 @@ class Shopping(models.Model):
         user = f'{self.user.username} {self.time_joined.strftime("%I:%M:%S %p")}'
 
         data = [
-            self.get_number(), user, self.supplier.name, self.invoice_number,
+            self.get_number(), user, self.warehouse.__str__(), self.supplier.name, self.invoice_number,
             date_joined, self.cant, f'{self.discount:,.2f}', f'{self.subtotal:,.2f}',
             f'{self.iva:,.2f}', f'{self.income_tax:,.2f}', f'{self.city_tax:,.2f}', f'{self.total:,.2f}',
             opt
@@ -489,7 +549,7 @@ class Sale(models.Model):
         super(Sale, self).delete()
 
     def calculate_invoice(self):
-        subtotal = self.saleproduct_set.all().filter(product__tax='grabado').aggregate(
+        subtotal = self.saleproduct_set.all().filter(restore=False).filter(product__tax='grabado').aggregate(
             result=Coalesce(Sum(F('price') * F('cant')), 0.00, output_field=FloatField())).get('result')
         self.subtotal = subtotal
         self.total_iva = (self.subtotal - self.discount) * 0.15

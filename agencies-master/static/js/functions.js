@@ -23,18 +23,18 @@ const csrftoken = getCookie('csrftoken');
 function message_error(obj) {
     var html = '';
     if (typeof (obj) === 'object') {
-        html = '<ul style="text-align: left;">';
         $.each(obj, function (key, value) {
-            html += '<li>' + key + ': ' + value + '</li>';
+            html += `<span class='text-center'> ${value}</span> <br>`;
         });
-        html += '</ul>';
     } else {
         html = '<p>' + obj + '</p>';
     }
     Swal.fire({
         title: 'Error!',
         html: html,
-        icon: 'error'
+        icon: 'error',
+        confirmButtonColor: "#3085d6",
+
     });
 }
 
@@ -42,7 +42,7 @@ function message_info(obj) {
     var html = '';
     if (typeof (obj) === 'object') {
         $.each(obj, function (key, value) {
-            html += ` <span class='text-center'> ${value}</span>`;
+            html += ` <span class='text-center'> ${value}</span> -`;
         });
     } else {
         html = '<p>' + obj + '</p>';
@@ -122,6 +122,8 @@ function alert_action(title, content, callback, cancel) {
     }).then((result) => {
         if (result.isConfirmed) {
             callback();
+        } else if (result.isDismissed) {
+            cancel();
         }
     })
 

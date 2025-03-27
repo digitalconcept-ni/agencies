@@ -74,6 +74,7 @@ class deviceVerificationMixin(object):
         if request.user_agent.is_mobile:
             self.form_class = SaleMovilForm
             self.template_name = 'sale/createmovil2.html'
+            # self.template_name = 'sale/createmovil-map.html'
             # se esta trabajando de esta manera mientras se
             # agregan todos las georeferencias de lso clientes
             # self.template_name = 'map/load.html'
