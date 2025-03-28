@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views.generic import ListView
 
 from core.pos.choices import random_code
-from core.pos.models import Product, Brands, Category, ProductWarehouse
+from core.pos.models import Product, Brands, Category, ProductWarehouse, Warehouse
 
 
 class loadCsvView(LoginRequiredMixin, ListView):
@@ -23,7 +23,29 @@ class loadCsvView(LoginRequiredMixin, ListView):
             reader = csv.reader(decode_file, delimiter=';')
 
             if selection == "ajuste":
-                warehouse = ProductWarehouse.objects.all().delete()
+                ProductWarehouse.objects.all().delete()
+                warehouse = Warehouse(
+                    code="3000",
+                    name="CENTRAL",
+                    description='BODEGA CENTRAL',
+                    status=1,
+                    is_central=1
+                ).save()
+
+                products = Product.objects.select_related()
+
+                pw_update = []
+                for p in products:
+                    pw = ProductWarehouse(
+                        warehouse=warehouse.id,
+                        product_id=p.id,
+                        stock=p.stock,
+                    )
+                    pw_update.append(pw)
+
+                ProductWarehouse.objects.bulk_create(pw_update)
+
+                data['success'] = 'Bodega Eliminada correctamente'
             if selection == 'category':
                 category_update = []
                 for row in reader:
