@@ -19,7 +19,7 @@ class loadCsvView(LoginRequiredMixin, ListView):
             selection = request.POST['selection']
             update = request.POST['update']
             file = request.FILES['file']
-            decode_file = file.read().decode("utf-8").splitlines()
+            decode_file = file.read().decode("utf-8-sig").splitlines()
             reader = csv.reader(decode_file, delimiter=';')
 
             if selection == 'category':
@@ -33,7 +33,6 @@ class loadCsvView(LoginRequiredMixin, ListView):
                 Category.objects.bulk_create(category_update)
                 # Category.objects.filter(name='', desc='').delete()
                 data['success'] = 'Categorias grabadas exitosamente'
-
             elif selection == 'product':
                 product_list = []
 
@@ -42,37 +41,40 @@ class loadCsvView(LoginRequiredMixin, ListView):
                     product = Product()
 
                 else:
-                    print('products')
                     for row in reader:
+                        print(row)
+                        if row[6] == '':
+                            value = 0.00
+                        else:
+                            value = float(row[6])
+
                         product = Product(
                             # supplier_id=row[0],
                             brand_id=row[0],
                             category_id=row[1],
                             name=row[2],
-                            code=random_code(),
-                            tax=row[3],
-                            um=row[4],
-                            expiration=row[5],
-                            image='',
+                            code=row[3],
+                            tax=row[4],
+                            um=row[5],
                             is_inventoried=True,
-                            stock=row[6],
-                            cost=row[7],
-                            pvp=row[8]
+                            stock=int(row[6]),
+                            cost=value,
+                            pvp=float(row[8])
                         )
                         product_list.append(product)
                     Product.objects.bulk_create(product_list)
                     data['success'] = 'Proceso terminado con exito'
             elif selection == 'brands':
-                # brand_list = []
-                # for row in reader:
-                #     print(row)
-                #     brand = Brands(
-                #         name=row[0].strip(),
-                #         description=row[1].strip()
-                #     )
-                #     brand_list.append(brand)
-                # Brands.objects.bulk_create(brand_list)
-                Brands.objects.filter(name='', description='').delete()
+                brand_list = []
+                for row in reader:
+                    print(row)
+                    brand = Brands(
+                        name=row[0].strip(),
+                        description=row[1].strip()
+                    )
+                    brand_list.append(brand)
+                Brands.objects.bulk_create(brand_list)
+                # Brands.objects.filter(name='', description='').delete()
                 data['success'] = 'Marcas grabadas exitosamente'
 
             return JsonResponse(data, safe=False)
