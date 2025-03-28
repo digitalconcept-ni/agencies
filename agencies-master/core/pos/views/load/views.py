@@ -23,21 +23,22 @@ class loadCsvView(LoginRequiredMixin, ListView):
             reader = csv.reader(decode_file, delimiter=';')
 
             if selection == "ajuste":
-                ProductWarehouse.objects.all().delete()
-                warehouse = Warehouse(
-                    code="3000",
-                    name="CENTRAL",
-                    description='BODEGA CENTRAL',
-                    status=1,
-                    is_central=1
-                ).save()
+                Warehouse.objects.filter(is_central=1).delete()
+                warehouse = Warehouse()
+                warehouse.code = "3002"
+                warehouse.name = "CENTRAL"
+                warehouse.description = 'ALMACENAMIENTO CENTRAL'
+                warehouse.status = 1
+                warehouse.is_central = 1
+                warehouse.save()
 
                 products = Product.objects.select_related()
 
                 pw_update = []
                 for p in products:
+                    print(p.id)
                     pw = ProductWarehouse(
-                        warehouse=warehouse.id,
+                        warehouse_id=warehouse.id,
                         product_id=p.id,
                         stock=p.stock,
                     )
