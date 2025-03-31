@@ -410,7 +410,7 @@ class Client(models.Model):
     dni = models.CharField(max_length=14, unique=True, default='0010101010034S', verbose_name='RUC')
     phone_number = models.CharField(max_length=8, default=87878787, verbose_name='Numero de telefono')
     birthdate = models.DateField(default=datetime.now,null=True, blank=True, verbose_name='Fecha de nacimiento')
-    address = models.CharField(max_length=150, verbose_name='Dirección')
+    address = models.CharField(max_length=150, null=True, verbose_name='Dirección')
     gender = models.CharField(max_length=10, choices=genders, default='male', verbose_name='Genero')
     municipality = models.CharField(max_length=13, choices=municipality, default='managua', verbose_name='Municipio')
     frequent = models.BooleanField(verbose_name='Frecuente', default=True, null=True, blank=True)
