@@ -160,7 +160,10 @@ class WarehouseUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, U
         data = {}
         try:
             action = request.POST['action']
-            if action == 'search_products':
+            if action == 'get_product_by_category':
+                products = Product.objects.filter(category=request.POST['categoryID'])
+                data = [i.toJSON() for i in products]
+            elif action == 'search_products':
                 data = []
                 ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
@@ -187,8 +190,6 @@ class WarehouseUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, U
                     # Json donde optenemos los productos insertados por el usuario
                     products = json.loads(request.POST['products'])
                     # products_delete = json.loads(request.POST['products_delete'])
-
-                    print(products)
 
                     w = self.get_object()
                     w.code = request.POST['code']
