@@ -148,12 +148,37 @@ class Warehouse(models.Model):
 
     def toLIST(self):
         item = [
-            self.id, self.code, self.name, self.get_is_central_display(), self.description, self.get_status_display(), self.id
+            self.id, self.code, self.name, self.get_is_central_display(), self.description, self.get_status_display(),
+            self.id
         ]
         return item
 
 
 class Product(models.Model):
+    UDM_CHOICE = (
+        ('lb', 'LIBRA'),
+        ('kg', 'KG'),
+        ('gr', 'GR'),
+        ('onz', 'ONZ'),
+        ('lt', 'LT'),
+        ('ml', 'ML'),
+        ('cuarta', 'CUARTA'),
+        ('bolson', 'BOLSON'),
+        ('bolsa', 'BOLSA'),
+        ('caja', 'CAJ'),
+        ('cajilla', 'CAJILLA'),
+        ('cajon', 'CAJON'),
+        ('und', 'UND'),
+        ('pq', 'PAQ'),
+        ('ristra', 'RISTRA'),
+        ('docena', 'DOCENA'),
+        ('paca', 'PACA'),
+        ('qq', 'QQ'),
+        ('bidon', 'BIDON'),
+        ('balde', 'BALDE'),
+        ('par', 'PAR'),
+    )
+
     # supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, verbose_name='Proveedor')
     brand = models.ForeignKey(Brands, on_delete=models.CASCADE, verbose_name='Marca', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
@@ -173,7 +198,7 @@ class Product(models.Model):
             brand = ' '
         else:
             brand = self.brand.name
-        return f'{self.code} | {self.name} {brand} {self.um}'
+        return f'{self.code} | {brand} {self.name} {self.um}'
 
     def get_total_earnings(self):
         # return sum([payment.amount for payment in self.objects.all()])
@@ -186,12 +211,13 @@ class Product(models.Model):
             brand = 1
         else:
             brand = self.brand.get_full_name()
+
         if self.expiration is None:
             ex = 'No registrada'
         else:
             ex = self.expiration.strftime('%Y-%m-%d')
         data = [
-            self.id, self.category.name, self.__str__(), ex, self.tax,
+            self.id, brand, self.category.name, self.__str__(), ex, self.tax,
             self.is_inventoried, self.stock, f'{self.cost:,.2f}', f'{self.pvp:,.2f}', self.id
         ]
         return data
@@ -383,8 +409,8 @@ class Client(models.Model):
     names = models.CharField(max_length=150, verbose_name='Nombres')
     dni = models.CharField(max_length=14, unique=True, default='0010101010034S', verbose_name='RUC')
     phone_number = models.CharField(max_length=8, default=87878787, verbose_name='Numero de telefono')
-    birthdate = models.DateField(default=datetime.now, verbose_name='Fecha de nacimiento')
-    address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')
+    birthdate = models.DateField(default=datetime.now,null=True, blank=True, verbose_name='Fecha de nacimiento')
+    address = models.CharField(max_length=150, verbose_name='Dirección')
     gender = models.CharField(max_length=10, choices=genders, default='male', verbose_name='Genero')
     municipality = models.CharField(max_length=13, choices=municipality, default='managua', verbose_name='Municipio')
     frequent = models.BooleanField(verbose_name='Frecuente', default=True, null=True, blank=True)

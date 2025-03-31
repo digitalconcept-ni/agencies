@@ -82,6 +82,7 @@ class ProductForm(ModelForm):
                 'style': 'width: 100%'
             }),
         }
+        exclude = ['stock']
 
     def save(self, commit=True):
         data = {}
