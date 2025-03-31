@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 
-from core.pos.models import Sale, Product, SaleProduct, Client, Company
+from core.pos.models import Sale, Product, SaleProduct, Client, ProductWarehouse
 from core.pos.query import visitFrequency
 from core.processes.models import production
 from core.user.models import User
@@ -94,7 +94,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     sale = querySales.filter(date_joined__exact=now)
                 else:
                     sale = querySales.filter(Q(user_id=request.user.id) & Q(date_joined__exact=now))
-                lowInventory = queryProducts.filter(stock__lte=15).count()
+                lowInventory = queryProducts.filter(productwarehouse__stock__lte=10).count()
                 totalProductsQuery = queryProducts.count()
                 totalClientsQuery = Client.objects.count()
                 countSalesToday = sale.count()
@@ -149,11 +149,26 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     data = {'info': 'No hay pre ventas activos para calcular el reporte'}
                     return JsonResponse(data, safe=False)
             elif action == 'search_lower_inventory':
-                queryProducts = Product.objects.filter(stock__lte=10)
-                data = [p.toLIST() for p in queryProducts]
-                # for p in queryProducts:
-                #     data.append([p.id, p.name, p.brand.name, p.stock,
-                #                  f'{p.cost:.2f}'])
+                data = []
+                products = ProductWarehouse.objects.select_related().filter(stock__lte=10)
+                # data = [p.toLIST() for p in queryProducts]
+                for p in products:
+                    if p.product.brand is None:
+                        brand = 1
+                    else:
+                        brand = p.product.brand.get_full_name()
+
+                    if p.product.expiration is None:
+                        ex = 'No registrada'
+                    else:
+                        ex = p.product.expiration.strftime('%Y-%m-%d')
+                    data.append(
+                        [
+                            p.product.id, p.warehouse.__str__(), brand, p.product.category.name, p.product.__str__(),
+                            ex, p.product.tax, p.product.is_inventoried, p.stock, f'{p.product.cost:,.2f}',
+                            f'{p.product.pvp:,.2f}', p.id
+                        ]
+                    )
             elif action == 'search_payment_method':
                 data = []
                 query = Sale.objects.select_related().filter(date_joined=now)

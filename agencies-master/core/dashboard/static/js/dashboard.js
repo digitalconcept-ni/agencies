@@ -56,13 +56,15 @@ $(function () {
 
         let config = [
             {
-                targets: [0, 3, 4, 5, 7, 8, 9],
+                targets: '_all',
                 class: 'text-center',
+            },
+            {
+                targets: [0, 3, 5, 6, 7, 9, 10, 11],
                 visible: false
             },
             {
-                targets: [6],
-                class: 'text-center',
+                targets: [8],
                 render: function (data, type, row) {
                     let html = `<span class="badge bg-danger">
                                     <i class="bi bi-exclamation-octagon me-1"></i> ${data}
@@ -74,7 +76,7 @@ $(function () {
         let data = {
             'data': {'action': 'search_lower_inventory'},
             'inserInto': 'rowModalInfo',
-            'th': ['Nro', 'Marca', 'Nombre', 'Vencimiento', 'Imagen', '¿Es inventariado?', 'Stock', 'Costo', 'Precio venta', 'Opciones'],
+            'th': ['Nro', 'Bodega', 'Marca', 'Categoria', 'Nombre', 'Vencimiento', 'Impuesto', '¿Es inventariado?', 'Stock', 'Costo', 'Precio venta', 'Opciones'],
             'table': 'tableModalInfo',
             'config': config,
             'modal': true,
@@ -178,7 +180,7 @@ $(function () {
                 visible: false
             },
             {
-                targets: [1, 2, 3, 4,5],
+                targets: [1, 2, 3, 4, 5],
                 class: 'text-center',
             },
         ]
