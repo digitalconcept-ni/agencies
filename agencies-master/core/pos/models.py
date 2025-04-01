@@ -6,7 +6,7 @@ from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 
 from config import settings
-from core.pos.choices import genders, payment, municipality, tax_type, random_code, printer
+from core.pos.choices import genders, payment, municipality, tax_type, printer
 from core.user.models import User
 
 
@@ -19,6 +19,7 @@ class Company(models.Model):
     website = models.CharField(max_length=60, verbose_name='Website')
     image = models.ImageField(upload_to='company/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
     printer = models.CharField(choices=printer, max_length=10, null=True, blank=True, verbose_name='Tipo de impresora')
+    control_stock = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

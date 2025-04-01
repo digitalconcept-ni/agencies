@@ -252,14 +252,23 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                 ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
+                # Verificar la opcion de llevar el control del stock de la empresa
+                company = Company.objects.first()
 
-                product_warehouse = ProductWarehouse.objects.filter(
-                    Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
-                    Q(product__name__icontains=term) | Q(product__code__icontains=term) &
-                    Q(product__is_inventoried=True))
+                if company.control_stock:
+                    product_warehouse = ProductWarehouse.objects.filter(
+                        Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
+                        Q(product__name__icontains=term) | Q(product__code__icontains=term) &
+                        Q(product__is_inventoried=True)).exclude(product_id__in=ids_exclude)[0:10]
+                else:
+                    product_warehouse = Product.objects.filter(
+                        Q(name__icontains=term) | Q(code__icontains=term))
 
-                for i in product_warehouse.exclude(product_id__in=ids_exclude)[0:10]:
-                    item = i.product.toJSON()
+                for i in product_warehouse:
+                    if company.control_stock:
+                        item = i.product.toJSON()
+                    else:
+                        item = i.toJSON()
                     item['text'] = i.__str__()
                     item['stock'] = i.stock
                     data.append(item)
@@ -299,8 +308,6 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                     details = json.loads(request.POST['details'])
                     products = details['products']
 
-                    print(products)
-
                     now = datetime.now()
                     today = str(now.date())
                     exist = Sale.objects.filter(Q(date_joined=today) & Q(client_id=request.POST['client'])).exists()
@@ -326,10 +333,6 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                         warehouse_update = []
 
                         for p in products:
-                            # Buscamos el porducto a actualiza en la bodega correspondiente
-                            product_warehouse = ProductWarehouse.objects.filter(
-                                warehouse__is_central=1, product_id=int(p['id'])).first()
-
                             sp = SaleProduct(
                                 sale_id=sale.id,
                                 product_id=int(p['id']),
@@ -339,9 +342,13 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                             )
                             sale_product_create.append(sp)
 
-                            # Actualizamos el stock de la bdoega CENTRAL
-                            product_warehouse.stock -= p['cant']
-                            warehouse_update.append(product_warehouse)
+                            if sale.company.control_stock:
+                                # Buscamos el porducto a actualiza en la bodega correspondiente
+                                product_warehouse = ProductWarehouse.objects.filter(
+                                    warehouse__is_central=1, product_id=int(p['id'])).first()
+                                # Actualizamos el stock de la bdoega CENTRAL
+                                product_warehouse.stock -= p['cant']
+                                warehouse_update.append(product_warehouse)
 
                         # for i in products:
                         #     detail = SaleProduct()
@@ -357,8 +364,9 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
 
                         # Agregamos el detalle de la venta
                         SaleProduct.objects.bulk_create(sale_product_create)
-                        # Actualizamos los porductos vendidos en la bodega central
-                        ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
+                        if sale.company.control_stock:
+                            # Actualizamos los porductos vendidos en la bodega central
+                            ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
                         sale.calculate_invoice()
 
                         # if request.POST['coords'] != 'false':
@@ -494,14 +502,23 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                 ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
+                # Verificar la opcion de llevar el control del stock de la empresa
+                company = Company.objects.first()
 
-                product_warehouse = ProductWarehouse.objects.filter(
-                    Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
-                    Q(product__name__icontains=term) | Q(product__code__icontains=term) &
-                    Q(product__is_inventoried=True))
+                if company.control_stock:
+                    product_warehouse = ProductWarehouse.objects.filter(
+                        Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
+                        Q(product__name__icontains=term) | Q(product__code__icontains=term) &
+                        Q(product__is_inventoried=True)).exclude(product_id__in=ids_exclude)[0:10]
+                else:
+                    product_warehouse = Product.objects.filter(
+                        Q(name__icontains=term) | Q(code__icontains=term))
 
-                for i in product_warehouse.exclude(product_id__in=ids_exclude)[0:10]:
-                    item = i.product.toJSON()
+                for i in product_warehouse:
+                    if company.control_stock:
+                        item = i.product.toJSON()
+                    else:
+                        item = i.toJSON()
                     item['text'] = i.__str__()
                     item['stock'] = i.stock
                     data.append(item)
@@ -536,6 +553,9 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
 
                     sale_product_create = []
                     warehouse_update = []
+
+                    # Comprobamso si llevamos el control del stock
+                    company = Company.objects.first()
                     for p in totalProducts:
                         restore = bool(p['restore']) # Fue devuelto si o no
 
@@ -546,44 +566,47 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                         else:
                             subtotal = float(p['subtotal'])
 
-                        # Buscamos el porducto a actualiza en la bodega correspondiente
-                        product_warehouse = ProductWarehouse.objects.filter(
-                            warehouse__is_central=1, product_id=int(p['id'])).first()
+                        # Agreamos los items al detalle de la venta
+                        saleproduct = SaleProduct(
+                            sale_id=sale.id,
+                            product_id=int(p['id']),
+                            restore=bool(p['restore']),
+                            cant=int(p['cant']),
+                            price=float(p['pvp']),
+                            subtotal=subtotal
+                        )
+                        sale_product_create.append(saleproduct)
 
-                        if 'delete' in p:
-                            product_warehouse.stock += p['cant']
-                        else:
-                            saleproduct = SaleProduct(
-                                sale_id=sale.id,
-                                product_id=int(p['id']),
-                                restore=bool(p['restore']),
-                                cant=int(p['cant']),
-                                price=float(p['pvp']),
-                                subtotal=subtotal
-                            )
-                            sale_product_create.append(saleproduct)
+                        if company.control_stock:
+                            # Buscamos el porducto a actualiza en la bodega correspondiente
+                            product_warehouse = ProductWarehouse.objects.filter(
+                                warehouse__is_central=1, product_id=int(p['id'])).first()
 
-                            # En caso que el producto actual es NUEVO, le restamos la cantidad actual
-                            if 'before' not in p:
-                                product_warehouse.stock -= p['cant']
+                            if 'delete' in p:
+                                product_warehouse.stock += p['cant']
                             else:
-                                # Verificamos si es devolucion
-                                # si anteriormente fue facturado y se devolvio se suma al inventario
-                                # De lo contrario se le resta
-                                if restore:
-                                    product_warehouse.stock += p['cant']
+                                # En caso que el producto actual es NUEVO, le restamos la cantidad actual
+                                if 'before' not in p:
+                                    product_warehouse.stock -= p['cant']
                                 else:
-                                    if bool(p['initial_restore']):
-                                        product_warehouse.stock -= p['cant']
+                                    # Verificamos si es devolucion
+                                    # si anteriormente fue facturado y se devolvio se suma al inventario
+                                    # De lo contrario se le resta
+                                    if restore:
+                                        product_warehouse.stock += p['cant']
                                     else:
-                                        if 'initial_amount' in p:
-                                            # SI fue modificado le restamos el valor anterior y le sumamos la cantidad actual
-                                            product_warehouse.stock = (product_warehouse.stock + int(
-                                                p['initial_amount'])) - p['cant']
-                        warehouse_update.append(product_warehouse)
+                                        if bool(p['initial_restore']):
+                                            product_warehouse.stock -= p['cant']
+                                        else:
+                                            if 'initial_amount' in p:
+                                                # SI fue modificado le restamos el valor anterior y le sumamos la cantidad actual
+                                                product_warehouse.stock = (product_warehouse.stock + int(
+                                                    p['initial_amount'])) - p['cant']
+                            warehouse_update.append(product_warehouse)
 
                     SaleProduct.objects.bulk_create(sale_product_create)
-                    ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
+                    if company.control_stock:
+                        ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
 
                     # for p in products:
                     #     detail = SaleProduct()
