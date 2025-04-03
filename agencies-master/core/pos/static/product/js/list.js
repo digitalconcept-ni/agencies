@@ -1,7 +1,7 @@
 var product = {
     config: [
         {
-            targets: [0,1,2],
+            targets: [0, 1, 2, 7],
             visible: false,
         },
         {
@@ -26,17 +26,17 @@ var product = {
 
             }
         },
-        {
-            targets: [7],
-            render: function (data, type, row) {
-                if (data === 0) {
-                    return `<span class="badge bg-danger"><i class="bi bi-exclamation-octagon me-1"></i>Sin stock</span>`
-                } else if (data > 10) {
-                    return `<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>${data}</span>`
-                }
-                return `<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>${data}</span>`
-            }
-        },
+        // {
+        //     targets: [7],
+        //     render: function (data, type, row) {
+        //         if (data === 0) {
+        //             return `<span class="badge bg-danger"><i class="bi bi-exclamation-octagon me-1"></i>Sin stock</span>`
+        //         } else if (data > 10) {
+        //             return `<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>${data}</span>`
+        //         }
+        //         return `<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>${data}</span>`
+        //     }
+        // },
         // {
         //     targets: [7, 8],
         //     render: function (data, type, row) {
