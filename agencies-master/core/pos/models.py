@@ -442,8 +442,13 @@ class Client(models.Model):
         for v in visit:
             if item[v]:
                 frequent.append(visit[v])
+
+        if self.birthdate:
+            birthdate = self.birthdate.strftime('%Y-%m-%d')
+        else:
+            birthdate = ' '
         data = [self.get_number(), self.is_active, self.user.username, self.names, self.dni,
-                self.birthdate.strftime('%Y-%m-%d'),
+                birthdate,
                 self.get_gender_display(), self.address, frequent, self.id
                 ]
         return data
@@ -454,7 +459,11 @@ class Client(models.Model):
         frequent = []
         item = model_to_dict(self)
         item['gender'] = {'id': self.gender, 'name': self.get_gender_display()}
-        item['birthdate'] = self.birthdate.strftime('%Y-%m-%d')
+        print(self.birthdate)
+        if self.birthdate:
+            item['birthdate'] = self.birthdate.strftime('%Y-%m-%d')
+        else:
+            item['birthdate'] = ' '
         for v in visit:
             if item[v]:
                 frequent.append(visit[v])
