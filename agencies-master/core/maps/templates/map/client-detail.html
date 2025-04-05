@@ -1,0 +1,64 @@
+{% extends 'map/base.html' %}
+{% load static %}
+
+{% block body %}
+    <header id="header" class="header fixed-top d-flex align-items-center">
+
+        <a href="{% url 'map' %}" class="btn btn-danger">
+            <i class="bi bi-box-arrow-left h-75"></i>
+        </a>
+
+        <nav class="header-nav m-auto d-flex align-items-center">
+            <span class="ms-auto pe-3">{{ client.id }} - {{ client.names }}</span>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+
+    <main class="main" id="main">
+
+        <div class="container-fluid">
+
+            {# row to checkin, pedido and checkout #}
+            <div class="row d-flex justify-content-around">
+
+                <div class="btn-group" role="group" aria-label="Basic example outline">
+                    <button id="btn-checkin" type="button"
+                            class="btn btn-primary d-flex flex-column justify-content-center align-items-center">
+                        Check-in
+                        <span id="checkin">--:--</span>
+                    </button>
+                    <button id="btn-pedido" type="button" class="btn btn-primary d-flex flex-column justify-content-center align-items-center">
+                        Pedido
+                        <i class="bi bi-basket"></i>
+                    </button>
+                    <button id="btn-checkout" type="button"
+                            class="btn btn-primary d-flex flex-column justify-content-center align-items-center">
+                        Check-out
+                        <span id="checkout">--:--</span>
+                    </button>
+                </div>
+            </div>
+
+            <input type="hidden" value="{{ client.id }}" id="input-id-client">
+
+            {# row to use monthly statistics #}
+            <div class="row mt-4">
+                <h4>Estadísticas mensuales</h4>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    {# client detail JS file #}
+    <script src="{% static 'map/js/client-detail.js' %} "></script>
+
+{% endblock %}

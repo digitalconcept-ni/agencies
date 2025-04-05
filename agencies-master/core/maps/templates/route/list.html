@@ -1,0 +1,14 @@
+{% extends 'list2.html' %}
+{% load static %}
+
+{% block head_list_extra %}
+    <script src="{% static 'route/js/list.js' %}"></script>
+{% endblock %}
+
+{# NO CARGMAOS LA LIBRERIA DEL RANGO DE FEHCAS #}
+{% block daterangepicker %}
+{% endblock %}
+
+{# NO CARGAMOS EL INPUT DE RANGO DE FEHCAS #}
+{% block list_controls %}
+{% endblock %}

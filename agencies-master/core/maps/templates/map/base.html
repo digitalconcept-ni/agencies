@@ -1,0 +1,277 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    {#    <meta content="width=device-width, initial-scale=1.0" name="viewport">#}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ title }}</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon/favicon-32x32.png' %} ">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon/favicon-16x16.png' %} ">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+          rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'lib2/bootstrap/css/bootstrap.min.css' %} " rel="stylesheet">
+    <link href="{% static 'lib2/bootstrap-icons/bootstrap-icons.css' %} " rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="{% static 'css/style.css' %} " rel="stylesheet">
+
+    {# Fuction data tables include librarys #}
+    {# Included libraries: jQuery 3 3.7.0, JSZip 3.10.1 #}
+    {# pdfmake 0.2.7, DataTables 2.0.8, Buttons 3.0.2, Column visibility 3.0.2,  #}
+    {# HTML5 export 3.0.2, Print view 3.0.2, DateTime 1.5.2, FixedHeader 4.0.1, Responsive 3.0.2#}
+    <script src="{% static 'lib2/DataTables/datatables.min.js' %}"></script>
+
+    <!-- Etiquetas para select2 -->
+    {#    <link href="{% static 'lib2/select2-4.0.13/css/select2.min.css' %}" rel="stylesheet"/>#}
+    {#    <link href="{% static 'lib2/select2-4.0.13/css/select2-bootstrap4.min.css' %}" rel="stylesheet"/>#}
+    {#    <script src="{% static 'lib2/select2-4.0.13/js/select2.min.js' %}"></script>#}
+    {#    <script src="{% static 'lib2/select2-4.0.13/js/i18n/es.js' %}"></script>#}
+
+    {# loader #}
+    <link rel="stylesheet" href="{% static 'css/loader2.css' %}">
+
+    <!-- Functions -->
+    <script defer src="{% static 'js/functions.js' %}"></script>
+    {# getGeolocation JS file #}
+    <script defer src="{% static 'js/geolocation.js' %}"></script>
+
+    {# necesary script for the header #}
+    {% block head %}
+
+    {% endblock %}
+
+
+</head>
+<body>
+
+{# start preloader #}
+<div id="preloader">
+    <div class="socket">
+        <div class="gel center-gel">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c1 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c2 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c3 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c4 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c5 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c6 r1">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+
+        <div class="gel c7 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+
+        <div class="gel c8 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c9 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c10 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c11 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c12 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c13 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c14 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c15 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c16 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c17 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c18 r2">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c19 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c20 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c21 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c22 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c23 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c24 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c25 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c26 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c28 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c29 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c30 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c31 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c32 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c33 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c34 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c35 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c36 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+        <div class="gel c37 r3">
+            <div class="hex-brick h1"></div>
+            <div class="hex-brick h2"></div>
+            <div class="hex-brick h3"></div>
+        </div>
+    </div>
+</div>
+
+{% block body %}
+
+{% endblock %}
+
+
+{# ///// END SECTION MODAL INFORMATION #}
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+        class="bi bi-arrow-up-short"></i></a>
+
+<!-- JS Files -->
+<script src="{% static 'lib2/bootstrap/js/bootstrap.bundle.min.js' %} "></script>
+
+<!-- Template Main JS File -->
+<script src="{% static 'js/main.js' %} "></script>
+{# Sweet Alert 2#}
+<script src="{% static 'lib2/sweetalert2-11.0.16/sweetalert2.all.min.js' %}"></script>
+
+{# archivos que manejan las transacciones de sincronizacion y guardan datos #}
+<script src="{% static 'lib/localForage-1.10.0/dist/localforage.js' %}"></script>
+<script src="{% static 'map/js/data.js' %}"></script>
+
+{% block scripts %}
+
+{% endblock %}
+
+</body>
+</html>

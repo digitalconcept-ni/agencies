@@ -1,0 +1,35 @@
+{% extends 'map/base.html' %}
+{% load static %}
+
+{% block head %}
+    {# styles for leaflet maps  #}
+    <link rel="stylesheet" href="{% static 'lib2/leaflet/leaflet.css' %}"/>
+    {# styles  #}
+    <link rel="stylesheet" href="{% static 'map/css/map.css' %}">
+{% endblock %}
+
+{% block body %}
+    {# contenedor del mapa #}
+    <div id="map">
+
+    </div>
+{% endblock %}
+
+
+
+{% block scripts %}
+    {# OPTENEMOS EL CONTEXTO DE LOS CLIENTES PAR AMOSTRARLOS #}
+    <script>
+        const points = {{ points|safe }};
+        console.log(points.errors)
+    </script>
+
+    {# script leaflet #}
+    <script src="{% static 'lib2/leaflet/leaflet.js' %}"></script>
+    {# script main map #}
+    <script src="{% static 'map/js/config.js' %}"></script>
+    {# color markers JS file #}
+    <script src="{% static 'map/js/leaflet-color-markers.js' %}"></script>
+    {# addClientMarkers JS file para cargar los markers de los PDV #}
+    <script src="{% static 'map/js/addClientMarkers.js' %}"></script>
+{% endblock %}

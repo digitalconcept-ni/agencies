@@ -1,50 +1,49 @@
-let clients = [
-    // {
-    //     name: 'Bryan Urbina',
-    //     lat: 37.717642,
-    //     lng: -102.507713,
-    //     phone: '8793 4983'
-    // },
-    // {
-    //     name: 'Bryan Urbina',
-    //     lat: 49.062016,
-    //     lng: 7.923058,
-    //     phone: '8793 4983'
-    // },
-    // {
-    //     name: 'Bryan Urbina',
-    //     lat: 35.513549,
-    //     lng: 137.801934,
-    //     phone: '8793 4983'
-    // },
-    {
-        name: 'Bryan Urbina',
-        lat: 12.132095501308989,
-        lng: -86.226031,
-        phone: '8793 4983'
-    },
-    {
-        name: 'Pedro Carmona',
-        lat: 12.131538,
-        lng: -86.226653,
-        phone: '8793 4983'
-    },
-    {
-        name: 'Carlos Urbina',
-        lat: 12.130694,
-        lng: -86.226939,
-        phone: '8793 4983'
-    },
-    {
-        name: 'Bryan Hernadez',
-        lat: 12.131002,
-        lng: -86.226148,
-        phone: '8793 4983'
-    },
-    {
-        name: 'Maritza Hernadez',
-        lat: 12.131189,
-        lng: -86.225634,
-        phone: '8793 4983'
+// Configuracion del controlador de la base de datos
+localforage.config({
+    driver: [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE], // Force WebSQL; same as using setDriver()
+    name: 'map',
+    version: 1.0,
+    size: 4980736, // Size of database, in bytes. WebSQL-only for now.
+    storeName: 'clients', // Should be alphanumeric, with underscores.
+    description: 'Lista de clientes a visitar'
+});
+
+class Synchronization {
+
+    //Almacenar en el LS
+    guardarClientesLocalForage(cliente) {
+        localforage.setItem(`${cliente.id}`, cliente);
     }
-]
+
+    agregarCamposLocalForage(key, campos) {
+        let _this = this;
+        localforage.getItem(`${key}`)
+            .then(function (value) {
+
+                Object.entries(campos).forEach(([key, val]) => {
+                    value[`${key}`] = val;
+                    _this.guardarClientesLocalForage(value)
+                })
+            })
+    }
+
+    cargarInformacionDeLocalForage(cliente) {
+        localforage.getItem(`${cliente}`)
+            .then(function (value) {
+                if (value !== null) {
+                    // chechIn
+                    let spanCheckIn = document.getElementById('checkin');
+                    let spanCheckout = document.getElementById('checkout');
+                    if (value.hasOwnProperty('checkin')) {
+                        spanCheckIn.innerText = value['checkin'];
+                        document.getElementById('btn-checkin').classList.add('disabled');
+                    }
+                    if (value.hasOwnProperty('checkout')) {
+                        spanCheckout.innerText = value['checkout'];
+                        document.getElementById('btn-checkout').classList.add('disabled');
+                    }
+                }
+            })
+    }
+
+}
