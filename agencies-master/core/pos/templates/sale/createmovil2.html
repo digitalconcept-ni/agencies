@@ -4,19 +4,26 @@
 {% load core_app_extras %}
 
 {% block head_list %}
-    <link href="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.css' %}" rel="stylesheet"/>
-    <script src="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
-    <link href="{% static 'lib/select2-4.0.13/css/select2.min.css' %}" rel="stylesheet"/>
-    <link href="{% static 'lib/select2-4.0.13/css/select2-bootstrap4.min.css' %}" rel="stylesheet"/>
-    <script src="{% static 'lib/select2-4.0.13/js/select2.min.js' %}"></script>
-    <script src="{% static 'lib/select2-4.0.13/js/i18n/es.js' %}"></script>
-    <script src="{% static 'lib/moment-2.25.3/moment-with-locales.js' %}"></script>
-    <script src="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/js/tempusdominus-bootstrap.js' %}"></script>
+    {#    <link href="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.css' %}" rel="stylesheet"/>#}
+    {#    <script src="{% static 'lib/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>#}
+    {#    <link href="{% static 'lib/select2-4.0.13/css/select2.min.css' %}" rel="stylesheet"/>#}
+    {#    <link href="{% static 'lib/select2-4.0.13/css/select2-bootstrap4.min.css' %}" rel="stylesheet"/>#}
+    {#    <script src="{% static 'lib/select2-4.0.13/js/select2.min.js' %}"></script>#}
+    {#    <script src="{% static 'lib/select2-4.0.13/js/i18n/es.js' %}"></script>#}
+    {#    <script src="{% static 'lib/moment-2.25.3/moment-with-locales.js' %}"></script>#}
+    {#    <script src="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/js/tempusdominus-bootstrap.js' %}"></script>#}
     <link href="{% static 'lib/bootstrap-touchspin-4.2.5/css/jquery.bootstrap-touchspin.css' %}" rel="stylesheet"/>
     <script src="{% static 'lib/bootstrap-touchspin-4.2.5/js/jquery.bootstrap-touchspin.js' %}"></script>
-    <link href="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/css/tempusdominus-bootstrap.css' %}" rel="stylesheet"/>
+    {#    <link href="{% static 'lib/tempusdominus-bootstrap-4.5.37.0/css/tempusdominus-bootstrap.css' %}" rel="stylesheet"/>#}
 
-    <script src="{% static 'sale/js/formmovil.js' %}"></script>
+    {# Scrip general del modulo de facturacion #}
+    <script src="{% static 'sale/js/form.js' %}"></script>
+    {# Scrip general del modulo de facturacion #}
+    <script src="{% static 'sale/js/table-movil.conf.js' %}"></script>
+    {# Scrip general del modulo de facturacion #}
+    <script src="{% static 'sale/js/client.js' %}"></script>
+    {# Scrip general del modulo de facturacion #}
+    <script src="{% static 'sale/js/product.js' %}"></script>
 
     {# BLOQUE PARA CARGAR LOS ARCHIVOS DE LOS MAPAS #}
 
@@ -82,11 +89,11 @@
                                href="#custom-tabs-four-payment" role="tab" aria-controls="custom-tabs-four-payment"
                                aria-selected="false">Forma de pago</a>
                         </li>
-{#                        <li class="nav-item">#}
-{#                            <a class="nav-link " id="custom-tabs-four-profile-tab" data-toggle="pill"#}
-{#                               href="#custom-tabs-four-map" role="tab" aria-controls="custom-tabs-four-map"#}
-{#                               aria-selected="false">Mapa</a>#}
-{#                        </li>#}
+                        {#                        <li class="nav-item">#}
+                        {#                            <a class="nav-link " id="custom-tabs-four-profile-tab" data-toggle="pill"#}
+                        {#                               href="#custom-tabs-four-map" role="tab" aria-controls="custom-tabs-four-map"#}
+                        {#                               aria-selected="false">Mapa</a>#}
+                        {#                        </li>#}
                     </ul>
                 </div>
                 <div class="">
@@ -169,28 +176,28 @@
 
                         {# MAPS #}
 
-{#                        <div class="tab-pane fade" id="custom-tabs-four-map" role="tabpanel"#}
-{#                             aria-labelledby="custom-tabs-four-map-tab">#}
-{##}
-{##}
-{#                            <div class="row">#}
-{#                                <div class="col-6">#}
-{#                                    <div class="form-group">#}
-{#                                        <label for="latitud">Latitud:</label>#}
-{#                                        <input type="text" autocomplete="off" id="latitud" name='latitud'#}
-{#                                               class="form-control">#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="col-6">#}
-{#                                    <div class="form-group">#}
-{#                                        <label for="longitud">Longitud:</label>#}
-{#                                        <input type="text" autocomplete="off" id="longitud" name='longitud'#}
-{#                                               class="form-control">#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </div>#}
-{##}
-{#                        </div>#}
+                        {#                        <div class="tab-pane fade" id="custom-tabs-four-map" role="tabpanel"#}
+                        {#                             aria-labelledby="custom-tabs-four-map-tab">#}
+                        {##}
+                        {##}
+                        {#                            <div class="row">#}
+                        {#                                <div class="col-6">#}
+                        {#                                    <div class="form-group">#}
+                        {#                                        <label for="latitud">Latitud:</label>#}
+                        {#                                        <input type="text" autocomplete="off" id="latitud" name='latitud'#}
+                        {#                                               class="form-control">#}
+                        {#                                    </div>#}
+                        {#                                </div>#}
+                        {#                                <div class="col-6">#}
+                        {#                                    <div class="form-group">#}
+                        {#                                        <label for="longitud">Longitud:</label>#}
+                        {#                                        <input type="text" autocomplete="off" id="longitud" name='longitud'#}
+                        {#                                               class="form-control">#}
+                        {#                                    </div>#}
+                        {#                                </div>#}
+                        {#                            </div>#}
+                        {##}
+                        {#                        </div>#}
                     </div>
                 </div>
 
@@ -343,9 +350,9 @@
         </div>
     </div>
 
-    <script>
-        sale.details.products = {{ products|safe }};
-        sale.details.products_review = {{ products|safe }};
-        // Se removio el vents.list(); para calcular bien el iva en el editar. Revisar al final del archivo form.js se lo puso.
-    </script>
+    {% if action == 'edit' %}
+        <script>
+            sale.products = {{ products|safe }};
+        </script>
+    {% endif %}
 {% endblock %}

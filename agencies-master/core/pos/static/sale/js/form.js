@@ -1,5 +1,3 @@
-var select_client;
-
 var sale = {
     details: {
         subtotal_exempt: 0.00,
@@ -7,15 +5,21 @@ var sale = {
         iva: 0.00,
         discount: 0.00,
         total: 0.00,
-        products: [],
-        products_delete: [],
+    },
+    products: [],
+    products_delete: [],
+    getProductsIds: function () {
+        return this.products.map(value => value.id);
+    },
+    addProduct: function (item) {
+        this.products.push(item);
     },
     calculateInvoice: function () {
         var subtotal_exempt = 0.00;
         var subtotal_iva = 0.00;
         // var iva = $('input[name="iva"]').val();
         var discount = $('input[name="discount"]').val();
-        this.details.products.forEach(function (value, index, array) {
+        this.products.forEach(function (value, index) {
             value.index = index;
             if (!value.restore) {
                 if (value.tax === 'e' || value.tax === 'exento') {
@@ -47,99 +51,8 @@ var sale = {
 $(function () {
     var action = $('input[name="action"]').val();
 
-    select_client = $('select[name="client"]');
-    select_search_product = $('select[name="search_product"]');
-
     $('.select2').select2({
         theme: "bootstrap4",
-        language: 'es'
-    });
-
-    // Client
-
-    select_client.select2({
-        theme: "bootstrap4",
-        language: 'es',
-        allowClear: true,
-        ajax: {
-            delay: 250,
-            type: 'POST',
-            url: pathname,
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            data: function (params) {
-                return {
-                    term: params.term,
-                    action: 'search_client'
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data
-                };
-            },
-        },
-        placeholder: 'Ingrese una descripción',
-        minimumInputLength: 1,
-    })
-        .on('select2:select', function (e) {
-            var data = e.params.data;
-
-            $.ajax({
-                url: window.location.pathname,
-                type: 'POST',
-                data: {'action': 'search_if_exits_client', 'id_client': data.id},
-                dataType: 'json',
-                headers: {
-                    'X-CSRFToken': csrftoken
-                }
-            }).done(function (data) {
-                if (data.exists) {
-                    Swal.fire({
-                        title: "Notificación",
-                        text: "El cliente seleccionado ya cuenta con una venta",
-                        icon: "warning",
-                        confirmButtonColor: "#3085d6",
-                        confirmButtonText: "Ok!"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.href = data.success_url;
-                        }
-                    });
-                }
-                // else {
-                //     var lat = e.params.data.lat;
-                //     console.log(lat)
-                //     if (lat != null || lat != undefined) {
-                //         coordClient = true;
-                //     } else {
-                //         coordClient = false;
-                //     }
-                // }
-
-            })
-        });
-
-    $('.btnAddClient').on('click', function () {
-        $('#myModalClient').modal('show');
-    });
-
-    $('#myModalClient').on('hidden.bs.modal', function (e) {
-        $('#frmClient').trigger('reset');
-    });
-
-    $('#frmClient').on('submit', function (e) {
-        e.preventDefault();
-        var parameters = new FormData(this);
-        parameters.append('action', 'create_client');
-        submit_with_ajax(pathname, 'Notificación',
-            '¿Estas seguro de crear al siguiente Cliente?', parameters, function (response) {
-                //console.log(response);
-                var newOption = new Option(response.full_name, response.id, false, true);
-                select_client.append(newOption).trigger('change');
-                $('#myModalClient').modal('hide');
-            });
     });
 
     $("input[name='discount']").TouchSpin({
@@ -157,7 +70,7 @@ $(function () {
     $('#frmSale').on('submit', function (e) {
         e.preventDefault();
 
-        if (sale.details.products.length === 0) {
+        if (sale.products.length === 0) {
             message_error('Debe al menos tener un item en su detalle de venta');
             return false;
         }
@@ -173,8 +86,11 @@ $(function () {
         var success_url = this.getAttribute('data-url');
         var parameters = new FormData(this);
         parameters.append('details', JSON.stringify(sale.details));
+        parameters.append('products', JSON.stringify(sale.products));
+        if (action === 'edit') {
+            parameters.append('products_delete', JSON.stringify(sale.products_delete));
+        }
 
-        // parameters.append('coords', false);
         submit_with_ajax(pathname, 'Notificación',
             '¿Estas seguro de realizar la siguiente acción?', parameters, function (response) {
                 alert_action('Notificación', '¿Desea imprimir la factura de venta?', function () {
@@ -216,7 +132,7 @@ $(function () {
 
     })
 
-    $('input[type="checkbox"]').on('change', function (e) {
+    $('input[type="checkbox"]').on('change', function () {
         let frequent = $('#id_frequent').prop('checked');
         let is_active = $('#id_is_active').prop('checked');
 

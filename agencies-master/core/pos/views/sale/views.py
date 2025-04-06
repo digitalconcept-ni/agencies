@@ -1,5 +1,4 @@
 import json
-import shutil
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -262,7 +261,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                         Q(product__is_inventoried=True)).exclude(product_id__in=ids_exclude)[0:10]
                 else:
                     product_warehouse = Product.objects.filter(
-                        Q(name__icontains=term) | Q(code__icontains=term))
+                        Q(name__icontains=term) | Q(code__icontains=term)).exclude(id__in=ids_exclude)[0:10]
 
                 for i in product_warehouse:
                     if company.control_stock:
@@ -306,7 +305,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
             elif action == 'add':
                 with transaction.atomic():
                     details = json.loads(request.POST['details'])
-                    products = details['products']
+                    products = json.loads(request.POST['products'])
 
                     now = datetime.now()
                     today = str(now.date())
@@ -525,8 +524,8 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
             elif action == 'edit':
                 with transaction.atomic():
                     details = json.loads(request.POST['details'])
-                    products = details['products']
-                    products_delete = details['products_delete']
+                    products = json.loads(request.POST['products'])
+                    products_delete = json.loads(request.POST['products_delete'])
 
                     # Unificamos ambas listas para poder hacer una sola actualizacion masiva
                     totalProducts = products + products_delete
@@ -557,7 +556,8 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     # Comprobamso si llevamos el control del stock
                     company = Company.objects.first()
                     for p in totalProducts:
-                        restore = bool(p['restore']) # Fue devuelto si o no
+                        print(p['delete']) if 'delete' in p else print('Sin delete', p['name'])
+                        restore = bool(p['restore'])  # Fue devuelto si o no
 
                         # Si es True se toma como devolucion y se agrega a cantidad en 0 para que no se tome encuenta
                         # al calcular la factura
@@ -567,15 +567,17 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                             subtotal = float(p['subtotal'])
 
                         # Agreamos los items al detalle de la venta
-                        saleproduct = SaleProduct(
-                            sale_id=sale.id,
-                            product_id=int(p['id']),
-                            restore=bool(p['restore']),
-                            cant=int(p['cant']),
-                            price=float(p['pvp']),
-                            subtotal=subtotal
-                        )
-                        sale_product_create.append(saleproduct)
+                        # Si el producto cuenta con un delete no se insertara
+                        if 'delete' not in p:
+                            saleproduct = SaleProduct(
+                                sale_id=sale.id,
+                                product_id=int(p['id']),
+                                restore=bool(p['restore']),
+                                cant=int(p['cant']),
+                                price=float(p['pvp']),
+                                subtotal=subtotal
+                            )
+                            sale_product_create.append(saleproduct)
 
                         if company.control_stock:
                             # Buscamos el porducto a actualiza en la bodega correspondiente
