@@ -58,7 +58,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
 
             # query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
-            querySales = query.filter(Q(user_id=id) & Q(endofday__exact=endDay))
+            querySales = query.filter(Q(user_id=id) & Q(endofday__exact=False))
             # COLLECT ALL THE SALES FOR ESPESIFIC USER
             detailProducts = querySales.order_by('-saleproduct__product__category_id').values(
                 'saleproduct__product__category__name', 'saleproduct__product__code', 'saleproduct__product__name',
