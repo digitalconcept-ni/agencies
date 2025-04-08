@@ -42,9 +42,9 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
 
             now = datetime.now()
             user = param['user']
-            today = str(now.date())
+            # today = str(now.date())
             hour = f'{now.hour}:{now.minute}'
-            # today = '2025-01-14'
+            today = '2025-04-07'
             id = int(param['id'])
 
             if param['startHour'] != '' and param['endHour'] != '':
@@ -137,9 +137,9 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 hours = [[[
                     f'{t.time_joined.hour}:{t.time_joined.minute}:{t.time_joined.second}.{t.time_joined.microsecond}'],
                     t.time_joined.strftime("%I:%M:%S %p")] for t
-                    # in Sale.objects.filter(user__id=userId, date_joined='2025-01-14').order_by('time_joined')]
-                    in Sale.objects.filter(user__id=userId, date_joined=datetime.now().date()).order_by(
-                        'time_joined')]
+                    in Sale.objects.filter(user__id=userId, date_joined='2025-04-07').order_by('time_joined')]
+                    # in Sale.objects.filter(user__id=userId, date_joined=datetime.now().date()).order_by(
+                    #     'time_joined')]
                 data = hours
             elif action == 'apply_credit':
                 s = Sale.objects.get(id=request.POST['id'])
