@@ -60,15 +60,13 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             id = int(param['id'])
 
             if param['startHour'] != '' and param['endHour'] != '':
-                endDay = True
                 query = Sale.objects.select_related().filter(Q(date_joined=param['dateGuide']) &
                                                              Q(time_joined__range=(
                                                                  param['startHour'], param['endHour'])))
             else:
-                endDay = False
                 query = Sale.objects.select_related().filter(date_joined=param['dateGuide'])
 
-            querySales = query.filter(Q(user_id=id) & Q(endofday__exact=endDay))
+            querySales = query.filter(Q(user_id=id) & Q(endofday__exact=param['rePrint']))
             # COLLECT ALL THE SALES FOR ESPESIFIC USER
             detailProducts = querySales.order_by('-saleproduct__product__category_id').values(
                 'saleproduct__product__category__name', 'saleproduct__product__code', 'saleproduct__product__name',
@@ -143,12 +141,13 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 # Accion para saber las horas de la primer y ultima venta
                 # para la respectiva descarga de la guia
                 userId = request.POST['id']
+                dateGuide = request.POST['date']
 
                 hours = [[[
                     f'{t.time_joined.hour}:{t.time_joined.minute}:{t.time_joined.second}.{t.time_joined.microsecond}'],
                     t.time_joined.strftime("%I:%M:%S %p")] for t
                     # in Sale.objects.filter(user__id=userId, date_joined='2025-01-14').order_by('time_joined')]
-                    in Sale.objects.filter(user__id=userId, date_joined=datetime.now().date()).order_by(
+                    in Sale.objects.filter(user__id=userId, date_joined=dateGuide).order_by(
                         'time_joined')]
                 data = hours
             elif action == 'apply_credit':
@@ -167,7 +166,6 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     #     Q(time_joined__range=(tStart, tEnd)))
 
                 else:
-                    print('No hay fehca')
                     startHour = ''
                     endHour = ''
                 param = {
@@ -179,7 +177,10 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     'startHour': startHour,
                     'endHour': endHour,
                     'dateGuide': request.POST.get('dateGuide'),  # Mandamos la fecha a la que queremos descargar la guia
+                    'rePrint': bool(request.POST['rePrint']),
                 }
+
+                print(param)
 
                 path = self.guide(param)
                 data = path

@@ -122,69 +122,75 @@ $(function () {
     // variables que seleccionar los select donde pondremos las horas del preventa
     let startHour = $('#selectRangeHourStart');
     let endHour = $('#selectRangeHourEnd');
+    let inputDateGuide = $('#input-date-guide'); // Fecha de la cual se requiere descargar la guia
 
     $('#selectPreSales').on('change', function (e) {
         let _this = $(this);
 
-        if (_this.val() !== '') {
-            var param = new FormData();
-            param.append('action', 'search_time');
-            param.append('id', _this.val());
+        // Asignamos la fecha actual al input dateGuide
 
-            $.ajax({
-                url: pathname,
-                data: param,
-                type: 'POST',
-                dataType: 'json',
-                headers: {
-                    'X-CSRFToken': csrftoken
-                },
-                processData: false,
-                contentType: false,
-                success: function (request) {
-                    if (!request.hasOwnProperty('error')) {
-                        // Asignamos la fecha actual al input dateGuide
-                        let inputDateGuide = $('#input-date-guide');
-                        const hoy = new Date();
+        const hoy = new Date();
 
-                        const anio = hoy.getFullYear();
-                        const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-                        const dia = String(hoy.getDate()).padStart(2, '0');
+        const anio = hoy.getFullYear();
+        const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoy.getDate()).padStart(2, '0');
 
-                        const fechaFormateada = `${anio}-${mes}-${dia}`;
+        const fechaFormateada = `${anio}-${mes}-${dia}`;
 
-                        // Establecer el valor por defecto
-                        inputDateGuide.val(fechaFormateada);
+        // Establecer el valor por defecto
+        inputDateGuide.val(fechaFormateada);
 
-                        // Agregamso la hora a los inputs
-                        startHour.empty()
-                        endHour.empty()
-                        var opt = '';
-
-                        $.each(request, function (key, value) {
-                            opt += `<option value="${value[0]}">${value[1]}</option>`;
-                        });
-                        startHour.append(opt);
-                        endHour.append(opt);
-                        $('#btnDonwloadGuide').removeClass('disabled');
-                        return false;
-                    } else {
-                        message_error(request.error);
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    message_error(errorThrown + ' ' + textStatus);
-                }
-            });
+        if (_this.val() !== '' && startHour.val() !== '' && endHour.val() !== '') {
+            $('#btnDonwloadGuide').removeClass('disabled');
         } else {
             $('#btnDonwloadGuide').addClass('disabled');
         }
     })
 
+    inputDateGuide.on('change', function (e) {
+        let _this = $(this);
+
+        var param = new FormData();
+        param.append('action', 'search_time');
+        param.append('date', inputDateGuide.val());
+        param.append('id',  $('#selectPreSales').val());
+
+        $.ajax({
+            url: pathname,
+            data: param,
+            type: 'POST',
+            dataType: 'json',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            processData: false,
+            contentType: false,
+            success: function (request) {
+                if (!request.hasOwnProperty('error')) {
+                    // Agregamso la hora a los inputs
+                    startHour.empty()
+                    endHour.empty()
+                    var opt = '';
+
+                    $.each(request, function (key, value) {
+                        opt += `<option value="${value[0]}">${value[1]}</option>`;
+                    });
+                    startHour.append(opt);
+                    endHour.append(opt);
+                    return false;
+                } else {
+                    message_error(request.error);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                message_error(errorThrown + ' ' + textStatus);
+            }
+        });
+    })
+
     $('#btnDonwloadGuide').on('click', function (e) {
         id = $('#selectPreSales').val();
         var param = new FormData();
-        let inputDateGuide = $('#input-date-guide').val();
 
         if (startHour.val() !== endHour.val()) {
             param.append('startHour', startHour.val());
@@ -194,7 +200,8 @@ $(function () {
         if (id !== '') {
             param.append('action', 'download_guides');
             param.append('session', $('#idSession').prop('checked'));
-            param.append('dateGuide', inputDateGuide);
+            param.append('dateGuide', inputDateGuide.val());
+            param.append('rePrint', $('#re-print').prop('checked'));
             param.append('id', id);
 
             submit_with_ajax(pathname, 'Descargar Guia', '¿Estas seguro de esta accion?', param, function (request) {
