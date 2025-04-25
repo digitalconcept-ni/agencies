@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Q, Sum, F
 from django.http import HttpResponse
@@ -20,6 +21,7 @@ from weasyprint import HTML, CSS
 
 from core.pos.forms import SaleForm, ClientForm, SaleMovilForm
 from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin, deviceVerificationMixin
+from client.models import Client
 from core.pos.models import Sale, Product, SaleProduct, Client, Company, ProductWarehouse
 from core.reports.forms import ReportForm
 
@@ -28,6 +30,16 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
     form_class = ReportForm
     template_name = 'sale/list.html'
     permission_required = 'view_sale'
+
+    # def get(self, request, *args, **kwargs):
+    #     cache_tenant_id = f'cache_{request.tenant.id}'  # Creamos la clave del tenant
+    #     cached = cache.get(cache_tenant_id)  # buscamos en cache la clave del tenant
+    #
+    #     # si la clave no existe en cacha la creamso y asignamos los valores
+    #     if cached is None:
+    #         company = Company.objects.select_related().first()
+    #         cache.set(cache_tenant_id, f'{company.control_stock}')
+    #     return super().get(request, *args, **kwargs)
 
     def guide(self, param: dict):
         data = {}
@@ -49,15 +61,13 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
 
             if param['startHour'] != '' and param['endHour'] != '':
                 endDay = True
-                query = Sale.objects.select_related().filter(Q(date_joined=today) &
+                query = Sale.objects.select_related().filter(Q(date_joined=param['dateGuide']) &
                                                              Q(time_joined__range=(
-                                                                 param['startHour'], param['endHour']))
-                                                             & Q(user__presale=True))
+                                                                 param['startHour'], param['endHour'])))
             else:
                 endDay = False
-                query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
+                query = Sale.objects.select_related().filter(date_joined=param['dateGuide'])
 
-            # query = Sale.objects.select_related().filter(Q(date_joined=today) & Q(user__presale=True))
             querySales = query.filter(Q(user_id=id) & Q(endofday__exact=endDay))
             # COLLECT ALL THE SALES FOR ESPESIFIC USER
             detailProducts = querySales.order_by('-saleproduct__product__category_id').values(
@@ -147,12 +157,10 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 s.save()
             elif action == 'download_guides':
                 data = []
-                print(request.POST)
+
                 if 'startHour' in request.POST and 'endHour' in request.POST:
                     startHour = datetime.strptime(request.POST['startHour'], '%H:%M:%S.%f').time()
                     endHour = datetime.strptime(request.POST['endHour'], '%H:%M:%S.%f').time()
-
-                    print('hay fehca')
 
                     # q = Sale.objects.select_related().filter(
                     #     Q(date_joined='2024-06-26') & Q(user_id=request.POST['id']) &
@@ -170,7 +178,9 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     'session': request.session,
                     'startHour': startHour,
                     'endHour': endHour,
+                    'dateGuide': request.POST.get('dateGuide'),  # Mandamos la fecha a la que queremos descargar la guia
                 }
+
                 path = self.guide(param)
                 data = path
             elif action == 'search':
@@ -218,7 +228,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
         context['create_url'] = reverse_lazy('sale_create')
         context['list_url'] = reverse_lazy('sale_list')
         context['entity'] = 'Ventas'
-        context['pre_sales'] = User.objects.filter(presale=True)
+        context['pre_sales'] = User.objects.select_related()
         return context
 
 
@@ -252,9 +262,10 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
                 # Verificar la opcion de llevar el control del stock de la empresa
-                company = Company.objects.first()
+                company = cache.get(f'cache_{request.tenant.id}')
+                controlStock = bool(company)
 
-                if company.control_stock:
+                if controlStock:
                     product_warehouse = ProductWarehouse.objects.filter(
                         Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
                         Q(product__name__icontains=term) | Q(product__code__icontains=term) &
@@ -264,22 +275,18 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                         Q(name__icontains=term) | Q(code__icontains=term)).exclude(id__in=ids_exclude)[0:10]
 
                 for i in product_warehouse:
-                    if company.control_stock:
+                    if controlStock:
                         item = i.product.toJSON()
                     else:
                         item = i.toJSON()
                     item['text'] = i.__str__()
                     item['stock'] = i.stock
+                    item['control_stock'] = controlStock
                     data.append(item)
             elif action == 'add_map':
                 with transaction.atomic():
                     products = json.loads(request.POST['products'])
-                    now = datetime.now()
-                    # today = str(now.date())
-                    # exist = Sale.objects.filter(Q(date_joined=today) & Q(client_id=request.POST['client'])).exists()
-                    # if exist:
-                    #     data['error'] = 'El cliente ya cuenta con una factura, favor de modificar la actual'
-                    # else:
+
                     sale = Sale()
                     sale.user_id = request.user.id
                     sale.user_commissions = request.user.username
@@ -340,6 +347,9 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                                 subtotal=float(p['subtotal'])
                             )
                             sale_product_create.append(sp)
+
+                            print('antes')
+                            print(sale.company.control_stock)
 
                             if sale.company.control_stock:
                                 # Buscamos el porducto a actualiza en la bodega correspondiente
@@ -502,9 +512,10 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
                 # Verificar la opcion de llevar el control del stock de la empresa
-                company = Company.objects.first()
+                company = cache.get(f'cache_{request.tenant.id}')
+                controlStock = bool(company)
 
-                if company.control_stock:
+                if controlStock:
                     product_warehouse = ProductWarehouse.objects.filter(
                         Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
                         Q(product__name__icontains=term) | Q(product__code__icontains=term) &
@@ -520,6 +531,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                         item = i.toJSON()
                     item['text'] = i.__str__()
                     item['stock'] = i.stock
+                    item['control_stock'] = controlStock
                     data.append(item)
             elif action == 'edit':
                 with transaction.atomic():

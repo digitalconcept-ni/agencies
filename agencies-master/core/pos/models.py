@@ -5,12 +5,14 @@ from django.db.models import Sum, F, FloatField
 from django.db.models.functions import Coalesce
 from django.forms import model_to_dict
 
+from client.models import Client
 from config import settings
 from core.pos.choices import genders, payment, municipality, tax_type, printer
 from core.user.models import User
 
 
 class Company(models.Model):
+    tenant = models.ForeignKey(Client,null=True, on_delete=models.CASCADE) # new in 09-04-25
     name = models.CharField(max_length=150, verbose_name='Razón Social')
     ruc = models.CharField(max_length=14, verbose_name='Ruc')
     address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')

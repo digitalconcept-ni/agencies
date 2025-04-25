@@ -40,8 +40,10 @@ $(function () {
             if (!Number.isInteger(repo.id)) {
                 return repo.text;
             }
-
-            var stock = repo.is_inventoried ? repo.stock : 'Sin stock';
+            var stock = '';
+            if (repo.control_stock) {
+                stock += `<b>Stock:</b> ${repo.is_inventoried ? repo.stock : 'Sin stock'} <br>`;
+            }
 
             var tax = '';
 
@@ -60,7 +62,8 @@ $(function () {
                 //'<br>' +
                 '<p style="margin-bottom: 0;">' +
                 '<b>Nombre:</b> ' + repo.full_name + '<br>' +
-                '<b>Stock:</b> ' + stock + '<br>' +
+                stock+
+                // '<b>Stock:</b> ' + stock + '<br>' +
                 '<b>PVP:</b> <span class="badge bg-secondary">' + repo.pvp + '</span>' + '<br>' +
                 '<b>Tipo:</b> <span class="badge bg-dark">' + tax + '</span>' +
                 '</p>' +
@@ -128,9 +131,6 @@ $(function () {
 
             } else {
                 sale.details.products[tr.row].restore = false
-                console.log(typeof sale.details.products[tr.row].subtotal)
-                console.log(sale.details.products[tr.row].subtotal)
-
                 let s = parseFloat(sale.details.products[tr.row].cant) * parseFloat(sale.details.products[tr.row].pvp);
                 $('td:last', tblProducts.row(tr.row).node()).html(s.toFixed(2));
 

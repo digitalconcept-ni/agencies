@@ -33,7 +33,6 @@ $(function () {
             var buttonId = $(item).attr('id');
             var inputValue = $(`#id_${buttonId}`).val();
 
-            console.log(inputValue)
             // Verificamos si el valor es mayor que 0.00
             if (inputValue > 0.00) {
                 // Si el botón no tiene la clase btn-success, la agregamos

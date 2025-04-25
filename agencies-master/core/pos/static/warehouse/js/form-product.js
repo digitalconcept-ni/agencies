@@ -203,8 +203,6 @@ $(function () {
             contentType: false,
             success: function (request) {
 
-                console.log(request);
-
                 request.forEach(item => {
                     item.cant = item.stock;
                     product.addProduct(item);

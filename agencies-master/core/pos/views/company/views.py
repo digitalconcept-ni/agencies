@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import UpdateView
@@ -15,6 +16,12 @@ class CompanyUpdateView(ValidatePermissionRequiredMixin, UpdateView):
     url_redirect = success_url
     permission_required = 'change_company'
 
+
+    # Utilziamos el metodo get, que al hacer la actualizacion del modelo, lo eliminamos
+    def get(self, request, *args, **kwargs):
+        cache.delete(f'cache_{request.tenant.id}')  # Eliminamos el espacion en cache al actualizar el modelo
+        return super().get(request, *args, **kwargs)
+
     def get_object(self, queryset=None):
         company = Company.objects.all()
         if company.exists():
@@ -29,10 +36,15 @@ class CompanyUpdateView(ValidatePermissionRequiredMixin, UpdateView):
                 instance = self.get_object()
                 if instance.pk is not None:
                     form = CompanyForm(request.POST, request.FILES, instance=instance)
-                    data = form.save()
+                    # company = form.save(commit=False)
+                    # company.tenant = request.tenant
+                    # company.save()
+                    form.save()
                 else:
                     form = CompanyForm(request.POST, request.FILES)
-                    data = form.save()
+                    company = form.save(commit=False)
+                    company.tenant = request.tenant
+                    company.save()
             else:
                 data['error'] = 'No ha ingresado a ninguna opción'
         except Exception as e:

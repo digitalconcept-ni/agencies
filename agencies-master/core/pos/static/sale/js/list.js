@@ -143,6 +143,20 @@ $(function () {
                 contentType: false,
                 success: function (request) {
                     if (!request.hasOwnProperty('error')) {
+                        // Asignamos la fecha actual al input dateGuide
+                        let inputDateGuide = $('#input-date-guide');
+                        const hoy = new Date();
+
+                        const anio = hoy.getFullYear();
+                        const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+                        const dia = String(hoy.getDate()).padStart(2, '0');
+
+                        const fechaFormateada = `${anio}-${mes}-${dia}`;
+
+                        // Establecer el valor por defecto
+                        inputDateGuide.val(fechaFormateada);
+
+                        // Agregamso la hora a los inputs
                         startHour.empty()
                         endHour.empty()
                         var opt = '';
@@ -170,6 +184,7 @@ $(function () {
     $('#btnDonwloadGuide').on('click', function (e) {
         id = $('#selectPreSales').val();
         var param = new FormData();
+        let inputDateGuide = $('#input-date-guide').val();
 
         if (startHour.val() !== endHour.val()) {
             param.append('startHour', startHour.val());
@@ -179,6 +194,7 @@ $(function () {
         if (id !== '') {
             param.append('action', 'download_guides');
             param.append('session', $('#idSession').prop('checked'));
+            param.append('dateGuide', inputDateGuide);
             param.append('id', id);
 
             submit_with_ajax(pathname, 'Descargar Guia', '¿Estas seguro de esta accion?', param, function (request) {

@@ -94,7 +94,6 @@ $(function () {
     $('#btnSearch').on('click', function () {
 
         let clientId = $('#search_client').val();
-        console.log(clientId)
 
         if (clientId === '' || clientId === null) {
             message_info({'Error de seleccion': 'Favor selecciona un cliente'})

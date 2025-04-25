@@ -117,7 +117,6 @@ $(function () {
 
     $('#frmshopping').on('submit', function (e) {
         e.preventDefault();
-        console.log(shopping.details.products)
 
         if (shopping.details.products.length === 0) {
             message_error('Debe al menos tener un item en su detalle en su compra');
