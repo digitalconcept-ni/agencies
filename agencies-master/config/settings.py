@@ -35,7 +35,7 @@ SECRET_KEY = env.str('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'mac.localhost:8000']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -211,9 +211,6 @@ LOGIN_URL = '/login/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-# TENANT MEDIA
-# MULTITENANT_RELATIVE_MEDIA_ROOT = "%s/other_dir"
-
 # MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'user.User'
@@ -266,7 +263,6 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 AWS_S3_VERITY = True
 
-
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
@@ -285,8 +281,21 @@ STORAGES = {
     },
 }
 
+# TENANT MEDIA
+MULTITENANT_RELATIVE_MEDIA_ROOT = ""
+# DEFAULT_FILE_STORAGE = "core.user.storage_backends.TenantS3Storage"
+
 # MAX CLIENT UPLOAD FILES
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
 
 # VARIABLE PARA INDICAR QUE CUANDO SE CIERRE EL NAVEGADOR SE CIERRE LA SESSION
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# CONFIGURACION PARA LA CACHE DEL SISTEMA UTILIZANDO MEMCHACHED
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
