@@ -43,7 +43,7 @@ class CompanyUpdateView(ValidatePermissionRequiredMixin, UpdateView):
                 else:
                     form = CompanyForm(request.POST, request.FILES)
                     company = form.save(commit=False)
-                    company.tenant = request.tenant
+                    company.tenant_id = request.tenant
                     company.save()
             else:
                 data['error'] = 'No ha ingresado a ninguna opción'
