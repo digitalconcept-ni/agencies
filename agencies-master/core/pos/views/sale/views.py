@@ -31,15 +31,15 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
     template_name = 'sale/list.html'
     permission_required = 'view_sale'
 
-    # def get(self, request, *args, **kwargs):
-    #     cache_tenant_id = f'cache_{request.tenant.id}'  # Creamos la clave del tenant
-    #     cached = cache.get(cache_tenant_id)  # buscamos en cache la clave del tenant
-    #
-    #     # si la clave no existe en cacha la creamso y asignamos los valores
-    #     if cached is None:
-    #         company = Company.objects.select_related().first()
-    #         cache.set(cache_tenant_id, f'{company.control_stock}')
-    #     return super().get(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        key = f'cache_{request.tenant.id}'  # Creamos la clave del tenant
+        cached = cache.get(key)  # buscamos en cache la clave del tenant
+
+        # si la clave no existe en cacha la creamso y asignamos los valores
+        if cached is None:
+            company = Company.objects.select_related().first()
+            cache.set(key, f'{company.control_stock}')
+        return super().get(request, *args, **kwargs)
 
     def guide(self, param: dict):
         data = {}
@@ -516,6 +516,9 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                 company = cache.get(f'cache_{request.tenant.id}')
                 controlStock = bool(company)
 
+                print(type(controlStock))
+                print(controlStock)
+
                 if controlStock:
                     product_warehouse = ProductWarehouse.objects.filter(
                         Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
@@ -526,7 +529,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                         Q(name__icontains=term) | Q(code__icontains=term))
 
                 for i in product_warehouse:
-                    if company.control_stock:
+                    if controlStock:
                         item = i.product.toJSON()
                     else:
                         item = i.toJSON()
