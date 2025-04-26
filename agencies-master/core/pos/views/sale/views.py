@@ -58,15 +58,13 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             hour = f'{now.hour}:{now.minute}'
             # today = '2025-04-07'
             id = int(param['id'])
+            sale = Sale.objects.select_related().filter(date_joined=param['dateGuide'], user_id=id)
 
             if param['startHour'] != '' and param['endHour'] != '':
-                query = Sale.objects.select_related().filter(Q(date_joined=param['dateGuide']) &
-                                                             Q(time_joined__range=(
-                                                                 param['startHour'], param['endHour'])))
-            else:
-                query = Sale.objects.select_related().filter(date_joined=param['dateGuide'])
+                sale = sale.filter(Q(time_joined__range=(param['startHour'], param['endHour'])))
 
-            querySales = query.filter(Q(user_id=id) & Q(endofday__exact=param['rePrint']))
+            querySales = sale.filter(endofday=param['rePrint'])
+
             # COLLECT ALL THE SALES FOR ESPESIFIC USER
             detailProducts = querySales.order_by('-saleproduct__product__category_id').values(
                 'saleproduct__product__category__name', 'saleproduct__product__code', 'saleproduct__product__name',
@@ -161,13 +159,13 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     startHour = datetime.strptime(request.POST['startHour'], '%H:%M:%S.%f').time()
                     endHour = datetime.strptime(request.POST['endHour'], '%H:%M:%S.%f').time()
 
-                    # q = Sale.objects.select_related().filter(
-                    #     Q(date_joined='2024-06-26') & Q(user_id=request.POST['id']) &
-                    #     Q(time_joined__range=(tStart, tEnd)))
-
                 else:
                     startHour = ''
                     endHour = ''
+
+                # Evalua si reprint esta vacio en caso contrario la cadena la evalua y la vuelve un boleano
+                reprint_str = request.POST.get('rePrint')
+                reprint_bool = (reprint_str and reprint_str.lower() == 'true')
                 param = {
                     'id': request.POST['id'],
                     'tenant': request.tenant.schema_name,
@@ -177,10 +175,8 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     'startHour': startHour,
                     'endHour': endHour,
                     'dateGuide': request.POST.get('dateGuide'),  # Mandamos la fecha a la que queremos descargar la guia
-                    'rePrint': bool(request.POST['rePrint']),
+                    'rePrint': reprint_bool,
                 }
-
-                print(param)
 
                 path = self.guide(param)
                 data = path
