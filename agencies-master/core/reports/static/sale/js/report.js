@@ -160,9 +160,6 @@ $(function () {
             'end_date': input_daterange.data('daterangepicker').endDate.format('YYYY-MM-DD'),
         };
 
-        console.log(parameters)
-
-
         let config = [{
             targets: [-1, -2, -3],
             class: 'text-center',

@@ -1,4 +1,4 @@
-var input_daterange;
+var input_daterange, select_presale;
 
 var sale = {
     config: [
@@ -97,17 +97,17 @@ var sale = {
         });
         html += '</tbody>';
         return html;
-    }
+    },
 };
 
 $(function () {
+    input_daterange = $('input[name="date_range"]');
+    select_presale = $('#selectPreSales');
 
     $('.select2').select2({
         theme: "bootstrap4",
         language: 'es'
     });
-
-    input_daterange = $('input[name="date_range"]');
 
     input_daterange
         .daterangepicker({
@@ -124,36 +124,11 @@ $(function () {
     let endHour = $('#selectRangeHourEnd');
     let inputDateGuide = $('#input-date-guide'); // Fecha de la cual se requiere descargar la guia
 
-    $('#selectPreSales').on('change', function (e) {
-        let _this = $(this);
-
-        // Asignamos la fecha actual al input dateGuide
-
-        const hoy = new Date();
-
-        const anio = hoy.getFullYear();
-        const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-        const dia = String(hoy.getDate()).padStart(2, '0');
-
-        const fechaFormateada = `${anio}-${mes}-${dia}`;
-
-        // Establecer el valor por defecto
-        inputDateGuide.val(fechaFormateada);
-
-        if (_this.val() !== '' && startHour.val() !== '' && endHour.val() !== '') {
-            $('#btnDonwloadGuide').removeClass('disabled');
-        } else {
-            $('#btnDonwloadGuide').addClass('disabled');
-        }
-    })
-
-    inputDateGuide.on('change', function (e) {
-        let _this = $(this);
-
+    const findHours = () => {
         var param = new FormData();
         param.append('action', 'search_time');
         param.append('date', inputDateGuide.val());
-        param.append('id',  $('#selectPreSales').val());
+        param.append('id', $('#selectPreSales').val());
 
         $.ajax({
             url: pathname,
@@ -166,18 +141,22 @@ $(function () {
             processData: false,
             contentType: false,
             success: function (request) {
+                console.log(request)
                 if (!request.hasOwnProperty('error')) {
-                    // Agregamso la hora a los inputs
-                    startHour.empty()
-                    endHour.empty()
-                    var opt = '';
+                    if (request.length !== 0) {
+                        // Agregamso la hora a los inputs
+                        startHour.empty()
+                        endHour.empty()
+                        var opt = '';
 
-                    $.each(request, function (key, value) {
-                        opt += `<option value="${value[0]}">${value[1]}</option>`;
-                    });
-                    startHour.append(opt);
-                    endHour.append(opt);
-                    return false;
+                        $.each(request, function (key, value) {
+                            opt += `<option value="${value[0]}">${value[1]}</option>`;
+                        });
+                        startHour.append(opt);
+                        endHour.append(opt);
+                        return false;
+                    }
+
                 } else {
                     message_error(request.error);
                 }
@@ -186,6 +165,38 @@ $(function () {
                 message_error(errorThrown + ' ' + textStatus);
             }
         });
+    }
+
+    const addDateGuide = () => {
+        // Asignamos la fecha actual al input dateGuide
+        const hoy = new Date();
+
+        const anio = hoy.getFullYear();
+        const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoy.getDate()).padStart(2, '0');
+
+        const fechaFormateada = `${anio}-${mes}-${dia}`;
+
+        // Establecer el valor por defecto
+        inputDateGuide.val(fechaFormateada);
+    }
+
+    select_presale.on('change', function (e) {
+        let _this = $(this);
+
+        addDateGuide();
+        findHours();
+
+        if (_this.val() !== '' && startHour.val() !== '' && endHour.val() !== '') {
+            $('#btnDonwloadGuide').removeClass('disabled');
+        } else {
+            $('#btnDonwloadGuide').addClass('disabled');
+        }
+    })
+
+    // Evento que nos ayudara a buscar las horas del preventa segun la fecha seleccionada
+    inputDateGuide.on('change', function (e) {
+        findHours();
     })
 
     $('#btnDonwloadGuide').on('click', function (e) {
