@@ -31,15 +31,15 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
     template_name = 'sale/list.html'
     permission_required = 'view_sale'
 
-    def get(self, request, *args, **kwargs):
-        key = f'cache_{request.tenant.id}'  # Creamos la clave del tenant
-        cached = cache.get(key)  # buscamos en cache la clave del tenant
-
-        # si la clave no existe en cacha la creamso y asignamos los valores
-        if cached is None:
-            company = Company.objects.select_related().first()
-            cache.set(key, f'{company.control_stock}')
-        return super().get(request, *args, **kwargs)
+    # def get(self, request, *args, **kwargs):
+    #     key = f'cache_{request.tenant.id}'  # Creamos la clave del tenant
+    #     cached = cache.get(key)  # buscamos en cache la clave del tenant
+    #
+    #     # si la clave no existe en cacha la creamso y asignamos los valores
+    #     if cached is None:
+    #         company = Company.objects.select_related().first()
+    #         cache.set(key, f'{company.control_stock}')
+    #     return super().get(request, *args, **kwargs)
 
     def guide(self, param: dict):
         data = {}

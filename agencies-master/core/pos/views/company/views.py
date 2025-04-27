@@ -36,10 +36,10 @@ class CompanyUpdateView(ValidatePermissionRequiredMixin, UpdateView):
                 instance = self.get_object()
                 if instance.pk is not None:
                     form = CompanyForm(request.POST, request.FILES, instance=instance)
-                    company = form.save(commit=False)
-                    company.tenant_id = request.tenant.id
-                    company.save()
-                    # form.save()
+                    # company = form.save(commit=False)
+                    # company.tenant_id = request.tenant.id
+                    # company.save()
+                    form.save()
                 else:
                     form = CompanyForm(request.POST, request.FILES)
                     company = form.save(commit=False)
