@@ -1,8 +1,8 @@
 $(function () {
 
     const options = {
-        // enableHighAccuracy: false,
-        timeout: 30000,
+        enableHighAccuracy: true,
+        timeout: 60000,
         maximumAge: 5 * 60 * 1000 //27000
     };
 
