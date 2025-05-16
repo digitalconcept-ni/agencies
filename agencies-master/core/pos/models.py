@@ -244,7 +244,7 @@ class Product(models.Model):
         item['restore'] = False
         item['image'] = self.get_image()
         item['pvp'] = f'{self.pvp:.2f}'
-        if item['cost']:
+        if item.get('cost') is not None:
             item['cost'] = f'{self.cost:.2f}'
         else:
             item['pvpc'] = f'{100.20:.2f}'

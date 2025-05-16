@@ -201,16 +201,21 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     data.append(i.toJSON())
             elif action == 'delete':
                 sale = Sale.objects.get(id=request.POST['id'])
-                set = sale.saleproduct_set.all()
-                warehouse_update = []
-                for s in set:
-                    product_warehouse = ProductWarehouse.objects.get(
-                        warehouse__is_central=1, product_id=s.product_id)
-                    if not s.restore:
-                        product_warehouse.stock += s.cant
-                    warehouse_update.append(product_warehouse)
+                # VERIFICAMOS SI EL CLIENTE MANEJA SU INVNETARIO
+                company = cache.get(f'cache_{request.tenant.id}')
+                controlStock = bool(company)
 
-                ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
+                if controlStock:
+                    set = sale.saleproduct_set.all()
+                    warehouse_update = []
+                    for s in set:
+                        product_warehouse = ProductWarehouse.objects.get(
+                            warehouse__is_central=1, product_id=s.product_id)
+                        if not s.restore:
+                            product_warehouse.stock += s.cant
+                        warehouse_update.append(product_warehouse)
+
+                    ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
                 sale.delete()
             else:
                 data['error'] = 'No se ha encontrado el action'
@@ -344,9 +349,6 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                                 subtotal=float(p['subtotal'])
                             )
                             sale_product_create.append(sp)
-
-                            print('antes')
-                            print(sale.company.control_stock)
 
                             if sale.company.control_stock:
                                 # Buscamos el porducto a actualiza en la bodega correspondiente
@@ -511,9 +513,6 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                 # Verificar la opcion de llevar el control del stock de la empresa
                 company = cache.get(f'cache_{request.tenant.id}')
                 controlStock = bool(company)
-
-                print(type(controlStock))
-                print(controlStock)
 
                 if controlStock:
                     product_warehouse = ProductWarehouse.objects.filter(
