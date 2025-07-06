@@ -12,7 +12,7 @@ from core.user.models import User
 
 
 class Company(models.Model):
-    tenant = models.ForeignKey(Client,null=True, on_delete=models.CASCADE) # new in 09-04-25
+    tenant = models.ForeignKey(Client, null=True, on_delete=models.CASCADE)  # new in 09-04-25
     name = models.CharField(max_length=150, verbose_name='Razón Social')
     ruc = models.CharField(max_length=14, verbose_name='Ruc')
     address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')
@@ -159,6 +159,7 @@ class Warehouse(models.Model):
 
 class Product(models.Model):
     UDM_CHOICE = (
+        ('und', 'UND'),
         ('lb', 'LIBRA'),
         ('kg', 'KG'),
         ('gr', 'GR'),
@@ -168,10 +169,9 @@ class Product(models.Model):
         ('cuarta', 'CUARTA'),
         ('bolson', 'BOLSON'),
         ('bolsa', 'BOLSA'),
-        ('caja', 'CAJ'),
+        ('caja', 'CAJA'),
         ('cajilla', 'CAJILLA'),
         ('cajon', 'CAJON'),
-        ('und', 'UND'),
         ('pq', 'PAQ'),
         ('ristra', 'RISTRA'),
         ('docena', 'DOCENA'),
@@ -189,19 +189,29 @@ class Product(models.Model):
     code = models.CharField(max_length=13, unique=True, verbose_name='Codigo de producto')
     tax = models.CharField(max_length=7, default='exento', choices=tax_type, verbose_name='Impuesto')
     um = models.CharField(max_length=20, null=True, blank=True, verbose_name='Unidad de medida')
+    udm = models.CharField(max_length=10, default='und', choices=UDM_CHOICE, verbose_name='Unidad de medida')
     expiration = models.DateField(verbose_name='Fecha de vencimiento', null=True, blank=True)
     image = models.ImageField(upload_to='product/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
     is_inventoried = models.BooleanField(default=True, blank=True, null=True, verbose_name='¿Es inventariado?')
     stock = models.IntegerField(default=0, verbose_name='Stock')
     cost = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de compra')
-    pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta')
+    pvp = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta #1')
+    pvp2 = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta #2')
+    pvp3 = models.DecimalField(default=0.00, max_digits=9, decimal_places=2, verbose_name='Precio de venta #3')
 
     def __str__(self):
+        # Validamos si tiene la unidad de medida anterior
+        # De lo contrario optenemos la lista
+        if self.um:
+            udm = self.um
+        else:
+            udm = self.get_udm_display()
+
         if self.brand is None:
             brand = ' '
         else:
             brand = self.brand.name
-        return f'{self.code} | {brand} {self.name} {self.um}'
+        return f'{self.code} | {brand} {self.name} {udm}'
 
     def get_total_earnings(self):
         # return sum([payment.amount for payment in self.objects.all()])
@@ -219,9 +229,11 @@ class Product(models.Model):
             ex = 'No registrada'
         else:
             ex = self.expiration.strftime('%Y-%m-%d')
+
         data = [
             self.id, brand, self.category.name, self.__str__(), ex, self.tax,
-            self.is_inventoried, self.stock, f'{self.cost:,.2f}', f'{self.pvp:,.2f}', self.id
+            self.is_inventoried, f'{self.cost:,.2f}', f'{self.pvp:,.2f}', f'{self.pvp2:,.2f}',
+            f'{self.pvp3:,.2f}', self.id
         ]
         return data
 
@@ -412,7 +424,7 @@ class Client(models.Model):
     names = models.CharField(max_length=150, verbose_name='Nombres')
     dni = models.CharField(max_length=14, unique=True, default='0010101010034S', verbose_name='RUC')
     phone_number = models.CharField(max_length=8, default=87878787, verbose_name='Numero de telefono')
-    birthdate = models.DateField(default=datetime.now,null=True, blank=True, verbose_name='Fecha de nacimiento')
+    birthdate = models.DateField(default=datetime.now, null=True, blank=True, verbose_name='Fecha de nacimiento')
     address = models.CharField(max_length=150, null=True, verbose_name='Dirección')
     gender = models.CharField(max_length=10, choices=genders, default='male', verbose_name='Genero')
     municipality = models.CharField(max_length=13, choices=municipality, default='managua', verbose_name='Municipio')
