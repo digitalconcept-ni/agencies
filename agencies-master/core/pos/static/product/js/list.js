@@ -1,7 +1,7 @@
 var product = {
     config: [
         {
-            targets: [0, 1, 2, 7],
+            targets: [0, 1, 2],
             visible: false,
         },
         {
@@ -61,7 +61,7 @@ var product = {
         let data = {
             'data': {'action': 'search'},
             'inserInto': 'rowList',
-            'th': ['Nro', 'Marca', 'Categoría', 'Nombre', 'Vencimiento', 'Impuesto', '¿Es inventariado?', 'Stock', 'Costo', 'Precio venta', 'Opciones'],
+            'th': ['Nro', 'Marca', 'Categoría', 'Nombre', 'Vencimiento', 'Impuesto', '¿Es inventariado?', 'Costo', 'Precio venta #1', 'Precio venta #2', 'Precio venta #3', 'Opciones'],
             'table': 'tableList',
             'config': product.config,
             'modal': false,

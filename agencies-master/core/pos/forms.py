@@ -81,8 +81,12 @@ class ProductForm(ModelForm):
                 'class': 'select2',
                 'style': 'width: 100%'
             }),
+            'udm': forms.Select(attrs={
+                'class': 'select2',
+                'style': 'width: 100%'
+            }),
         }
-        exclude = ['stock']
+        exclude = ['stock', 'um']
 
     def save(self, commit=True):
         data = {}
