@@ -11,13 +11,13 @@ import requests
 
 class AuthenticationForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={
-        'placeholder': 'Ingrese un username',
+        # 'placeholder': 'Ingrese un username',
         'class': 'form-control',
         'autocomplete': 'off'
     }))
 
     password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Ingrese un password',
+#         'placeholder': 'Ingrese un password',
         'class': 'form-control',
         'autocomplete': 'off'
     }))
