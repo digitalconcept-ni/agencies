@@ -198,6 +198,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
             elif action == 'search_products_detail':
                 data = []
                 for i in SaleProduct.objects.filter(sale_id=request.POST['id']):
+                    print(i.toJSON())
                     data.append(i.toJSON())
             elif action == 'delete':
                 sale = Sale.objects.get(id=request.POST['id'])
@@ -282,6 +283,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                     else:
                         item = i.toJSON()
                     item['text'] = i.__str__()
+                    item['pvp_list'] = {'pvp': i.pvp, 'pvp2': i.pvp2, 'pvp3': i.pvp3}
                     item['stock'] = i.stock
                     item['control_stock'] = controlStock
                     data.append(item)
@@ -346,7 +348,8 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                                 product_id=int(p['id']),
                                 cant=int(p['cant']),
                                 price=float(p['pvp']),
-                                subtotal=float(p['subtotal'])
+                                subtotal=float(p['subtotal']),
+                                applied_price=str(p['applied_price'])
                             )
                             sale_product_create.append(sp)
 
@@ -465,7 +468,8 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     form = SaleMovilForm(instance=instance)
                     form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
                     # self.fields['user_com'].required = False
-                    self.template_name = 'sale/createmovil2.html'
+                    self.template_name = 'sale/createmovil.V2.html'
+                    # self.template_name = 'sale/createmovil2.html'
                 elif self.request.headers['Sec-Ch-Ua-Mobile'] == '?0':
                     form = SaleForm(instance=instance)
                     form.fields['client'].queryset = Client.objects.filter(id=instance.client.id)
@@ -485,7 +489,9 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
             item['subtotal'] = f'{i.subtotal:.2f}'
             item['restore'] = i.restore
             item['initial_restore'] = i.restore
+            item['applied_price'] = i.applied_price
             item['cant'] = i.cant
+            item['pvp_list'] = {'pvp': item['pvp'], 'pvp2': item['pvp2'], 'pvp3': item['pvp3']}
             item['before'] = True
             data.append(item)
         return json.dumps(data)
@@ -530,6 +536,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                         item = i.toJSON()
                     item['text'] = i.__str__()
                     item['stock'] = i.stock
+                    item['pvp_list'] = {'pvp': i.pvp, 'pvp2': i.pvp2, 'pvp3': i.pvp3}
                     item['control_stock'] = controlStock
                     data.append(item)
             elif action == 'edit':
@@ -586,7 +593,8 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                                 restore=bool(p['restore']),
                                 cant=int(p['cant']),
                                 price=float(p['pvp']),
-                                subtotal=subtotal
+                                subtotal=subtotal,
+                                applied_price=str(p['applied_price'])
                             )
                             sale_product_create.append(saleproduct)
 
