@@ -29,7 +29,7 @@ $(function () {
                 };
             },
         },
-        placeholder: 'Ingrese una descripción',
+        placeholder: 'Buscar cliente (Nombre o cédula)',
         minimumInputLength: 1,
     })
         .on('select2:select', function (e) {

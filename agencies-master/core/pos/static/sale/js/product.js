@@ -6,6 +6,79 @@ $(function () {
 
     select_search_product = $('select[name="search_product"]');
 
+    // Funcion para mostrar el detalle en modal el producto antes de insertarlo
+
+    const showProduct = (data) => {
+        var html = '<div class="row">';
+        html += '<div class="col-6">';
+        html += `<input name="inputCant" value="${data.cant}" id="inputCant" class="form-control" placeholder="Ingresa la cantidad">`;
+        html += '</div>'
+        html += '<div class="col-6">';
+        html += '<select name="selectPVP" id="selectPVP" class="form-control">';
+
+        $.each(data.pvp_list, function (i, item) {
+            if (data.applied_price === i) {
+                html += `<option value="${item}" data-selection="${i}" selected>${i}: ${item}</option>`;
+            } else {
+                html += `<option value="${item}" data-selection="${i}">${i}: ${item}</option>`;
+            }
+        })
+        html += '</select>';
+        html += '</div>';
+        html += '</div>';
+
+        Swal.fire({
+            title: data.full_name,
+            // allowOutsideClick: false,
+            showCancelButton: false,
+            showDenyButton: true,
+            confirmButtonColor: "#198754",
+            denyButtonColor: "#d33",
+            confirmButtonText: '<i class="bi bi-floppy"></i>',
+            denyButtonText: '<i class="bi bi-trash3"></i>',
+            // cancelButtonText: "Eliminar",
+            html: html,
+            focusConfirm: false,
+            preConfirm: () => {
+                const cant = Swal.getPopup().querySelector('#inputCant').value;
+                const select = Swal.getPopup().querySelector('#selectPVP');
+                const selectedOption = select.options[select.selectedIndex]; // Obtenemos la <option> seleccionada
+
+                const selectValue = selectedOption.value; // El valor normal del option
+                const dataAppliedPrice = selectedOption.dataset.selection; // Accedemos al atributo data-categoria
+
+                if (!cant || !select) {
+                    Swal.showValidationMessage(`Por favor, ingresa una cantidad valida.`);
+                    return false; // Evita que el SweetAlert se cierre
+                }
+                return {cant: cant, select: selectValue, applied_price: dataAppliedPrice};
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const {cant, select, applied_price} = result.value;
+                if (!data.hasOwnProperty('index')) {
+                    data.cant = cant;
+                    data.pvp = select;
+                    data.applied_price = applied_price;
+                    sale.addProduct(data);
+                } else {
+                    sale.products[data.index].cant = cant;
+                    data.pvp = select;
+                    data.applied_price = applied_price;
+                }
+
+                tableConf.listProducts();
+            }
+            if (result.isDenied) {
+                let delItem = sale.products.splice(data.index, 1);
+                delItem[0].delete = true;
+                sale.products_delete.push(delItem[0]);
+                tableConf.listProducts();
+            }
+        });
+    }
+
+
     select_search_product.select2({
         theme: "bootstrap4",
         language: 'es',
@@ -62,7 +135,7 @@ $(function () {
                 //'<br>' +
                 '<p style="margin-bottom: 0;">' +
                 '<b>Nombre:</b> ' + repo.full_name + '<br>' +
-                stock+
+                stock +
                 // '<b>Stock:</b> ' + stock + '<br>' +
                 '<b>PVP:</b> <span class="badge bg-secondary">' + repo.pvp + '</span>' + '<br>' +
                 '<b>Tipo:</b> <span class="badge bg-dark">' + tax + '</span>' +
@@ -77,10 +150,13 @@ $(function () {
             if (!Number.isInteger(data.id)) {
                 return false;
             }
+            // data.applied_price = 'pvp';
             data.cant = 1;
             data.subtotal = 0.00;
-            sale.addProduct(data);
-            tableConf.listProducts();
+            // data.pvp = data.pvp_list.pvp; //al momento de insertar se carga el precio de publico general
+            showProduct(data)
+            // sale.addProduct(data);
+            // tableConf.listProducts();
             select_search_product.val('').trigger('change.select2');
         });
 
@@ -88,13 +164,35 @@ $(function () {
         .off()
         .on('click', 'a[rel="remove"]', function (e) {
             var tr = tblProducts.cell($(this).closest('td, li')).index();
-            alert_action('Notificación', '¿Estas seguro de eliminar el producto de tu detalle?',
-                function () {
-                    let delItem = sale.products.splice(tr.row, 1);
-                    delItem[0].delete = true;
-                    sale.products_delete.push(delItem[0]);
-                    tableConf.listProducts();
-                });
+            data = sale.products[tr.row]
+            data.index = tr.row; // Agregamos un index al array para saber que posicion vamos a tratar
+            showProduct(data)
+            // alert_action('Notificación', '¿Estas seguro de eliminar el producto de tu detalle?',
+            //     function () {
+            //         let delItem = sale.products.splice(tr.row, 1);
+            //         delItem[0].delete = true;
+            //         sale.products_delete.push(delItem[0]);
+            //         tableConf.listProducts();
+            //     });
+        })
+        .on('change', 'select[name="selectPVP"]', function (e) {
+            var tr = tblProducts.cell($(this).closest('td, li')).index();
+            let _this = $(this);
+            const selectedOption = _this.find('option:selected');
+
+            sale.products[tr.row]['applied_price'] = selectedOption.data().selection;
+            sale.products[tr.row]['pvp'] = selectedOption.val();
+            // console.clear();
+            // var cant = parseInt($(this).val());
+            // if (action === 'edit') {
+            //     if (sale.products[tr.row].hasOwnProperty('before') &&
+            //         !sale.products[tr.row].hasOwnProperty('initial_amount')) {
+            //     }
+            // }
+            //
+            // sale.products[tr.row].cant = cant;
+            sale.calculateInvoice();
+            $('td:last', tblProducts.row(tr.row).node()).html(sale.products[tr.row].subtotal.toFixed(2));
         })
         .on('change', 'input[name="cant"]', function (e) {
             console.clear();

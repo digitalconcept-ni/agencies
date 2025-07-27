@@ -21,14 +21,14 @@ var sale = {
         var discount = $('input[name="discount"]').val();
         this.products.forEach(function (value, index) {
             value.index = index;
+            value.cant = parseInt(value.cant);
+            value.subtotal = value.cant * parseFloat(value.pvp_list[`${value.applied_price}`]);
+            // value.subtotal = value.cant * parseFloat(value.pvp);
+
             if (!value.restore) {
                 if (value.tax === 'e' || value.tax === 'exento') {
-                    value.cant = parseInt(value.cant);
-                    value.subtotal = value.cant * parseFloat(value.pvp);
                     subtotal_exempt += value.subtotal;
                 } else if (value.tax === 'grabado') {
-                    value.cant = parseInt(value.cant);
-                    value.subtotal = value.cant * parseFloat(value.pvp);
                     subtotal_iva += value.subtotal;
                 }
             }
@@ -55,17 +55,17 @@ $(function () {
         theme: "bootstrap4",
     });
 
-    $("input[name='discount']").TouchSpin({
-        min: 0,
-        max: 1000000,
-        step: 0.01,
-        decimals: 2,
-        boostat: 5,
-        maxboostedstep: 10,
-        // postfix: 'C$'
-    }).on('change', function () {
-        sale.calculateInvoice();
-    })
+    // $("input[name='discount']").TouchSpin({
+    //     min: 0,
+    //     max: 1000000,
+    //     step: 0.01,
+    //     decimals: 2,
+    //     boostat: 5,
+    //     maxboostedstep: 10,
+    //     // postfix: 'C$'
+    // }).on('change', function () {
+    //     sale.calculateInvoice();
+    // })
 
     $('#frmSale').on('submit', function (e) {
         e.preventDefault();

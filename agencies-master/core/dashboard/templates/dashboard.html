@@ -223,96 +223,96 @@
     </section>
 
 
-{#    ELIMINACION PENDIENTE DE UI LEGACY #}
+    {#    ELIMINACION PENDIENTE DE UI LEGACY #}
 
-{#    <div class="container">#}
-{#        <div class="row mb-3">#}
-{##}
-{#            <div class="col-md-3 col-sm-6 col-12">#}
-{#                <div class="info-box bg-gradient-secondary shadow" id="programingClients">#}
-{#                    <span class="info-box-icon"><i class="fa fa-user-friends"></i></span>#}
-{#                    <div class="info-box-content">#}
-{#                        <span class="info-box-text">Clientes Programados</span>#}
-{#                        <h3 class="info-box-number" id="programing-clients">0</h3>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{##}
-{#            <div class="col-md-3 col-sm-6 col-12">#}
-{#                <div class="info-box bg-olive shadow-lg" id="sale">#}
-{#                    <span class="info-box-icon"><i class="fa fa-file-alt"></i></span>#}
-{#                    <div class="info-box-content">#}
-{#                        <span class="info-box-text">Ventas</span>#}
-{#                        <h3 class="info-box-number" id="sales-today">0</h3>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-            {# //END FIRST #}
-{##}
-{#            <div class="col-md-3 col-sm-6 col-12">#}
-{#                <div class="info-box bg-gradient-success shadow">#}
-{#                    <span class="info-box-icon"><i class="fa fa-money-bill-wave"></i></span>#}
-{#                    <div class="info-box-content">#}
-{#                        <span class="info-box-text">Total ventas</span>#}
-{#                        <h3 class="info-box-number" id="sales">0</h3>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-            {# //END SECOND #}
-{##}
-{#            {% if request.user.is_superuser %}#}
-{##}
-{#                <div class="col-md-3 col-sm-6 col-12">#}
-{#                    <div class="info-box bg-gradient-info products shadow" id="pro">#}
-{#                        <span class="info-box-icon"><i class="fa fa-barcode"></i></span>#}
-{#                        <div class="info-box-content">#}
-{#                            <span class="info-box-text">Productos</span>#}
-{#                            <h3 class="info-box-number" id="products">0</h3>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-                {# //END THIRD #}
-{##}
-{#                <div class="col-md-3 col-sm-6 col-12">#}
-{#                    <a href="{{ clients_url }}">#}
-{#                        <div class="info-box bg-gradient-lightblue products shadow">#}
-{#                            <span class="info-box-icon"><i class="fa fa-users"></i></span>#}
-{#                            <div class="info-box-content">#}
-{#                                <span class="info-box-text">Clientes</span>#}
-{#                                <h3 class="info-box-number" id="clients">0</h3>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </a>#}
-{#                </div>#}
-                {# //END FOUR #}
-{#            {% endif %}#}
-{##}
-{#            <div class="col-md-3 col-sm-6 col-12" id="lower">#}
-{#                <div class="info-box bg-gradient-danger products shadow">#}
-{#                    <span class="info-box-icon"><i class="fa fa-arrow-down"></i></span>#}
-{#                    <div class="info-box-content">#}
-{#                        <span class="info-box-text">Productos poco inventario</span>#}
-{#                        <h3 class="info-box-number" id="lower-inventory">0</h3>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{##}
-            {# APPLIED CREDIT #}
-{##}
-{#            <div class="col-md-3 col-sm-6 col-12" id="pending-invoices">#}
-{#                <div class="info-box bg-gradient-navy products shadow">#}
-{#                    <span class="info-box-icon"><i class="fa fa-file-alt"></i></span>#}
-{#                    <div class="info-box-content">#}
-{#                        <span class="info-box-text">Facturas pendientes</span>#}
-{#                        <h3 class="info-box-number" id="applied-credit">0</h3>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{##}
-{#    </div>#}
+    {#    <div class="container">#}
+    {#        <div class="row mb-3">#}
+    {##}
+    {#            <div class="col-md-3 col-sm-6 col-12">#}
+    {#                <div class="info-box bg-gradient-secondary shadow" id="programingClients">#}
+    {#                    <span class="info-box-icon"><i class="fa fa-user-friends"></i></span>#}
+    {#                    <div class="info-box-content">#}
+    {#                        <span class="info-box-text">Clientes Programados</span>#}
+    {#                        <h3 class="info-box-number" id="programing-clients">0</h3>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            </div>#}
+    {##}
+    {#            <div class="col-md-3 col-sm-6 col-12">#}
+    {#                <div class="info-box bg-olive shadow-lg" id="sale">#}
+    {#                    <span class="info-box-icon"><i class="fa fa-file-alt"></i></span>#}
+    {#                    <div class="info-box-content">#}
+    {#                        <span class="info-box-text">Ventas</span>#}
+    {#                        <h3 class="info-box-number" id="sales-today">0</h3>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            </div>#}
+    {# //END FIRST #}
+    {##}
+    {#            <div class="col-md-3 col-sm-6 col-12">#}
+    {#                <div class="info-box bg-gradient-success shadow">#}
+    {#                    <span class="info-box-icon"><i class="fa fa-money-bill-wave"></i></span>#}
+    {#                    <div class="info-box-content">#}
+    {#                        <span class="info-box-text">Total ventas</span>#}
+    {#                        <h3 class="info-box-number" id="sales">0</h3>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            </div>#}
+    {# //END SECOND #}
+    {##}
+    {#            {% if request.user.is_superuser %}#}
+    {##}
+    {#                <div class="col-md-3 col-sm-6 col-12">#}
+    {#                    <div class="info-box bg-gradient-info products shadow" id="pro">#}
+    {#                        <span class="info-box-icon"><i class="fa fa-barcode"></i></span>#}
+    {#                        <div class="info-box-content">#}
+    {#                            <span class="info-box-text">Productos</span>#}
+    {#                            <h3 class="info-box-number" id="products">0</h3>#}
+    {#                        </div>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {# //END THIRD #}
+    {##}
+    {#                <div class="col-md-3 col-sm-6 col-12">#}
+    {#                    <a href="{{ clients_url }}">#}
+    {#                        <div class="info-box bg-gradient-lightblue products shadow">#}
+    {#                            <span class="info-box-icon"><i class="fa fa-users"></i></span>#}
+    {#                            <div class="info-box-content">#}
+    {#                                <span class="info-box-text">Clientes</span>#}
+    {#                                <h3 class="info-box-number" id="clients">0</h3>#}
+    {#                            </div>#}
+    {#                        </div>#}
+    {#                    </a>#}
+    {#                </div>#}
+    {# //END FOUR #}
+    {#            {% endif %}#}
+    {##}
+    {#            <div class="col-md-3 col-sm-6 col-12" id="lower">#}
+    {#                <div class="info-box bg-gradient-danger products shadow">#}
+    {#                    <span class="info-box-icon"><i class="fa fa-arrow-down"></i></span>#}
+    {#                    <div class="info-box-content">#}
+    {#                        <span class="info-box-text">Productos poco inventario</span>#}
+    {#                        <h3 class="info-box-number" id="lower-inventory">0</h3>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            </div>#}
+    {##}
+    {# APPLIED CREDIT #}
+    {##}
+    {#            <div class="col-md-3 col-sm-6 col-12" id="pending-invoices">#}
+    {#                <div class="info-box bg-gradient-navy products shadow">#}
+    {#                    <span class="info-box-icon"><i class="fa fa-file-alt"></i></span>#}
+    {#                    <div class="info-box-content">#}
+    {#                        <span class="info-box-text">Facturas pendientes</span>#}
+    {#                        <h3 class="info-box-number" id="applied-credit">0</h3>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {##}
+    {#    </div>#}
 
-{#   END BLOCK ELIMINACION PENDIENTE DE UI LEGACY #}
+    {#   END BLOCK ELIMINACION PENDIENTE DE UI LEGACY #}
 
 
     {#    /////////////////////#}
@@ -408,8 +408,8 @@
             </div>
             <br>
         </div>
-        </div>
 
+        {{ company }}
         {#    PART OF THE CODE FOR THE MODAL INFO FOR THE EPORDUCTS  WITH THE LOWER STOCK#}
         <script type="application/javascript">
             var year = new Date;

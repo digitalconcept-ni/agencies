@@ -256,6 +256,8 @@ class Product(models.Model):
         item['restore'] = False
         item['image'] = self.get_image()
         item['pvp'] = f'{self.pvp:.2f}'
+        item['pvp2'] = f'{self.pvp2:.2f}'
+        item['pvp3'] = f'{self.pvp3:.2f}'
         if item.get('cost') is not None:
             item['cost'] = f'{self.cost:.2f}'
         else:
@@ -617,6 +619,7 @@ class SaleProduct(models.Model):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
+    applied_price = models.CharField(max_length=4, null=True)# Precio aplicado
     cant = models.IntegerField(default=0)
     # Con este campo vamos a validar que productos de la factura los devolucionaron
     restore = models.BooleanField(default=False, verbose_name='Devolucion')

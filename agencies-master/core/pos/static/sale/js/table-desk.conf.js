@@ -68,18 +68,30 @@ var tableConf = {
                     targets: [-3],
                     orderable: false,
                     render: function (data, type, row) {
-                        return parseFloat(data).toFixed(2);
+                        // var html = '<select name="selectPVP" id="selectPVP" class="form-control">';
+                        // $.each(data, function (i, item) {
+                        //     if (row.applied_price === i) {
+                        //         html += `<option value="${item}" data-selection="${i}" selected>${i}: ${item}</option>`;
+                        //     } else {
+                        //         html += `<option value="${item}" data-selection="${i}">${i}: ${item}</option>`;
+                        //     }
+                        // })
+                        // html += '</select>';
+                        // return html;
+                        // // return JSON.stringify(data);
+                        return `${row.applied_price} | ${parseFloat(data).toFixed(2)}`;
                     }
                 },
                 {
                     targets: [-2],
                     orderable: false,
                     render: function (data, type, row) {
-                        if (row.restore === true) {
-                            return '<input disabled type="text" name="cant" class="form-control form-control-sm" autocomplete="off" value="' + row.cant + '">';
-                        } else {
-                            return '<input type="text" name="cant" class="form-control form-control-sm" autocomplete="off" value="' + row.cant + '">';
-                        }
+                        // if (row.restore === true) {
+                        //     return '<input disabled type="text" name="cant" class="form-control form-control-sm" autocomplete="off" value="' + row.cant + '">';
+                        // } else {
+                        //     return '<input type="text" name="cant" class="form-control form-control-sm" autocomplete="off" value="' + row.cant + '">';
+                        // }
+                        return data;
                     }
                 },
                 {
