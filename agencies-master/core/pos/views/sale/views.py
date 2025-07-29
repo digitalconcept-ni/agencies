@@ -280,10 +280,11 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                 for i in product_warehouse:
                     if controlStock:
                         item = i.product.toJSON()
+                        item['pvp_list'] = {'pvp': i.product.pvp, 'pvp2': i.product.pvp2, 'pvp3': i.product.pvp3}
                     else:
                         item = i.toJSON()
+                        item['pvp_list'] = {'pvp': i.pvp, 'pvp2': i.pvp2, 'pvp3': i.pvp3}
                     item['text'] = i.__str__()
-                    item['pvp_list'] = {'pvp': i.pvp, 'pvp2': i.pvp2, 'pvp3': i.pvp3}
                     item['stock'] = i.stock
                     item['control_stock'] = controlStock
                     data.append(item)
