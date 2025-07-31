@@ -18,11 +18,11 @@
 
     <style>
         body {
-            padding-bottom: 120px; /* Altura del footer */
+            padding-top: 175px; /* Altura del footer */
         {#padding-top: 200px; /* Altura del header \\  card-body */#}
         }
 
-        footer {
+        /*footer {
             position: fixed;
             height: 120px;
             width: 100%;
@@ -32,7 +32,7 @@
             border-radius: 15px 15px 0 0;
             color: white;
             font-weight: 700;
-        }
+        }*/
     </style>
 
 {% endblock %}
@@ -81,11 +81,17 @@
                                     aria-selected="false" tabindex="-1">Forma de pago
                             </button>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="total-tab" data-bs-toggle="tab"
+                                    data-bs-target="#bordered-total" type="button" role="tab" aria-controls="total"
+                                    aria-selected="false" tabindex="-1">Total
+                            </button>
+                        </li>
                     </ul>
                 </div>
             </div>
 
-            <div class="tab-content" id="borderedTabContent" style="margin-top: 175px">
+            <div class="tab-content" id="borderedTabContent">
                 {# ROW FOR THE TABLE INSERT PRODUCT #}
                 <div class="tab-pane fade show active" id="bordered-productos" role="tabpanel"
                      aria-labelledby="productos-tab">
@@ -153,62 +159,118 @@
 
 
                 </div>
+
+                {# TOTAL #}
+                <div class="tab-pane fade pt-2" id="bordered-total" role="tabpanel"
+                     aria-labelledby="total-tab">
+                    <div class="container">
+
+                        {# ROW SUB TOTAL EXENTO #}
+                        <div class="row mb-3">
+                            <div class="col-5 d-flex justify-content-end">
+                                <label for="id_subtotal_exempt" class="col-form-label">Sub total exento:</label>
+                            </div>
+                            <div class="col-6">
+                                <input type="text" id="id_subtotal_exempt" name="subtotal_exempt"
+                                       class="form-control-plaintext" readonly value="0.00">
+                            </div>
+                        </div>
+
+                        {# ROW SUB TOTAL IVA #}
+                        <div class="row mb-3">
+                            <div class="col-5 d-flex justify-content-end">
+                                <label for="id_subtotal_exempt" class="col-form-label ">Sub total IVA:</label>
+                            </div>
+                            <div class="col-6">
+                                <input type="text" id="id_subtotal" name="subtotal"
+                                       class="form-control-plaintext" value="0.00">
+                            </div>
+
+                        </div>
+
+                        {# ROW IVA #}
+                        <div class="row mb-3">
+                            <div class="col-5 d-flex justify-content-end">
+                                <label for="ivacalc" class="col-form-label text-center">iva:</label>
+
+                            </div>
+                            <div class="col-6">
+                                <input type="text" id="ivacalc" readonly name="ivacalc"
+                                       class="form-control-plaintext"
+                                       value="0.00">
+                            </div>
+                        </div>
+
+                        {# ROW TOTAL #}
+                        <div class="row mb-3">
+                            <div class="col-5 d-flex justify-content-end">
+                                <label for="id_total" class="col-form-label text-center">Total:</label>
+                            </div>
+                            <div class="col">
+                                <input type="text" id="id_total" readonly name="total"
+                                       class="form-control-plaintext" value="0.00">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
             </div>
         </div>
         {# PART OF DETAIL OF INVOICE #}
-        <footer class="bg-secondary">
-            {# FILA DEL SUB TOTAL Y CUANTO DEL IVA#}
-            <div class="row">
-                <div class="col">
-                    <label for="id_subtotal_exempt" class="col-form-label text-center">Sub exento:</label>
-                </div>
-
-                <div class="col">
-                    <input type="text" id="id_subtotal_exempt" name="subtotal_exempt"
-                           class="form-control-plaintext text-center text-light"
-                           value="0.00">
-                </div>
-
-                {# SUb IVA #}
-                <div class="col">
-                    <label for="id_subtotal_exempt" class="col-form-label text-center">Sub IVA:</label>
-                </div>
-                <div class="col">
-                    <input type="text" id="id_subtotal" name="subtotal"
-                           class="form-control-plaintext text-center text-light"
-                           value="0.00">
-                </div>
-            </div>
-
-            <div class="row g-3">
-                <div class="col text-center">
-                    <label for="ivacalc" class="col-form-label text-center">iva:</label>
-                </div>
-
-                <div class="col">
-                    <input type="text" id="ivacalc" readonly name="ivacalc"
-                           class="form-control-plaintext text-center text-light"
-                           value="0.00">
-                </div>
-
-                <div class="col">
-                    <label for="id_total" class="col-form-label text-center">Total:</label>
-                </div>
-
-                <div class="col">
-                    <input type="text" id="id_total" readonly name="total"
-                           class="form-control-plaintext text-center text-light"
-                           value="0.00">
-                </div>
-            </div>
-
-            {#PARTE DEL IVA CALCULADO Y DEL TOTAL A PAGAR#}
-        </footer>
+        {#        <footer class="bg-secondary">#}
+        {# FILA DEL SUB TOTAL Y CUANTO DEL IVA#}
+        {#            <div class="row">#}
+        {#                <div class="col">#}
+        {#                    <label for="id_subtotal_exempt" class="col-form-label text-center">Sub exento:</label>#}
+        {#                </div>#}
+        {##}
+        {#                <div class="col">#}
+        {#                    <input type="text" id="id_subtotal_exempt" name="subtotal_exempt"#}
+        {#                           class="form-control-plaintext text-center text-light"#}
+        {#                           value="0.00">#}
+        {#                </div>#}
+        {##}
+        {# SUb IVA #}
+        {#                <div class="col">#}
+        {#                    <label for="id_subtotal_exempt" class="col-form-label text-center">Sub IVA:</label>#}
+        {#                </div>#}
+        {#                <div class="col">#}
+        {#                    <input type="text" id="id_subtotal" name="subtotal"#}
+        {#                           class="form-control-plaintext text-center text-light"#}
+        {#                           value="0.00">#}
+        {#                </div>#}
+        {#            </div>#}
+        {##}
+        {#            <div class="row g-3">#}
+        {#                <div class="col text-center">#}
+        {#                    <label for="ivacalc" class="col-form-label text-center">iva:</label>#}
+        {#                </div>#}
+        {##}
+        {#                <div class="col">#}
+        {#                    <input type="text" id="ivacalc" readonly name="ivacalc"#}
+        {#                           class="form-control-plaintext text-center text-light"#}
+        {#                           value="0.00">#}
+        {#                </div>#}
+        {##}
+        {#                <div class="col">#}
+        {#                    <label for="id_total" class="col-form-label text-center">Total:</label>#}
+        {#                </div>#}
+        {##}
+        {#                <div class="col">#}
+        {#                    <input type="text" id="id_total" readonly name="total"#}
+        {#                           class="form-control-plaintext text-center text-light"#}
+        {#                           value="0.00">#}
+        {#                </div>#}
+        {#PARTE DEL IVA CALCULADO Y DEL TOTAL A PAGAR#}
+        {#            </div>#}
+        {##}
+        {#        </footer>#}
     </form>
 
-        {% if action == 'edit' %}
-            <script>
-                sale.products = {{ products|safe }};
-            </script>
-        {% endif %}
+    {% if action == 'edit' %}
+        <script>
+            sale.products = {{ products|safe }};
+        </script>
+    {% endif %}
 {% endblock %}

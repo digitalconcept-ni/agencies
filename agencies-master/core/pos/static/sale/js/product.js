@@ -11,7 +11,7 @@ $(function () {
     const showProduct = (data) => {
         var html = '<div class="row">';
         html += '<div class="col-6">';
-        html += `<input name="inputCant" value="${data.cant}" id="inputCant" class="form-control" placeholder="Ingresa la cantidad">`;
+        html += `<input name="inputCant" type="number" value="${data.cant}" id="inputCant" class="form-control" placeholder="Ingresa la cantidad">`;
         html += '</div>'
         html += '<div class="col-6">';
         html += '<select name="selectPVP" id="selectPVP" class="form-control">';
