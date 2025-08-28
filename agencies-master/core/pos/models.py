@@ -20,7 +20,7 @@ class Company(models.Model):
     phone = models.CharField(max_length=8, verbose_name='Teléfono Convencional')
     website = models.CharField(max_length=60, verbose_name='Website')
     image = models.ImageField(upload_to='company/%Y/%m/%d', null=True, blank=True, verbose_name='Imagen')
-    printer = models.CharField(choices=printer, max_length=10, null=True, blank=True, verbose_name='Tipo de impresora')
+    # printer = models.CharField(choices=printer, max_length=10, null=True, blank=True, verbose_name='Tipo de impresora')
     control_stock = models.BooleanField(default=True)
 
     def __str__(self):

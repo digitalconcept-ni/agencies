@@ -717,7 +717,7 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
 
             sale = Sale.objects.get(pk=self.kwargs['pk'])
             countSales = sale.saleproduct_set.all().count()
-            printer = sale.company.printer
+            printer = request.user.printer
 
             if tenantName in personalized_invoice:
                 template = get_template('sale/' + templateName)

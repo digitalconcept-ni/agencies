@@ -3,12 +3,14 @@ from django.db import models
 from django.forms import model_to_dict
 from crum import get_current_request
 from config import settings
+from core.pos.choices import printer
 
 
 class User(AbstractUser):
     phone_number = models.CharField(max_length=8, null=True, blank=True, verbose_name='Numero de telefono')
     image = models.ImageField(upload_to='users/%Y/%m/%d', null=True, blank=True)
     token = models.UUIDField(primary_key=False, editable=False, null=True, blank=True)
+    printer = models.CharField(choices=printer, default='standard', max_length=10, null=True, blank=True, verbose_name='Tipo de impresora')
     presale = models.BooleanField(default=False)
     map = models.BooleanField(default=False)
 
