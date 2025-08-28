@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura - {{ sale.client.names }}</title>
+    <style media="print">
+        @page {
+            size: 58mm {{ h }}mm;
+            margin: .5cm;
+            padding: 0;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            font-size: 7pt;
+        }
+
+        .no-page-break {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        .comprobante {
+            width: 100%;
+        }
+
+        .comprobante table {
+            width: 100%;
+            border-collapse: collapse;
+            keep-with-next: always;
+            orphans: 2;
+            widows: 2;
+            break-inside: avoid;
+        }
+
+        th, td {
+            padding: 2px;
+            text-align: center;
+            border-bottom: 1px solid black;
+        }
+
+        tr {
+            page-break-inside: avoid;
+        }
+
+        .txt-info-invoice {
+            text-align: right;
+        }
+
+        .name-company {
+            font-size: 18px;
+            padding: 0;
+            margin: auto;
+            width: 100%;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center !important;
+        }
+
+        .txt-info, .txt-info-invoice {
+            margin: 0.3cm 0;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tr {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+<div class="comprobante no-page-break">
+    <img alt="" src="{{ sale.company.get_image }}">
+
+    <br><br>
+    <h1 class="name-company">{{ sale.company.name }}</h1>
+
+    <div class="txt-info">
+        <b>RUC: </b> {{ sale.company.ruc }}<br>
+        <b>Direccion: </b> {{ sale.company.address }}<br>
+        <b>Celular: </b> {{ sale.company.mobile }}<br>
+        <b>Teléfono: </b> {{ sale.company.phone }}<br>
+        <b>Web: </b> {{ sale.company.website }}<br>
+    </div>
+
+    <div class="txt-info">
+        <b>Número: </b> {{ sale.get_number }} <br>
+        <b>Cliente: </b> {{ sale.client.get_full_name }} <br>
+        <b>Número de cedula: </b> {{ sale.client.dni }} <br>
+        <b>Fecha de venta: </b> {{ sale.date_joined|date:'c' }} <br>
+        <b>Dirección:</b> {{ sale.client.address }} <br>
+        <b>Vendedor: </b> {{ sale.user.first_name }} {{ sale.user.last_name }} <br>
+    </div>
+
+
+    <div class="table">
+
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th style="width: 5%">Und</th>
+            <th style="width: 75%">Concepto</th>
+            <th style="width: 10%; text-align: center;">P.U</th>
+            <th style="width: 10%; text-align: center;">Sub</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for det in sale.saleproduct_set.all %}
+            <tr>
+                <td style="text-align: center;">{{ det.cant }}</td>
+                <td style="">{{ det.product }}</td>
+                <td style=" text-align: center;">{{ det.price|floatformat:2 }}</td>
+                <td style="text-align: center;">{{ det.subtotal|floatformat:2 }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="txt-info-invoice no-page-break">
+        <b>Sub total exento: </b>{{ sale.subtotal_exempt|floatformat:2 }}<br>
+        <b>Sub total IVA: </b>{{ sale.subtotal|floatformat:2 }}<br>
+        <b>Descuento: </b>{{ sale.discount|floatformat:2 }}<br>
+        <b>Iva: </b>{{ sale.total_iva|floatformat:2 }}<br>
+        <b>Total a pagar: </b>{{ sale.total|floatformat:2 }}<br>
+    </div>
+
+    <p style="text-align: center; margin: auto; width: 95%">
+        <br>
+        Total de productos: <b> {{ sale.saleproduct_set.all.count }} </b><br>
+        <br>
+        Una vez que usted ha recibido el pedido<br>
+        no hay derecho a reclamo ni devolución del producto.<br>
+    </p>
+    <p style="text-align: center">
+        ¡Que tenga un excelente día!<br>
+        Gracias por su preferencia<br>
+    </p>
+</div>
+
+</body>
+</html>
