@@ -14,6 +14,7 @@ import os
 
 from core.pos.choices import personalized_invoice
 from core.pos.mergerPdfFiles import mergerPdf
+from core.pos.wharehouse_control import COMPANY
 from core.user.models import User
 
 # os.add_dll_directory(r"C:\Program Files\GTK3-Runtime Win64\bin")
@@ -197,9 +198,25 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                     data.append(i.toLIST())
             elif action == 'search_products_detail':
                 data = []
-                for i in SaleProduct.objects.filter(sale_id=request.POST['id']):
-                    print(i.toJSON())
-                    data.append(i.toJSON())
+                query = SaleProduct.objects.select_related('product').filter(sale_id=request.POST['id'])
+                saleProduct = query.values(
+                    'warehouse__name', 'applied_price', 'price', 'cant', 'subtotal', 'restore',
+                    'product__name', 'product__brand__name', 'product__code'
+                )
+
+                for sp in saleProduct:
+                    warehouse = sp.get('warehouse__name') or ''
+                    product = f'{sp["product__code"]} | {sp["product__brand__name"]} {sp["product__name"]}'
+                    item = {
+                        'warehouse': warehouse,
+                        'restore': sp["restore"],
+                        'product': product,
+                        'applied_price': sp["applied_price"],
+                        'price': sp["price"],
+                        'cant': sp["cant"],
+                        'subtotal': sp["subtotal"],
+                    }
+                    data.append(item)
             elif action == 'delete':
                 sale = Sale.objects.get(id=request.POST['id'])
                 # VERIFICAMOS SI EL CLIENTE MANEJA SU INVNETARIO
@@ -260,34 +277,104 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                     item['value'] = i.__str__()
                     data.append(item)
             elif action == 'search_products_select2':
+                current_user = request.user  # 💡NUEVA VARIABLE CLAVE: Obtener el usuario actual
                 data = []
                 ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
-                data.append({'id': term, 'text': term})
-                # Verificar la opcion de llevar el control del stock de la empresa
-                company = cache.get(f'cache_{request.tenant.id}')
-                controlStock = bool(company)
 
-                if controlStock:
-                    product_warehouse = ProductWarehouse.objects.filter(
-                        Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
-                        Q(product__name__icontains=term) | Q(product__code__icontains=term) &
-                        Q(product__is_inventoried=True)).exclude(product_id__in=ids_exclude)[0:10]
+                # Si el término es muy corto, no buscar
+                if len(term) < 3:
+                    return JsonResponse(data, safe=False)
                 else:
-                    product_warehouse = Product.objects.filter(
-                        Q(name__icontains=term) | Q(code__icontains=term)).exclude(id__in=ids_exclude)[0:10]
+                    data.append({'id': term, 'text': term})
+                    # Verificar la opcion de llevar el control del stock de la empresa
+                    # company = cache.get(f'cache_{request.tenant.id}')
+                    # controlStock = bool(company)
+                    controlStock = bool(COMPANY.get(f'{request.tenant}').get('control_stock'))
 
-                for i in product_warehouse:
                     if controlStock:
-                        item = i.product.toJSON()
-                        item['pvp_list'] = {'pvp': i.product.pvp, 'pvp2': i.product.pvp2, 'pvp3': i.product.pvp3}
+                        # product_warehouse = ProductWarehouse.objects.filter(
+                        #     Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
+                        #     Q(product__name__icontains=term) | Q(product__code__icontains=term) &
+                        #     Q(product__is_inventoried=True)).exclude(product_id__in=ids_exclude)[0:10]
+
+                        # Filtro para la búsqueda en ProductWarehouse
+                        queryset = ProductWarehouse.objects.select_related('product').filter(
+                            # 1. RESTRICCIÓN DE ALMACÉN: El almacén debe estar asignado al usuario actual
+                            Q(warehouse__user=current_user) &
+                            Q(warehouse__status=1) &
+                            Q(stock__gt=0)
+                        ).filter(
+                            # 3. Restricción de búsqueda de producto
+                            Q(product__name__icontains=term) | Q(product__brand__name__icontains=term) | Q(
+                                product__code__icontains=term)
+                        ).filter(
+                            # 4. Restricción de inventariado
+                            product__is_inventoried=True
+                            # ).exclude(product_id__in=ids_exclude).distinct()[:10]
+                        ).exclude(product_id__in=ids_exclude)
+
+                        # 3. Usamos values() para seleccionar solo los campos necesarios y evitar traer el objeto completo
+                        #    Renombramos campos con F() para que coincidan en ambos casos (controlStock y no)
+                        products_data = queryset.values(
+                            'product_id', 'stock', 'product__brand__name', 'product__is_inventoried',
+                            'product__tax', 'warehouse_id', 'warehouse__name',
+                            name=F('product__name'), code=F('product__code'), udm=F('product__udm'),
+                            pvp=F('product__pvp'), pvp2=F('product__pvp2'), pvp3=F('product__pvp3'))[:10]
                     else:
-                        item = i.toJSON()
-                        item['pvp_list'] = {'pvp': i.pvp, 'pvp2': i.pvp2, 'pvp3': i.pvp3}
-                    item['text'] = i.__str__()
-                    item['stock'] = i.stock
-                    item['control_stock'] = controlStock
-                    data.append(item)
+                        queryset = Product.objects.select_related('name').filter(
+                            Q(name__icontains=term) | Q(brand__name__icontains=term) | Q(
+                                code__icontains=term)).exclude(id__in=ids_exclude)[0:10]
+                        # Hacemos lo mismo para el caso sin control de stock
+                        products_data = queryset.values(
+                            'id', 'stock', 'name', 'code', 'udm', 'pvp', 'pvp2', 'pvp3', 'brand__name',
+                            'tax', 'is_inventoried'
+                        )[:10]
+
+                    for p in products_data:
+                        # if controlStock:
+                        #     item = i.product.toJSON()
+                        #     item['pvp_list'] = {'pvp': i.product.pvp, 'pvp2': i.product.pvp2, 'pvp3': i.product.pvp3}
+                        # else:
+                        #     item = i.toJSON()
+                        #     item['pvp_list'] = {'pvp': i.pvp, 'pvp2': i.pvp2, 'pvp3': i.pvp3}
+                        # item['text'] = i.__str__()
+                        # item['stock'] = i.stock
+                        # item['control_stock'] = controlStock
+                        # data.append(item)
+
+                        # El ID del producto es 'product_id' en el primer caso y 'id' en el segundo
+                        product_id = p.get('product_id') or p.get('id')
+                        stock = p.get('stock')
+
+                        # Obtenemos la lista de UDM una sola vez si es necesario
+                        udm_display = dict(Product.UDM_CHOICE).get(p['udm'], p['udm'])
+                        brand_name = p.get('brand__name') or p.get('product__brand__name')
+                        tax = p.get('tax') or p.get('product__tax')
+                        warehouse_id = p.get('warehouse_id') or ''
+                        warehouse_name = p.get('warehouse__name') or ''
+                        is_inventoried = p.get('product__is_inventoried') or p.get('is_inventoried')
+                        text = f"{p['code']} | {brand_name} {p['name']} {udm_display}"
+
+                        item = {
+                            'id': product_id,
+                            'text': text,
+                            'full_name': text,
+                            'restore': False,
+                            'warehouse_name': warehouse_name,
+                            'warehouse_id': warehouse_id,
+                            'stock': f'{stock}',
+                            'control_stock': controlStock,
+                            'is_inventoried': is_inventoried,
+                            'tax': tax,
+                            'pvp': p["pvp"],
+                            'pvp_list': {
+                                'pvp': f'{p["pvp"]}',
+                                'pvp2': f'{p["pvp2"]}',
+                                'pvp3': f'{p["pvp3"]}'
+                            },
+                        }
+                        data.append(item)
             elif action == 'add_map':
                 with transaction.atomic():
                     products = json.loads(request.POST['products'])
@@ -318,6 +405,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                 with transaction.atomic():
                     details = json.loads(request.POST['details'])
                     products = json.loads(request.POST['products'])
+                    controlStock = bool(COMPANY.get(f'{request.tenant}').get('control_stock'))
 
                     now = datetime.now()
                     today = str(now.date())
@@ -343,10 +431,28 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                         sale_product_create = []
                         warehouse_update = []
 
+                        if controlStock:
+                            # 1. Preparación: Extraer los IDs necesarios del listado de productos.
+                            product_ids = [int(p['id']) for p in products]
+                            warehouse_ids = [int(p['warehouse_id']) for p in products]
+
+                            # 2. Consulta Única: Obtener todos los ProductWarehouse relevantes de una sola vez.
+                            product_warehouses = ProductWarehouse.objects.filter(
+                                product_id__in=product_ids,
+                                warehouse_id__in=warehouse_ids
+                            )
+
+                            # 3. Mapeo para Acceso Rápido: Crear un diccionario para búsquedas instantáneas.
+                            # La clave será una tupla (product_id, warehouse_id) para una identificación única.
+                            pw_map = {
+                                (pw.product_id, pw.warehouse_id): pw for pw in product_warehouses
+                            }
+
                         for p in products:
                             sp = SaleProduct(
                                 sale_id=sale.id,
                                 product_id=int(p['id']),
+                                warehouse_id=int(p['warehouse_id']) if p['warehouse_id'] else None,
                                 cant=int(p['cant']),
                                 price=float(p['pvp']),
                                 subtotal=float(p['subtotal']),
@@ -354,13 +460,22 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
                             )
                             sale_product_create.append(sp)
 
-                            if sale.company.control_stock:
-                                # Buscamos el porducto a actualiza en la bodega correspondiente
-                                product_warehouse = ProductWarehouse.objects.filter(
-                                    warehouse__is_central=1, product_id=int(p['id'])).first()
-                                # Actualizamos el stock de la bdoega CENTRAL
-                                product_warehouse.stock -= p['cant']
-                                warehouse_update.append(product_warehouse)
+                            if controlStock:
+                                # Búsqueda en el diccionario (extremadamente rápida, sin acceso a BD)
+                                product_warehouse = pw_map.get((int(p['id']), int(p['warehouse_id'])))
+
+                                if product_warehouse:
+                                    # Actualizamos el stock del objeto en memoria
+                                    product_warehouse.stock -= int(p['cant'])
+                                    warehouse_update.append(product_warehouse)
+
+                            # if sale.company.control_stock:
+                            #     # Buscamos el porducto a actualiza en la bodega correspondiente
+                            #     product_warehouse = ProductWarehouse.objects.filter(
+                            #         warehouse__is_central=1, product_id=int(p['id'])).first()
+                            #     # Actualizamos el stock de la bdoega CENTRAL
+                            #     product_warehouse.stock -= p['cant']
+                            #     warehouse_update.append(product_warehouse)
 
                         # for i in products:
                         #     detail = SaleProduct()
@@ -376,7 +491,7 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
 
                         # Agregamos el detalle de la venta
                         SaleProduct.objects.bulk_create(sale_product_create)
-                        if sale.company.control_stock:
+                        if controlStock:
                             # Actualizamos los porductos vendidos en la bodega central
                             ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
                         sale.calculate_invoice()
@@ -482,6 +597,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
         data = []
         sale = self.get_object()
         for i in sale.saleproduct_set.all():
+            print(i.cant)
             item = i.product.toJSON()
             # if i.restore:
             #     item['cant'] = 1
@@ -489,7 +605,9 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
             #     item['cant'] = i.cant
             item['subtotal'] = f'{i.subtotal:.2f}'
             item['restore'] = i.restore
+            item['warehouse_id'] = i.warehouse.id
             item['initial_restore'] = i.restore
+            item['initial_amount'] = i.cant
             item['applied_price'] = i.applied_price
             item['cant'] = i.cant
             item['pvp_list'] = {'pvp': item['pvp'], 'pvp2': item['pvp2'], 'pvp3': item['pvp3']}
@@ -513,38 +631,129 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     item['value'] = i.__str__()
                     data.append(item)
             elif action == 'search_products_select2':
+                current_user = request.user  # 💡NUEVA VARIABLE CLAVE: Obtener el usuario actual
                 data = []
                 ids_exclude = json.loads(request.POST['ids'])
                 term = request.POST['term'].strip()
-                data.append({'id': term, 'text': term})
-                # Verificar la opcion de llevar el control del stock de la empresa
-                company = cache.get(f'cache_{request.tenant.id}')
-                controlStock = bool(company)
 
-                if controlStock:
-                    product_warehouse = ProductWarehouse.objects.filter(
-                        Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
-                        Q(product__name__icontains=term) | Q(product__code__icontains=term) &
-                        Q(product__is_inventoried=True)).exclude(product_id__in=ids_exclude)[0:10]
+                # Si el término es muy corto, no buscar
+                if len(term) < 3:
+                    return JsonResponse(data, safe=False)
                 else:
-                    product_warehouse = Product.objects.filter(
-                        Q(name__icontains=term) | Q(code__icontains=term))
+                    data.append({'id': term, 'text': term})
+                    # Verificar la opcion de llevar el control del stock de la empresa
+                    # company = cache.get(f'cache_{request.tenant.id}')
+                    # controlStock = bool(company)
+                    controlStock = bool(COMPANY.get(f'{request.tenant}').get('control_stock'))
 
-                for i in product_warehouse:
                     if controlStock:
-                        item = i.product.toJSON()
+                        # product_warehouse = ProductWarehouse.objects.filter(
+                        #     Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
+                        #     Q(product__name__icontains=term) | Q(product__code__icontains=term) &
+                        #     Q(product__is_inventoried=True)).exclude(product_id__in=ids_exclude)[0:10]
+
+                        # Filtro para la búsqueda en ProductWarehouse
+                        queryset = ProductWarehouse.objects.select_related('product').filter(
+                            # 1. RESTRICCIÓN DE ALMACÉN: El almacén debe estar asignado al usuario actual
+                            Q(warehouse__user=current_user) &
+                            Q(warehouse__status=1) &
+                            Q(stock__gt=0)
+                        ).filter(
+                            # 3. Restricción de búsqueda de producto
+                            Q(product__name__icontains=term) | Q(product__brand__name__icontains=term) | Q(
+                                product__code__icontains=term)
+                        ).filter(
+                            # 4. Restricción de inventariado
+                            product__is_inventoried=True
+                            # ).exclude(product_id__in=ids_exclude).distinct()[:10]
+                        ).exclude(product_id__in=ids_exclude)
+
+                        # 3. Usamos values() para seleccionar solo los campos necesarios y evitar traer el objeto completo
+                        #    Renombramos campos con F() para que coincidan en ambos casos (controlStock y no)
+                        products_data = queryset.values(
+                            'product_id', 'stock', 'product__brand__name', 'product__is_inventoried',
+                            'product__tax', 'warehouse_id', 'warehouse__name',
+                            name=F('product__name'), code=F('product__code'), udm=F('product__udm'),
+                            pvp=F('product__pvp'), pvp2=F('product__pvp2'), pvp3=F('product__pvp3'))[:10]
                     else:
-                        item = i.toJSON()
-                    item['text'] = i.__str__()
-                    item['stock'] = i.stock
-                    item['pvp_list'] = {'pvp': i.pvp, 'pvp2': i.pvp2, 'pvp3': i.pvp3}
-                    item['control_stock'] = controlStock
-                    data.append(item)
+                        queryset = Product.objects.select_related('name').filter(
+                            Q(name__icontains=term) | Q(brand__name__icontains=term) | Q(
+                                code__icontains=term)).exclude(id__in=ids_exclude)[0:10]
+                        # Hacemos lo mismo para el caso sin control de stock
+                        products_data = queryset.values(
+                            'id', 'stock', 'name', 'code', 'udm', 'pvp', 'pvp2', 'pvp3', 'brand__name',
+                            'tax', 'is_inventoried'
+                        )[:10]
+
+                    for p in products_data:
+                        # El ID del producto es 'product_id' en el primer caso y 'id' en el segundo
+                        product_id = p.get('product_id') or p.get('id')
+                        stock = p.get('stock')
+
+                        # Obtenemos la lista de UDM una sola vez si es necesario
+                        udm_display = dict(Product.UDM_CHOICE).get(p['udm'], p['udm'])
+                        brand_name = p.get('brand__name') or p.get('product__brand__name')
+                        tax = p.get('tax') or p.get('product__tax')
+                        warehouse_id = p.get('warehouse_id') or ''
+                        warehouse_name = p.get('warehouse__name') or ''
+                        is_inventoried = p.get('product__is_inventoried') or p.get('is_inventoried')
+                        text = f"{p['code']} | {brand_name} {p['name']} {udm_display}"
+
+                        item = {
+                            'id': product_id,
+                            'text': text,
+                            'full_name': text,
+                            'restore': False,
+                            'warehouse_name': warehouse_name,
+                            'warehouse_id': warehouse_id,
+                            'stock': f'{stock}',
+                            'control_stock': controlStock,
+                            'is_inventoried': is_inventoried,
+                            'tax': tax,
+                            'pvp': p["pvp"],
+                            'pvp_list': {
+                                'pvp': f'{p["pvp"]}',
+                                'pvp2': f'{p["pvp2"]}',
+                                'pvp3': f'{p["pvp3"]}'
+                            },
+                        }
+                        data.append(item)
+                    print(data)
+            # elif action == 'search_products_select2':
+            #     data = []
+            #     ids_exclude = json.loads(request.POST['ids'])
+            #     term = request.POST['term'].strip()
+            #     data.append({'id': term, 'text': term})
+            #     # Verificar la opcion de llevar el control del stock de la empresa
+            #     company = cache.get(f'cache_{request.tenant.id}')
+            #     controlStock = bool(company)
+            #
+            #     if controlStock:
+            #         product_warehouse = ProductWarehouse.objects.filter(
+            #             Q(warehouse__is_central=1) & Q(warehouse__status=1) & Q(stock__gt=0)).filter(
+            #             Q(product__name__icontains=term) | Q(product__code__icontains=term) &
+            #             Q(product__is_inventoried=True)).exclude(product_id__in=ids_exclude)[0:10]
+            #     else:
+            #         product_warehouse = Product.objects.filter(
+            #             Q(name__icontains=term) | Q(code__icontains=term))
+            #
+            #     for i in product_warehouse:
+            #         if controlStock:
+            #             item = i.product.toJSON()
+            #         else:
+            #             item = i.toJSON()
+            #         item['text'] = i.__str__()
+            #         item['stock'] = i.stock
+            #         item['pvp_list'] = {'pvp': i.pvp, 'pvp2': i.pvp2, 'pvp3': i.pvp3}
+            #         item['control_stock'] = controlStock
+            #         data.append(item)
             elif action == 'edit':
                 with transaction.atomic():
                     details = json.loads(request.POST['details'])
                     products = json.loads(request.POST['products'])
                     products_delete = json.loads(request.POST['products_delete'])
+                    # Comprobamso si llevamos el control del stock
+                    controlStock = bool(COMPANY.get(f'{request.tenant}').get('control_stock'))
 
                     # Unificamos ambas listas para poder hacer una sola actualizacion masiva
                     totalProducts = products + products_delete
@@ -572,8 +781,6 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     sale_product_create = []
                     warehouse_update = []
 
-                    # Comprobamso si llevamos el control del stock
-                    company = Company.objects.first()
                     for p in totalProducts:
                         print(p['delete']) if 'delete' in p else print('Sin delete', p['name'])
                         restore = bool(p['restore'])  # Fue devuelto si o no
@@ -591,6 +798,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                             saleproduct = SaleProduct(
                                 sale_id=sale.id,
                                 product_id=int(p['id']),
+                                warehouse_id=int(p['warehouse_id']) if p['warehouse_id'] else None,
                                 restore=bool(p['restore']),
                                 cant=int(p['cant']),
                                 price=float(p['pvp']),
@@ -599,10 +807,14 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                             )
                             sale_product_create.append(saleproduct)
 
-                        if company.control_stock:
+                        if controlStock:
                             # Buscamos el porducto a actualiza en la bodega correspondiente
+                            # product_warehouse = ProductWarehouse.objects.filter(
+                            #     warehouse__is_central=1, product_id=int(p['id'])).first()
+                            # Se buscara los productos conforme el id de la bodega de la cual
+                            # se estan facturando
                             product_warehouse = ProductWarehouse.objects.filter(
-                                warehouse__is_central=1, product_id=int(p['id'])).first()
+                                warehouse_id=int(p['warehouse_id']), product_id=int(p['id'])).first()
 
                             if 'delete' in p:
                                 product_warehouse.stock += p['cant']
@@ -627,7 +839,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                             warehouse_update.append(product_warehouse)
 
                     SaleProduct.objects.bulk_create(sale_product_create)
-                    if company.control_stock:
+                    if controlStock:
                         ProductWarehouse.objects.bulk_update(warehouse_update, ['stock'])
 
                     # for p in products:

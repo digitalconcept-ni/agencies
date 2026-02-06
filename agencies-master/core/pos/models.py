@@ -8,8 +8,9 @@ from django.forms import model_to_dict
 from client.models import Client
 from config import settings
 from core.pos.choices import genders, payment, municipality, tax_type, printer
-from core.user.models import User
 
+
+# from core.user.models import User
 
 class Company(models.Model):
     tenant = models.ForeignKey(Client, null=True, on_delete=models.CASCADE)  # new in 09-04-25
@@ -140,6 +141,12 @@ class Warehouse(models.Model):
     description = models.CharField(max_length=100, verbose_name='Descripcion', null=True, blank=True)
     status = models.IntegerField(choices=STATUS_CHOICE, default=1, verbose_name='Estado')
     is_central = models.IntegerField(choices=CENTRAL_CHOICE, default=1, verbose_name='¿Es central?')
+    user = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        related_name='warehouse',
+        verbose_name='Usuarios permitidos'
+    )
 
     class Meta:
         verbose_name = 'Bodega'
@@ -150,9 +157,10 @@ class Warehouse(models.Model):
         return f'{self.code} | {self.name}'
 
     def toLIST(self):
+        user = [u.username for u in self.user.all()]
         item = [
             self.id, self.code, self.name, self.get_is_central_display(), self.description, self.get_status_display(),
-            self.id
+            user, self.id
         ]
         return item
 
@@ -185,8 +193,8 @@ class Product(models.Model):
     # supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, verbose_name='Proveedor')
     brand = models.ForeignKey(Brands, on_delete=models.CASCADE, verbose_name='Marca', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
-    name = models.CharField(max_length=150, verbose_name='Nombre')
-    code = models.CharField(max_length=13, unique=True, verbose_name='Codigo de producto')
+    name = models.CharField(max_length=150, verbose_name='Nombre', db_index=True)
+    code = models.CharField(max_length=13, unique=True, verbose_name='Codigo de producto', db_index=True)
     tax = models.CharField(max_length=7, default='exento', choices=tax_type, verbose_name='Impuesto')
     um = models.CharField(max_length=20, null=True, blank=True, verbose_name='Unidad de medida')
     udm = models.CharField(max_length=10, default='und', choices=UDM_CHOICE, verbose_name='Unidad de medida')
@@ -304,7 +312,7 @@ class ProductWarehouse(models.Model):
 class Shopping(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, verbose_name='Proveedor')
     warehouse = models.ForeignKey(Warehouse, null=True, on_delete=models.CASCADE, verbose_name='Bodega')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Usuario')
     cant = models.IntegerField(default=0)
     invoice_number = models.CharField(max_length=10, default='F000000000')
     register = models.BooleanField(default=True)
@@ -422,7 +430,7 @@ class ShoppingDetail(models.Model):
 
 
 class Client(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     names = models.CharField(max_length=150, verbose_name='Nombres')
     dni = models.CharField(max_length=14, unique=True, default='0010101010034S', verbose_name='RUC')
     phone_number = models.CharField(max_length=8, default=87878787, verbose_name='Numero de telefono')
@@ -524,7 +532,7 @@ class Assets(models.Model):
 
 class Sale(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Usuario')
     user_commissions = models.CharField(max_length=20, null=True, blank=True, verbose_name='Usuario a comisionar')
     endofday = models.BooleanField(default=False)
     applied = models.BooleanField(default=False)
@@ -618,8 +626,9 @@ class Sale(models.Model):
 class SaleProduct(models.Model):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, null=True, blank=True)
     price = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)
-    applied_price = models.CharField(max_length=4, null=True)# Precio aplicado
+    applied_price = models.CharField(max_length=4, null=True)  # Precio aplicado
     cant = models.IntegerField(default=0)
     # Con este campo vamos a validar que productos de la factura los devolucionaron
     restore = models.BooleanField(default=False, verbose_name='Devolucion')
@@ -646,7 +655,7 @@ class SaleProduct(models.Model):
 # Modelo para control de perdidas de productos
 
 class loss(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date_joined = models.DateField(default=datetime.now)
     time_joined = models.TimeField(default=datetime.now)
     total = models.DecimalField(default=0.00, max_digits=9, decimal_places=2)

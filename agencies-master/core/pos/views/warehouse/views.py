@@ -6,9 +6,9 @@ from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, FormView, UpdateView
 
-from core.pos.forms import ShoppingForm, SupplierForm, ProductForm, WarehouseForm
+from core.pos.forms import ProductForm, WarehouseForm
 from core.pos.mixins import ValidatePermissionRequiredMixin, ExistsCompanyMixin
-from core.pos.models import Product, Shopping, Supplier, ShoppingDetail, Warehouse, ProductWarehouse
+from core.pos.models import Product, Shopping, Warehouse, ProductWarehouse
 from core.reports.forms import ReportForm
 
 
@@ -31,7 +31,8 @@ class WarehouseListView(ValidatePermissionRequiredMixin, FormView):
                 sho.delete()
             elif action == 'search_products_detail':
                 data = []
-                for i in ProductWarehouse.objects.select_related().filter(warehouse__id=request.POST['warehouse_id']):
+                query = ProductWarehouse.objects.select_related().filter(warehouse__id=request.POST['warehouse_id'])
+                for i in query:
                     data.append([i.product.__str__(), f'{i.stock:.2f}'])
             else:
                 data['error'] = 'Ha ocurrido un error'
@@ -133,7 +134,7 @@ class WarehouseCreateView(ValidatePermissionRequiredMixin, CreateView):
         return context
 
 
-class WarehouseUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, UpdateView):
+class WarehouseUpdateView(ValidatePermissionRequiredMixin, UpdateView):
     model = Warehouse
     form_class = WarehouseForm
     template_name = 'warehouse/create.html'
@@ -141,11 +142,16 @@ class WarehouseUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, U
     url_redirect = success_url
     permission_required = 'change_bodega'
 
-    def get_form(self, form_class=None):
-        instance = self.get_object()
-        form = WarehouseForm(instance=instance)
-        # form.fields['supplier'].queryset = Supplier.objects.filter(id=instance.supplier.id)
-        return form
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        # print(self.object.user.all())
+        return super().dispatch(request, *args, **kwargs)
+
+    # def get_form(self, form_class=None):
+    #     instance = self.get_object()
+    #     form = WarehouseForm(instance=instance)
+    #     # form.fields['supplier'].queryset = Supplier.objects.filter(id=instance.supplier.id)
+    #     return form
 
     def get_details_product(self):
         data = []
@@ -180,7 +186,11 @@ class WarehouseUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, U
                 term = request.POST['term'].strip()
                 data.append({'id': term, 'text': term})
                 # products = Product.objects.filter(name__icontains=term).filter(Q(stock__gt=0) | Q(is_inventoried=False))
-                products = Product.objects.filter(name__icontains=term)
+                # products = Product.objects.filter(name__icontains=term)
+                products = Product.objects.filter(
+                    Q(name__icontains=term) | Q(brand__name__icontains=term) | Q(code__icontains=term)).exclude(
+                    id__in=ids_exclude)[0:10]
+
                 for i in products:
                     item = i.toJSON()
                     item['text'] = i.__str__()
@@ -190,6 +200,8 @@ class WarehouseUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, U
                     # Json donde optenemos los productos insertados por el usuario
                     products = json.loads(request.POST['products'])
                     # products_delete = json.loads(request.POST['products_delete'])
+                    # Json con los IDs de los usuarios seleccionados
+                    selected_users_ids = request.POST.getlist('user', '[]')
 
                     w = self.get_object()
                     w.code = request.POST['code']
@@ -197,6 +209,10 @@ class WarehouseUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, U
                     w.description = request.POST['description']
                     w.status = request.POST['status']
                     w.save()
+
+                    # Limpiar y agregar usuarios
+                    w.user.clear()  # Elimina todos los usuarios existentes de la relación
+                    w.user.add(*selected_users_ids)  # Agrega los nuevos usuarios por sus IDs
 
                     w.productwarehouse_set.all().delete()
 

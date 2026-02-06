@@ -66,14 +66,15 @@ $(function () {
                     data.pvp = select;
                     data.applied_price = applied_price;
                 }
-
                 tableConf.listProducts();
             }
             if (result.isDenied) {
-                let delItem = sale.products.splice(data.index, 1);
-                delItem[0].delete = true;
-                sale.products_delete.push(delItem[0]);
-                tableConf.listProducts();
+                if (data.hasOwnProperty('index')) {
+                    let delItem = sale.products.splice(data.index, 1);
+                    delItem[0].delete = true;
+                    sale.products_delete.push(delItem[0]);
+                    tableConf.listProducts();
+                }
             }
         });
     }
@@ -84,9 +85,10 @@ $(function () {
         language: 'es',
         allowClear: true,
         ajax: {
-            delay: 250,
+            delay: 300,
             type: 'POST',
             url: pathname,
+            minimumInputLength: 3,
             headers: {
                 'X-CSRFToken': csrftoken
             },
@@ -114,8 +116,10 @@ $(function () {
                 return repo.text;
             }
             var stock = '';
+            var warehouse = '';
             if (repo.control_stock) {
                 stock += `<b>Stock:</b> ${repo.is_inventoried ? repo.stock : 'Sin stock'} <br>`;
+                warehouse += `<b>Bodega:</b> ${repo.warehouse_name} <br>`;
             }
 
             var tax = '';
@@ -134,7 +138,8 @@ $(function () {
                 '<div class="col-lg-11 text-left shadow-sm">' +
                 //'<br>' +
                 '<p style="margin-bottom: 0;">' +
-                '<b>Nombre:</b> ' + repo.full_name + '<br>' +
+                '<b>Nombre:</b> ' + repo.text + '<br>' +
+                warehouse +
                 stock +
                 // '<b>Stock:</b> ' + stock + '<br>' +
                 '<b>PVP:</b> <span class="badge bg-secondary">' + repo.pvp + '</span>' + '<br>' +
@@ -201,7 +206,7 @@ $(function () {
             if (action === 'edit') {
                 if (sale.products[tr.row].hasOwnProperty('before') &&
                     !sale.products[tr.row].hasOwnProperty('initial_amount')) {
-                    sale.products[tr.row]['initial_amount'] = sale.products[tr.row][e.target.name];
+                    sale.products[tr.row]['initial_amount'] = sale.products[tr.row][e.target.cant];
                 }
             }
 

@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from core.pos.models import *
+from core.user.models import User
 
 
 class CategoryForm(ModelForm):
@@ -102,6 +103,9 @@ class ProductForm(ModelForm):
 
 
 class WarehouseForm(ModelForm):
+    def __init__(self, *args, request=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request
 
     category = forms.ModelChoiceField(queryset=Category.objects.all(),
                                       widget=forms.Select(attrs={'class': 'select2'}),
@@ -109,12 +113,13 @@ class WarehouseForm(ModelForm):
 
     class Meta:
         model = Warehouse
-        fields = 'code', 'name', 'description', 'status'
+        fields = 'code', 'name', 'description', 'status', 'user'
         widgets = {
             'status': forms.Select(attrs={
                 'class': 'select2',
                 # 'style': 'width: 100%'
             }),
+            'user': forms.SelectMultiple(attrs={'class': 'form-control select2'}),
         }
 
     # def save(self, commit=True):

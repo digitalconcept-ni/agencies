@@ -271,21 +271,10 @@ $(function () {
                     },
                 },
                 columns: [
-                    {
-                        "data": "product.name"
-                    },
-                    {
-                        "data": "product.brand.name"
-                    },
-                    {
-                        "data": "price"
-                    },
-                    {
-                        "data": "cant"
-                    },
-                    {
-                        "data": "subtotal"
-                    },
+                    {"data": "product"},
+                    {"data": "price"},
+                    {"data": "cant"},
+                    {"data": "subtotal"},
                 ],
                 columnDefs: [
                     {
@@ -296,25 +285,25 @@ $(function () {
                         targets: [0],
                         render: function (data, type, row) {
                             if (row.restore) {
-                                return `<span style="color: red">${data}</span>`
+                                if (row.warehouse !== '') {
+                                    return `<span class="badge bg-primary">${row.warehouse}</span> <span style="color: red">${data}</span>`
+                                } else {
+                                    return `<span style="color: red">${name}</span>`
+                                }
                             } else {
-                                return data
+                                if (row.warehouse !== '') {
+                                    return `<span class="badge bg-primary">${row.warehouse}</span> ${data}`
+                                } else {
+                                    return data
+                                }
                             }
 
                         }
                     },
                     {
-                        targets: [-1, -3],
-                        class: 'text-center',
+                        targets: [2, 3],
                         render: function (data) {
                             return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        targets: [-2],
-                        class: 'text-center',
-                        render: function (data, type, row) {
-                            return data;
                         }
                     },
                 ],
