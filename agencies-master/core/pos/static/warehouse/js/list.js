@@ -8,6 +8,15 @@ var warehouse = {
             class: 'text-center'
         },
         {
+            targets: [-2],
+            orderable: false,
+            render: function (data, type, row) {
+                return `<span class="m-0" style="border-radius: 0.3rem;   background-color: #d2d6de;border: 1px solid #d2d6de
+            color: #444;margin: 5px 0 0 50px;padding: 5px 10px;"> <b>${data}</b></span>`;
+
+            }
+        },
+        {
             targets: [-1],
             orderable: false,
             render: function (data, type, row) {
@@ -25,7 +34,7 @@ var warehouse = {
         let data = {
             'data': {'action': 'search'},
             'inserInto': 'rowList',
-            'th': ['ID', 'Codigo', 'Nombre', '¿Es central?', 'Descripción', 'Estato', 'Opciones'],
+            'th': ['ID', 'Codigo', 'Nombre', '¿Es central?', 'Descripción', 'Estato', 'Usuarios permitidos', 'Opciones'],
             'table': 'tableList',
             'config': this.config,
             'modal': false,

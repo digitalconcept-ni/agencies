@@ -52,10 +52,13 @@
                         <button type="submit" class="btn btn-success" id="send-form">
                             <i class="bi bi-floppy"></i>
                         </button>
-                        <button class="btn btn-success btnAddClient"
-                                type="button">
-                            <i class="bi bi-person-add"></i>
-                        </button>
+                        {% if action != 'edit' %}
+                            <button class="btn btn-success btnAddClient"
+                                    type="button">
+                                <i class="bi bi-person-add"></i>
+                            </button>
+                        {% endif %}
+
                     </div>
 
                     <div class="row pt-3 pb-2">

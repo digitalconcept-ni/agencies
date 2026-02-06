@@ -597,7 +597,6 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
         data = []
         sale = self.get_object()
         for i in sale.saleproduct_set.all():
-            print(i.cant)
             item = i.product.toJSON()
             # if i.restore:
             #     item['cant'] = 1
@@ -605,7 +604,7 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
             #     item['cant'] = i.cant
             item['subtotal'] = f'{i.subtotal:.2f}'
             item['restore'] = i.restore
-            item['warehouse_id'] = i.warehouse.id
+            item['warehouse_id'] = i.warehouse.id if i.warehouse else None
             item['initial_restore'] = i.restore
             item['initial_amount'] = i.cant
             item['applied_price'] = i.applied_price

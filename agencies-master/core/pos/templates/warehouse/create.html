@@ -32,6 +32,7 @@
                 <div class="container">
 
                     {# FILA DE LA INFOMRACION DE LA BODEGA #}
+
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
@@ -42,7 +43,8 @@
                                     <div class="row mt-3">
                                         {% for field in form.visible_fields %}
 
-                                            {% if field.label != 'Category' %}
+                                            {% if field.label != 'Category' and field.label != 'Usuarios permitidos' %}
+
                                                 <div class="col mb-3">
                                                     <label class="form-label"
                                                            for="{{ field.id_for_label }}">{{ field.label }}:</label>
@@ -52,6 +54,18 @@
                                             {% endif %}
 
 
+                                        {% endfor %}
+                                    </div>
+
+                                    <div class="row">
+                                        {% for field in  form.visible_fields %}
+                                            {% if field.label == 'Usuarios permitidos' %}
+                                                <div class="col">
+                                                    <label class="form-check-label"
+                                                           for="{{ field.id_for_label }}">{{ field.label }}: </label>
+                                                    {{ field }}
+                                                </div>
+                                            {% endif %}
                                         {% endfor %}
                                     </div>
                                 </div>
