@@ -781,7 +781,6 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                     warehouse_update = []
 
                     for p in totalProducts:
-                        print(p['delete']) if 'delete' in p else print('Sin delete', p['name'])
                         restore = bool(p['restore'])  # Fue devuelto si o no
 
                         # Si es True se toma como devolucion y se agrega a cantidad en 0 para que no se tome encuenta
