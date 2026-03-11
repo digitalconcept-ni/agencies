@@ -349,7 +349,8 @@ class SaleCreateView(deviceVerificationMixin, ExistsCompanyMixin, ValidatePermis
 
                         # Obtenemos la lista de UDM una sola vez si es necesario
                         udm_display = dict(Product.UDM_CHOICE).get(p['udm'], p['udm'])
-                        brand_name = p.get('brand__name') or p.get('product__brand__name')
+                        brand = p.get('brand__name') or p.get('product__brand__name')
+                        brand_name = brand if brand is not None else ''
                         tax = p.get('tax') or p.get('product__tax')
                         warehouse_id = p.get('warehouse_id') or ''
                         warehouse_name = p.get('warehouse__name') or ''
@@ -691,7 +692,8 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
 
                         # Obtenemos la lista de UDM una sola vez si es necesario
                         udm_display = dict(Product.UDM_CHOICE).get(p['udm'], p['udm'])
-                        brand_name = p.get('brand__name') or p.get('product__brand__name')
+                        brand = p.get('brand__name') or p.get('product__brand__name')
+                        brand_name = brand if brand is not None else ''
                         tax = p.get('tax') or p.get('product__tax')
                         warehouse_id = p.get('warehouse_id') or ''
                         warehouse_name = p.get('warehouse__name') or ''
@@ -717,7 +719,6 @@ class SaleUpdateView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, Update
                             },
                         }
                         data.append(item)
-                    print(data)
             # elif action == 'search_products_select2':
             #     data = []
             #     ids_exclude = json.loads(request.POST['ids'])
