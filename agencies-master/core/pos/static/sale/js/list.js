@@ -184,11 +184,14 @@ $(function () {
         let _this = $(this);
 
         addDateGuide();
-        findHours();
 
         // $("#inputUsername").val()
         let usernameGuide = $("#selectPreSales option:selected").text();
         $('#usernameGuide').val(usernameGuide);
+
+        if (_this.val() !== '') {
+            findHours();
+        }
 
         if (_this.val() !== '' && startHour.val() !== '' && endHour.val() !== '') {
             $('#btnDonwloadGuide').removeClass('disabled');
@@ -199,7 +202,10 @@ $(function () {
 
     // Evento que nos ayudara a buscar las horas del preventa segun la fecha seleccionada
     inputDateGuide.on('change', function (e) {
-        findHours();
+
+        if ($("#selectPreSales").val() !== '') {
+            findHours();
+        }
     })
 
     $('#btnDonwloadGuide').on('click', function (e) {
