@@ -120,7 +120,14 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 f = open(os.path.join(directorySchema, 'invoices.pdf'), 'wb')
                 f.write(pdfInvoice)
                 f.close()
-                pd = mergerPdf(directorySchema, param['tenant'])
+
+                # ACTUALIZAMOS ENVIANDO EL NOMBRE DEL SUSUARIO A QUIEN PERTENCE LA FACTURA Y GUIA DE ENTREGA
+                nergeInformation = {
+                    'directory': directorySchema,
+                    'tenant': param['tenant'],
+                    'user': user
+                }
+                pd = mergerPdf(nergeInformation)
                 # return HttpResponse(pd['path'], content_type='application/pdf')
                 data['path'] = pd['path']
                 return data

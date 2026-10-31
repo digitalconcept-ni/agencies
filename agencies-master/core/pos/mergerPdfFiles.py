@@ -3,16 +3,16 @@ from datetime import datetime, timedelta
 from PyPDF2 import PdfMerger, PdfReader
 
 
-def mergerPdf(directorySchema, tenant_name):
+def mergerPdf(information : dict):
     try:
         data = {}
         today = datetime.now().date()
         yesterday = today - timedelta(days=1)
-        dirname = directorySchema
+        dirname = information['directorySchema']
         # dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
         invoice = dirname + '/invoices.pdf'
         guide = dirname + '/guide.pdf'
-        finalName = 'guia-facturas-' + str(today) + '.pdf'
+        finalName = 'guia-facturas-'+ information['user'] + str(today) + '.pdf'
         beforeGuide = dirname + '/guia-facturas-' + str(yesterday) + '.pdf'
 
         # REMOVE GUIDE AND INVOICES FROM THE PREVIOUS DAY
@@ -28,7 +28,7 @@ def mergerPdf(directorySchema, tenant_name):
             merger.write(f)
             merger.close()
         # FINAL PATH WHERE THE FILE IS STORAGE
-        data['path'] = '/media/merger/' + tenant_name + '/' + finalName
+        data['path'] = '/media/merger/' + information['directorySchema'] + '/' + finalName
     except Exception as e:
         data['error'] = str(e)
     return data
