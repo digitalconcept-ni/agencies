@@ -12,7 +12,7 @@ def mergerPdf(information: dict):
         # dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
         invoice = dirname + '/invoices.pdf'
         guide = dirname + '/guide.pdf'
-        finalName = f'guia-facturas-{information["user"]}{str(today)}.pdf'
+        finalName = f'guia-facturas-{information["user"]}-{str(today)}.pdf'
         beforeGuide = f'{dirname}/guia-facturas-{str(yesterday)}.pdf'
 
         # REMOVE GUIDE AND INVOICES FROM THE PREVIOUS DAY
