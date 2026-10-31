@@ -122,12 +122,12 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 f.close()
 
                 # ACTUALIZAMOS ENVIANDO EL NOMBRE DEL SUSUARIO A QUIEN PERTENCE LA FACTURA Y GUIA DE ENTREGA
-                nergeInformation = {
+                mergeInformation = {
                     'directory': directorySchema,
                     'tenant': param['tenant'],
                     'user': user
                 }
-                pd = mergerPdf(nergeInformation)
+                pd = mergerPdf(mergeInformation)
                 # return HttpResponse(pd['path'], content_type='application/pdf')
                 data['path'] = pd['path']
                 return data
