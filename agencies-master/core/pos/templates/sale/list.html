@@ -51,6 +51,9 @@
                     <div class="form-group">
                         <label for="idPreSeles" class="form-label">Seleccionar usuario:</label>
                         <div class="input-group mb-3">
+                            {# AGREGAMOS UN INPURTA PARA OPTENER EL NOMBRE DE USUARIO #}
+                            <input type="hidden" value="" id="usernameGuide">
+
                             <select name="idPreSeles" id="selectPreSales" class="form-control select2">
                                 <option value="">Selecciona el preventa</option>
                                 {% for u in pre_sales %}

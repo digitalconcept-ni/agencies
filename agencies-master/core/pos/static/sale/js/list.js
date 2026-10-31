@@ -141,7 +141,6 @@ $(function () {
             processData: false,
             contentType: false,
             success: function (request) {
-                console.log(request)
                 if (!request.hasOwnProperty('error')) {
                     if (request.length !== 0) {
                         // Agregamso la hora a los inputs
@@ -186,6 +185,10 @@ $(function () {
 
         addDateGuide();
         findHours();
+
+        // $("#inputUsername").val()
+        let usernameGuide = $("#selectPreSales option:selected").text();
+        $('#usernameGuide').val(usernameGuide);
 
         if (_this.val() !== '' && startHour.val() !== '' && endHour.val() !== '') {
             $('#btnDonwloadGuide').removeClass('disabled');

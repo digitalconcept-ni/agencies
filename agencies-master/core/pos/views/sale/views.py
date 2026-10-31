@@ -125,7 +125,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 mergeInformation = {
                     'directory': directorySchema,
                     'tenant': param['tenant'],
-                    'user': user
+                    'user': param['usernameGuide'],
                 }
                 pd = mergerPdf(mergeInformation)
                 # return HttpResponse(pd['path'], content_type='application/pdf')
@@ -176,6 +176,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 reprint_bool = (reprint_str and reprint_str.lower() == 'true')
                 param = {
                     'id': request.POST['id'],
+                    'usernameGuide': request.POST['usernameGuide'],
                     'tenant': request.tenant.schema_name,
                     'user': request.user,
                     'uri': request.build_absolute_uri(),
