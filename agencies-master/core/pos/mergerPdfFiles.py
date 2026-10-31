@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from PyPDF2 import PdfMerger, PdfReader
 
 
-def mergerPdf(information : dict):
+def mergerPdf(information: dict):
     try:
         data = {}
         today = datetime.now().date()
