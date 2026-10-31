@@ -135,7 +135,7 @@ class SaleListView(ExistsCompanyMixin, ValidatePermissionRequiredMixin, FormView
                 data['info'] = 'No se encontraron ventas registradas del preventa'
                 return data
         except  Exception as e:
-            data['error'] = str(e)
+            data['error'] = F'ERROR GUIA: {str(e)}'
         return data
 
     def post(self, request, *args, **kwargs):

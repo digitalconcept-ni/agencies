@@ -12,8 +12,8 @@ def mergerPdf(information: dict):
         # dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
         invoice = dirname + '/invoices.pdf'
         guide = dirname + '/guide.pdf'
-        finalName = 'guia-facturas-' + information['user'] + str(today) + '.pdf'
-        beforeGuide = dirname + '/guia-facturas-' + str(yesterday) + '.pdf'
+        finalName = f'guia-facturas-{information["user"]}{str(today)}.pdf'
+        beforeGuide = f'{dirname}/guia-facturas-{str(yesterday)}.pdf'
 
         # REMOVE GUIDE AND INVOICES FROM THE PREVIOUS DAY
         if os.path.exists(beforeGuide): os.remove(beforeGuide)
@@ -28,7 +28,7 @@ def mergerPdf(information: dict):
             merger.write(f)
             merger.close()
         # FINAL PATH WHERE THE FILE IS STORAGE
-        data['path'] = '/media/merger/' + information['tenant'] + '/' + finalName
+        data['path'] = f'/media/merger/{information["tenant"]}/{finalName}'
     except Exception as e:
-        data['error'] = str(e)
+        data['error'] = f'ERROR MERGER PDF FILE: {str(e)}'
     return data
