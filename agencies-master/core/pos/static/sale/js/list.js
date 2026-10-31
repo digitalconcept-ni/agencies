@@ -205,6 +205,7 @@ $(function () {
     $('#btnDonwloadGuide').on('click', function (e) {
         id = $('#selectPreSales').val();
         var param = new FormData();
+        param.append('usernameGuide', $('#usernameGuide').val());
 
         if (startHour.val() !== endHour.val()) {
             param.append('startHour', startHour.val());
