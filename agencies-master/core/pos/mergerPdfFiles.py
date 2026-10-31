@@ -8,7 +8,7 @@ def mergerPdf(information : dict):
         data = {}
         today = datetime.now().date()
         yesterday = today - timedelta(days=1)
-        dirname = information['directorySchema']
+        dirname = information['directory']
         # dirname = os.path.join(settings.MEDIA_ROOT, 'merger')
         invoice = dirname + '/invoices.pdf'
         guide = dirname + '/guide.pdf'
@@ -28,7 +28,7 @@ def mergerPdf(information : dict):
             merger.write(f)
             merger.close()
         # FINAL PATH WHERE THE FILE IS STORAGE
-        data['path'] = '/media/merger/' + information['directorySchema'] + '/' + finalName
+        data['path'] = '/media/merger/' + information['directory'] + '/' + finalName
     except Exception as e:
         data['error'] = str(e)
     return data
